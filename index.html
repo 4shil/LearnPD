@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROBABILITY DISTRIBUTION - Interactive Explorer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="brutal-border">
+        <div class="logo">PROBABILITY DISTRIBUTION</div>
+        <nav>
+            <a href="#home" class="nav-link active">HOME</a>
+            <a href="#explorer" class="nav-link">EXPLORER</a>
+            <a href="#about" class="nav-link">ABOUT</a>
+        </nav>
+    </header>
+
+    <main id="content">
+        <!-- Landing Section -->
+        <section id="home" class="view active">
+            <div class="hero">
+                <h1 class="glitch" data-text="EXPLORE DISTRIBUTIONS">EXPLORE DISTRIBUTIONS</h1>
+                <p class="subtitle">INTERACTIVE PROBABILITY VISUALIZER</p>
+                <div class="teaser-container brutal-border">
+                    <canvas id="teaserCanvas"></canvas>
+                </div>
+                <button class="cta brutal-border" onclick="switchView('explorer')">ENTER EXPLORER</button>
+            </div>
+        </section>
+
+        <!-- Explorer Section -->
+        <section id="explorer" class="view">
+            <div class="explorer-grid">
+                <aside class="controls brutal-border">
+                    <div class="dist-selector">
+                        <label>SELECT DISTRIBUTION</label>
+                        <select id="distSelect" onchange="initDistribution()">
+                            <option value="normal">NORMAL (GAUSSIAN)</option>
+                            <option value="uniform">UNIFORM</option>
+                            <option value="bernoulli">BERNOULLI</option>
+                            <option value="binomial">BINOMIAL</option>
+                            <option value="poisson">POISSON</option>
+                            <option value="exponential">EXPONENTIAL</option>
+                        </select>
+                    </div>
+                    <div id="paramSliders" class="sliders-list">
+                        <!-- Dynamic sliders here -->
+                    </div>
+                    <button class="math-toggle cta-small brutal-border" onclick="toggleMath()">SHOW MATH</button>
+                    <div id="formulaBox" class="formula-box brutal-border hidden">
+                        <!-- Dynamic formula here -->
+                    </div>
+                </aside>
+
+                <div class="graph-area">
+                    <div class="canvas-wrapper brutal-border">
+                        <canvas id="mainCanvas"></canvas>
+                        <div id="brutalReadout" class="readout"></div>
+                    </div>
+                    <div class="intuition-cards">
+                        <div class="card brutal-border">
+                            <h3>WHAT IT IS</h3>
+                            <p id="whatText"></p>
+                        </div>
+                        <div class="card brutal-border">
+                            <h3>WHEN TO USE</h3>
+                            <p id="whenText"></p>
+                        </div>
+                        <div class="card brutal-border">
+                            <h3>MECHANICS</h3>
+                            <p id="mechanicsText"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="view">
+            <div class="about-content brutal-border">
+                <h2>PHILOSOPHY</h2>
+                <p>TEXTBOOKS ARE COWARDLY. FORMULAS ARE SHIELDS.</p>
+                <p>PROB//BRUT STRIPS THE FRILLS. IT IS RAW MATH FOR THE BOLD.</p>
+                <p>NEO-BRUTALISM IS NOT JUST AN AESTHETIC. IT IS A TEACHING WEAPON.</p>
+                <button class="cta-small brutal-border" onclick="switchView('home')">BACK TO REALITY</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="brutal-border">
+        NO GRADIENTS. NO SOFTNESS. JUST TRUTH. // 2026
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

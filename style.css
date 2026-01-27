@@ -1,0 +1,360 @@
+:root {
+    --bg: #FFFFFF;
+    --fg: #000000;
+    --accent: #FFFF00; /* Cyber Yellow */
+    --border-width: 4px;
+    --shadow: 8px 8px 0px 0px #000000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    line-height: 1.2;
+}
+
+/* Brutal Components */
+.brutal-border {
+    border: var(--border-width) solid var(--fg);
+    background: var(--bg);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    margin-bottom: 1rem;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    background: var(--accent);
+    padding: 0.5rem 1rem;
+}
+
+nav {
+    display: flex;
+    gap: 0.5rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--fg);
+    font-weight: bold;
+    margin-left: 0;
+    padding: 0.5rem 1rem;
+    border: 2px solid transparent;
+    font-size: 0.8rem;
+}
+
+nav a:hover, nav a.active {
+    background: var(--accent);
+    border: 2px solid var(--fg);
+}
+
+/* Views */
+.view {
+    display: none;
+    padding: 0 2rem 4rem 2rem;
+    min-height: 80vh;
+}
+
+.view.active {
+    display: block;
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    margin-top: 4rem;
+}
+
+h1 {
+    font-size: 5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    letter-spacing: -2px;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: var(--fg);
+    color: var(--bg);
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin-bottom: 2rem;
+}
+
+.teaser-container {
+    max-width: 800px;
+    height: 300px;
+    margin: 0 auto 3rem auto;
+    position: relative;
+    box-shadow: var(--shadow);
+}
+
+.teaser-container canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.cta {
+    font-size: 2rem;
+    font-weight: 900;
+    padding: 1.5rem 3rem;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.1s;
+}
+
+.cta:active {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0px 0px #000000;
+}
+
+/* Explorer Grid */
+.explorer-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2rem;
+}
+
+.controls {
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    height: fit-content;
+}
+
+.dist-selector {
+    margin-bottom: 2rem;
+}
+
+.dist-selector label {
+    display: block;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.dist-selector select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 3px solid var(--fg);
+    font-weight: bold;
+    font-size: 1.1rem;
+    background: var(--bg);
+    cursor: pointer;
+}
+
+.sliders-list {
+    margin-bottom: 2rem;
+}
+
+.param-control {
+    margin-bottom: 1.5rem;
+}
+
+.param-control label {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+}
+
+.param-control input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 20px;
+    border: 3px solid var(--fg);
+    background: var(--bg);
+    outline: none;
+}
+
+.param-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    border: 3px solid var(--fg);
+    cursor: pointer;
+}
+
+.cta-small {
+    width: 100%;
+    padding: 1rem;
+    font-weight: 900;
+    background: var(--bg);
+    cursor: pointer;
+}
+
+.cta-small:hover {
+    background: var(--accent);
+}
+
+.formula-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 1.2rem;
+    background: #eee;
+    text-align: center;
+}
+
+/* Graph Area */
+.canvas-wrapper {
+    height: 500px;
+    margin-bottom: 2rem;
+    position: relative;
+    box-shadow: var(--shadow);
+    background: white;
+}
+
+#mainCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+.readout {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 3rem;
+    font-weight: 900;
+    background: var(--accent);
+    padding: 0.5rem 1rem;
+    border: 3px solid var(--fg);
+    pointer-events: none;
+}
+
+/* Cards */
+.intuition-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.card {
+    padding: 1.5rem;
+    box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.card h3 {
+    background: var(--fg);
+    color: var(--bg);
+    padding: 0.3rem 0.6rem;
+    display: inline-block;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.card p {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* About */
+.about-content {
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 3rem;
+    box-shadow: var(--shadow);
+}
+
+.about-content h2 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    background: var(--accent);
+    display: inline-block;
+    padding: 0 1rem;
+}
+
+.about-content p {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+}
+
+/* Footer */
+footer {
+    padding: 2rem;
+    text-align: center;
+    font-weight: 900;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+/* Animations */
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake {
+    animation: shake 0.3s linear;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .explorer-grid {
+        grid-template-columns: 1fr;
+    }
+    h1 {
+        font-size: 3.5rem;
+    }
+    .intuition-cards {
+        grid-template-columns: 1fr;
+    }
+    header {
+        justify-content: center;
+        text-align: center;
+    }
+    .canvas-wrapper {
+        height: 350px;
+    }
+    .readout {
+        font-size: 2rem;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+    .view {
+        padding: 0 1rem 2rem 1rem;
+    }
+}
