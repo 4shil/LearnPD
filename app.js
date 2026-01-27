@@ -14,13 +14,9 @@ let compare2Dist = 'binomial';
 let compare1Params = {};
 let compare2Params = {};
 
-// DOM ELEMENTS
-const mainCanvas = document.getElementById('mainCanvas');
-const teaserCanvas = document.getElementById('teaserCanvas');
-const compareCanvas = document.getElementById('compareCanvas');
-const mainCtx = mainCanvas?.getContext('2d');
-const teaserCtx = teaserCanvas?.getContext('2d');
-const compareCtx = compareCanvas?.getContext('2d');
+// DOM ELEMENTS - Initialized on load
+let mainCanvas, teaserCanvas, compareCanvas;
+let mainCtx, teaserCtx, compareCtx;
 
 // NAVIGATION
 function switchView(viewId) {
@@ -257,11 +253,15 @@ const DISTRIBUTIONS = {
 // INITIALIZATION
 function initDistribution() {
     const select = document.getElementById('distSelect');
+    if (!select) return;
+    
     currentDist = select.value;
     const dist = DISTRIBUTIONS[currentDist];
     
     params = {};
     const sliderContainer = document.getElementById('paramSliders');
+    if (!sliderContainer) return;
+    
     sliderContainer.innerHTML = '';
     
     dist.params.forEach(p => {
@@ -277,17 +277,23 @@ function initDistribution() {
         sliderContainer.appendChild(div);
     });
 
-    document.getElementById('whatText').innerText = dist.what;
-    document.getElementById('whenText').innerText = dist.when;
-    document.getElementById('mechanicsText').innerText = dist.mechanics;
-    document.getElementById('formulaBox').innerText = dist.formula;
+    const whatText = document.getElementById('whatText');
+    const whenText = document.getElementById('whenText');
+    const mechanicsText = document.getElementById('mechanicsText');
+    const formulaBox = document.getElementById('formulaBox');
+    
+    if (whatText) whatText.innerText = dist.what;
+    if (whenText) whenText.innerText = dist.when;
+    if (mechanicsText) mechanicsText.innerText = dist.mechanics;
+    if (formulaBox) formulaBox.innerText = dist.formula;
 
     render();
 }
 
 function updateParam(id, val) {
     params[id] = parseFloat(val);
-    document.getElementById(`val-${id}`).innerText = val;
+    const valSpan = document.getElementById(`val-${id}`);
+    if (valSpan) valSpan.innerText = val;
     render();
 }
 
@@ -299,6 +305,8 @@ function toggleMath() {
     mathVisible = !mathVisible;
     const box = document.getElementById('formulaBox');
     const btn = document.querySelector('.math-toggle');
+    
+    if (!box || !btn) return;
     
     if (mathVisible) {
         box.classList.remove('hidden');
@@ -400,7 +408,10 @@ function render() {
         const mean = dist.mean(params);
         const variance = dist.variance(params);
         const peak = points.reduce((prev, current) => (prev.y > current.y) ? prev : current);
-        document.getElementById('brutalReadout').innerText = `MEAN: ${mean.toFixed(2)} | VAR: ${variance.toFixed(2)} | PEAK: ${(peak.y * 100).toFixed(1)}%`;
+        const readout = document.getElementById('brutalReadout');
+        if (readout) {
+            readout.innerText = `MEAN: ${mean.toFixed(2)} | VAR: ${variance.toFixed(2)} | PEAK: ${(peak.y * 100).toFixed(1)}%`;
+        }
     } else {
         mainCtx.beginPath();
         points.forEach((p, i) => {
@@ -420,7 +431,10 @@ function render() {
         const mean = dist.mean(params);
         const variance = dist.variance(params);
         const peak = points.reduce((prev, current) => (prev.y > current.y) ? prev : current);
-        document.getElementById('brutalReadout').innerText = `MEAN: ${mean.toFixed(2)} | VAR: ${variance.toFixed(2)} | PEAK: ${peak.y.toFixed(3)}`;
+        const readout = document.getElementById('brutalReadout');
+        if (readout) {
+            readout.innerText = `MEAN: ${mean.toFixed(2)} | VAR: ${variance.toFixed(2)} | PEAK: ${peak.y.toFixed(3)}`;
+        }
     }
 }
 
@@ -434,9 +448,14 @@ function resizeCanvas() {
 
 // CALCULATOR FUNCTIONS
 function updateCalcParams() {
-    const distName = document.getElementById('calcDistSelect').value;
+    const select = document.getElementById('calcDistSelect');
+    if (!select) return;
+    
+    const distName = select.value;
     const dist = DISTRIBUTIONS[distName];
     const container = document.getElementById('calcParams');
+    
+    if (!container) return;
     container.innerHTML = '';
     
     dist.params.forEach(p => {
@@ -455,8 +474,12 @@ function updateCalcParams() {
 }
 
 function updateCalcType() {
-    const calcType = document.querySelector('input[name="calcType"]:checked').value;
+    const calcTypeInput = document.querySelector('input[name="calcType"]:checked');
+    if (!calcTypeInput) return;
+    
+    const calcType = calcTypeInput.value;
     const inputsDiv = document.getElementById('calcInputs');
+    if (!inputsDiv) return;
     
     if (calcType === 'interval') {
         inputsDiv.innerHTML = `
@@ -481,31 +504,52 @@ function updateCalcType() {
 function calculate() {
     const distName = document.getElementById('calcDistSelect').value;
     const dist = DISTRIBUTIONS[distName];
-    const calcType = document.querySelector('input[name="calcType"]:checked').value;
+    const calcType = document.querySelector('input[name="calcType"]:checked')?.value;
+    
+    if (!calcType) {
+        document.getElementById('calcResult').innerText = 'Please select a calculation type.';
+        return;
+    }
     
     // Get parameters
     const p = {};
     dist.params.forEach(param => {
         const input = document.getElementById('calcParam_' + param.id);
-        p[param.id] = parseFloat(input.value);
+        if (input) p[param.id] = parseFloat(input.value);
     });
     
     let result = '';
     
     try {
         if (calcType === 'pdf') {
-            const x = parseFloat(document.getElementById('calcX').value);
-            const val = dist.isDiscrete ? dist.pmf(x, p) : dist.pdf(x, p);
-            result = `${dist.isDiscrete ? 'P(X=' + x + ')' : 'f(' + x + ')'} = ${val.toFixed(6)}`;
+            const xInput = document.getElementById('calcX');
+            if (!xInput) {
+                result = 'Error: Input field not found.';
+            } else {
+                const x = parseFloat(xInput.value);
+                const val = dist.isDiscrete ? dist.pmf(x, p) : dist.pdf(x, p);
+                result = `${dist.isDiscrete ? 'P(X=' + x + ')' : 'f(' + x + ')'} = ${val.toFixed(6)}`;
+            }
         } else if (calcType === 'cdf') {
-            const x = parseFloat(document.getElementById('calcX').value);
-            const val = dist.cdf(x, p);
-            result = `P(X ≤ ${x}) = ${val.toFixed(6)}`;
+            const xInput = document.getElementById('calcX');
+            if (!xInput) {
+                result = 'Error: Input field not found.';
+            } else {
+                const x = parseFloat(xInput.value);
+                const val = dist.cdf(x, p);
+                result = `P(X ≤ ${x}) = ${val.toFixed(6)}`;
+            }
         } else if (calcType === 'interval') {
-            const a = parseFloat(document.getElementById('calcA').value);
-            const b = parseFloat(document.getElementById('calcB').value);
-            const val = dist.cdf(b, p) - dist.cdf(a, p);
-            result = `P(${a} ≤ X ≤ ${b}) = ${val.toFixed(6)}`;
+            const aInput = document.getElementById('calcA');
+            const bInput = document.getElementById('calcB');
+            if (!aInput || !bInput) {
+                result = 'Error: Input fields not found.';
+            } else {
+                const a = parseFloat(aInput.value);
+                const b = parseFloat(bInput.value);
+                const val = dist.cdf(b, p) - dist.cdf(a, p);
+                result = `P(${a} ≤ X ≤ ${b}) = ${val.toFixed(6)}`;
+            }
         } else if (calcType === 'quantile') {
             result = 'Quantile calculation not yet implemented for all distributions.';
         }
@@ -513,7 +557,8 @@ function calculate() {
         result = 'Error: ' + e.message;
     }
     
-    document.getElementById('calcResult').innerText = result;
+    const resultDiv = document.getElementById('calcResult');
+    if (resultDiv) resultDiv.innerText = result;
 }
 
 // COMPARE FUNCTIONS
@@ -741,14 +786,27 @@ function runTeaser() {
 
 // STARTUP
 window.onload = () => {
+    // Initialize canvas elements
+    mainCanvas = document.getElementById('mainCanvas');
+    teaserCanvas = document.getElementById('teaserCanvas');
+    compareCanvas = document.getElementById('compareCanvas');
+    
+    if (mainCanvas) mainCtx = mainCanvas.getContext('2d');
+    if (teaserCanvas) teaserCtx = teaserCanvas.getContext('2d');
+    if (compareCanvas) compareCtx = compareCanvas.getContext('2d');
+    
     const hash = window.location.hash.substring(1) || 'home';
     switchView(hash);
     runTeaser();
     
     window.addEventListener('resize', () => {
-        resizeCanvas();
-        resizeCompareCanvas();
-        render();
-        renderCompare();
+        if (mainCanvas && mainCtx) {
+            resizeCanvas();
+            render();
+        }
+        if (compareCanvas && compareCtx) {
+            resizeCompareCanvas();
+            renderCompare();
+        }
     });
 };
