@@ -32,6 +32,7 @@ function switchView(viewId) {
         initDistribution();
     } else if (viewId === 'calculator') {
         updateCalcParams();
+        updateCalcType();
     } else if (viewId === 'compare') {
         resizeCompareCanvas();
         updateCompare(1);
@@ -802,11 +803,15 @@ window.onload = () => {
     window.addEventListener('resize', () => {
         if (mainCanvas && mainCtx) {
             resizeCanvas();
-            render();
+            if (document.getElementById('explorer')?.classList.contains('active')) {
+                render();
+            }
         }
         if (compareCanvas && compareCtx) {
             resizeCompareCanvas();
-            renderCompare();
+            if (document.getElementById('compare')?.classList.contains('active')) {
+                renderCompare();
+            }
         }
     });
 };
