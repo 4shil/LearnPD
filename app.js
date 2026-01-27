@@ -8,11 +8,19 @@ let currentDist = 'normal';
 let params = {};
 let mathVisible = false;
 
+// Compare state
+let compare1Dist = 'normal';
+let compare2Dist = 'binomial';
+let compare1Params = {};
+let compare2Params = {};
+
 // DOM ELEMENTS
 const mainCanvas = document.getElementById('mainCanvas');
 const teaserCanvas = document.getElementById('teaserCanvas');
+const compareCanvas = document.getElementById('compareCanvas');
 const mainCtx = mainCanvas?.getContext('2d');
 const teaserCtx = teaserCanvas?.getContext('2d');
+const compareCtx = compareCanvas?.getContext('2d');
 
 // NAVIGATION
 function switchView(viewId) {
@@ -26,6 +34,13 @@ function switchView(viewId) {
     if (viewId === 'explorer') {
         resizeCanvas();
         initDistribution();
+    } else if (viewId === 'calculator') {
+        updateCalcParams();
+    } else if (viewId === 'compare') {
+        resizeCompareCanvas();
+        updateCompare(1);
+        updateCompare(2);
+        renderCompare();
     }
 }
 
@@ -37,7 +52,7 @@ window.addEventListener('hashchange', () => {
 // MATH UTILS
 const factorial = (n) => {
     if (n === 0 || n === 1) return 1;
-    if (n > 170) return Infinity; // Prevent overflow
+    if (n > 170) return Infinity;
     let res = 1;
     for (let i = 2; i <= n; i++) res *= i;
     return res;
@@ -48,7 +63,6 @@ const combinations = (n, k) => {
     if (k === 0 || k === n) return 1;
     if (k > n / 2) k = n - k;
     
-    // Use logarithms for large values to prevent overflow
     if (n > 170) {
         let logResult = 0;
         for (let i = 0; i < k; i++) {
@@ -64,9 +78,7 @@ const combinations = (n, k) => {
     return res;
 };
 
-// ERROR FUNCTION (for Normal CDF)
 const erf = (x) => {
-    // Abramowitz and Stegun approximation
     const a1 =  0.254829592;
     const a2 = -0.284496736;
     const a3 =  1.421413741;
@@ -248,7 +260,6 @@ function initDistribution() {
     currentDist = select.value;
     const dist = DISTRIBUTIONS[currentDist];
     
-    // Reset params
     params = {};
     const sliderContainer = document.getElementById('paramSliders');
     sliderContainer.innerHTML = '';
@@ -266,7 +277,6 @@ function initDistribution() {
         sliderContainer.appendChild(div);
     });
 
-    // Update Text
     document.getElementById('whatText').innerText = dist.what;
     document.getElementById('whenText').innerText = dist.when;
     document.getElementById('mechanicsText').innerText = dist.mechanics;
@@ -279,6 +289,10 @@ function updateParam(id, val) {
     params[id] = parseFloat(val);
     document.getElementById(`val-${id}`).innerText = val;
     render();
+}
+
+function resetParams() {
+    initDistribution();
 }
 
 function toggleMath() {
@@ -330,7 +344,6 @@ function render() {
     let xMin = dist.range.min;
     let xMax = dist.range.max;
     
-    // Auto-scale X for discrete distributions
     if (dist.autoScaleX && dist.isDiscrete) {
         const mean = dist.mean(params);
         const variance = dist.variance(params);
@@ -342,7 +355,6 @@ function render() {
     const plotWidth = width - 2 * padding;
     const plotHeight = height - 2 * padding;
 
-    // Calculate points
     let points = [];
     let maxY = 0.001;
 
@@ -362,7 +374,6 @@ function render() {
         }
     }
 
-    // Logic for Y scaling
     if (dist.fixedY) {
         maxY = dist.fixedY;
     } else if (dist.autoScaleY) {
@@ -371,10 +382,8 @@ function render() {
         maxY = 1.0;
     }
 
-    // Plot
     mainCtx.lineWidth = 6;
     if (dist.isDiscrete) {
-        // Bar chart for discrete
         const numBars = xMax - xMin + 1;
         const barWidth = Math.min((plotWidth / numBars) * 0.8, 40);
         
@@ -388,13 +397,11 @@ function render() {
             mainCtx.strokeRect(canvasX - barWidth/2, canvasY, barWidth, (height - padding) - canvasY);
         });
         
-        // Calculate statistics
         const mean = dist.mean(params);
         const variance = dist.variance(params);
         const peak = points.reduce((prev, current) => (prev.y > current.y) ? prev : current);
         document.getElementById('brutalReadout').innerText = `MEAN: ${mean.toFixed(2)} | VAR: ${variance.toFixed(2)} | PEAK: ${(peak.y * 100).toFixed(1)}%`;
     } else {
-        // Line chart for continuous
         mainCtx.beginPath();
         points.forEach((p, i) => {
             const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
@@ -405,7 +412,6 @@ function render() {
         mainCtx.strokeStyle = FG;
         mainCtx.stroke();
         
-        // Fill under
         mainCtx.lineTo(padding + plotWidth, height - padding);
         mainCtx.lineTo(padding, height - padding);
         mainCtx.fillStyle = ACCENT;
@@ -423,6 +429,271 @@ function resizeCanvas() {
     if (wrapper && mainCanvas) {
         mainCanvas.width = wrapper.clientWidth;
         mainCanvas.height = wrapper.clientHeight;
+    }
+}
+
+// CALCULATOR FUNCTIONS
+function updateCalcParams() {
+    const distName = document.getElementById('calcDistSelect').value;
+    const dist = DISTRIBUTIONS[distName];
+    const container = document.getElementById('calcParams');
+    container.innerHTML = '';
+    
+    dist.params.forEach(p => {
+        const label = document.createElement('label');
+        label.innerText = p.label + ':';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = 'calcParam_' + p.id;
+        input.value = p.default;
+        input.step = p.step;
+        input.min = p.min;
+        input.max = p.max;
+        container.appendChild(label);
+        container.appendChild(input);
+    });
+}
+
+function updateCalcType() {
+    const calcType = document.querySelector('input[name="calcType"]:checked').value;
+    const inputsDiv = document.getElementById('calcInputs');
+    
+    if (calcType === 'interval') {
+        inputsDiv.innerHTML = `
+            <label>Lower bound (a):</label>
+            <input type="number" id="calcA" step="0.01" value="0">
+            <label>Upper bound (b):</label>
+            <input type="number" id="calcB" step="0.01" value="1">
+        `;
+    } else if (calcType === 'quantile') {
+        inputsDiv.innerHTML = `
+            <label>Probability (p):</label>
+            <input type="number" id="calcP" step="0.01" min="0" max="1" value="0.5">
+        `;
+    } else {
+        inputsDiv.innerHTML = `
+            <label>Value (x):</label>
+            <input type="number" id="calcX" step="0.01" value="0">
+        `;
+    }
+}
+
+function calculate() {
+    const distName = document.getElementById('calcDistSelect').value;
+    const dist = DISTRIBUTIONS[distName];
+    const calcType = document.querySelector('input[name="calcType"]:checked').value;
+    
+    // Get parameters
+    const p = {};
+    dist.params.forEach(param => {
+        const input = document.getElementById('calcParam_' + param.id);
+        p[param.id] = parseFloat(input.value);
+    });
+    
+    let result = '';
+    
+    try {
+        if (calcType === 'pdf') {
+            const x = parseFloat(document.getElementById('calcX').value);
+            const val = dist.isDiscrete ? dist.pmf(x, p) : dist.pdf(x, p);
+            result = `${dist.isDiscrete ? 'P(X=' + x + ')' : 'f(' + x + ')'} = ${val.toFixed(6)}`;
+        } else if (calcType === 'cdf') {
+            const x = parseFloat(document.getElementById('calcX').value);
+            const val = dist.cdf(x, p);
+            result = `P(X ≤ ${x}) = ${val.toFixed(6)}`;
+        } else if (calcType === 'interval') {
+            const a = parseFloat(document.getElementById('calcA').value);
+            const b = parseFloat(document.getElementById('calcB').value);
+            const val = dist.cdf(b, p) - dist.cdf(a, p);
+            result = `P(${a} ≤ X ≤ ${b}) = ${val.toFixed(6)}`;
+        } else if (calcType === 'quantile') {
+            result = 'Quantile calculation not yet implemented for all distributions.';
+        }
+    } catch (e) {
+        result = 'Error: ' + e.message;
+    }
+    
+    document.getElementById('calcResult').innerText = result;
+}
+
+// COMPARE FUNCTIONS
+function updateCompare(which) {
+    const distName = which === 1 ? document.getElementById('compare1Select').value : document.getElementById('compare2Select').value;
+    const dist = DISTRIBUTIONS[distName];
+    const container = which === 1 ? document.getElementById('compare1Params') : document.getElementById('compare2Params');
+    const targetParams = which === 1 ? compare1Params : compare2Params;
+    
+    container.innerHTML = '';
+    
+    dist.params.forEach(p => {
+        targetParams[p.id] = p.default;
+        
+        const div = document.createElement('div');
+        div.style.marginBottom = '1rem';
+        div.innerHTML = `
+            <label style="display:block; margin-bottom:0.5rem; font-weight:bold;">${p.label}: <span id="compare${which}_val_${p.id}">${p.default}</span></label>
+            <input type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.default}" 
+                style="width:100%; height:20px; border:3px solid #000;"
+                oninput="updateCompareParam(${which}, '${p.id}', this.value)">
+        `;
+        container.appendChild(div);
+    });
+    
+    if (which === 1) {
+        compare1Dist = distName;
+    } else {
+        compare2Dist = distName;
+    }
+    
+    renderCompare();
+}
+
+function updateCompareParam(which, id, val) {
+    if (which === 1) {
+        compare1Params[id] = parseFloat(val);
+        document.getElementById(`compare1_val_${id}`).innerText = val;
+    } else {
+        compare2Params[id] = parseFloat(val);
+        document.getElementById(`compare2_val_${id}`).innerText = val;
+    }
+    renderCompare();
+}
+
+function resizeCompareCanvas() {
+    const wrapper = document.querySelector('.compare-canvas-wrapper');
+    if (wrapper && compareCanvas) {
+        compareCanvas.width = wrapper.clientWidth;
+        compareCanvas.height = wrapper.clientHeight;
+    }
+}
+
+function renderCompare() {
+    if (!compareCtx) return;
+    
+    const dist1 = DISTRIBUTIONS[compare1Dist];
+    const dist2 = DISTRIBUTIONS[compare2Dist];
+    const width = compareCanvas.width;
+    const height = compareCanvas.height;
+    const padding = 60;
+    
+    compareCtx.clearRect(0, 0, width, height);
+    
+    // Draw grid and axes
+    compareCtx.strokeStyle = '#eee';
+    compareCtx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+        let x = padding + (i * (width - 2 * padding) / 10);
+        compareCtx.beginPath();
+        compareCtx.moveTo(x, padding);
+        compareCtx.lineTo(x, height - padding);
+        compareCtx.stroke();
+    }
+    
+    compareCtx.strokeStyle = FG;
+    compareCtx.lineWidth = 4;
+    compareCtx.beginPath();
+    compareCtx.moveTo(padding, padding);
+    compareCtx.lineTo(padding, height - padding);
+    compareCtx.lineTo(width - padding, height - padding);
+    compareCtx.stroke();
+    
+    // Find common x range
+    const xMin = Math.min(dist1.range.min, dist2.range.min);
+    const xMax = Math.max(dist1.range.max, dist2.range.max);
+    
+    const plotWidth = width - 2 * padding;
+    const plotHeight = height - 2 * padding;
+    
+    // Plot both distributions
+    [dist1, dist2].forEach((dist, idx) => {
+        const p = idx === 0 ? compare1Params : compare2Params;
+        const color = idx === 0 ? '#FF0000' : '#0000FF';
+        
+        let points = [];
+        let maxY = 0.001;
+        
+        if (dist.isDiscrete) {
+            for (let k = Math.floor(xMin); k <= Math.ceil(xMax); k++) {
+                const y = dist.pmf(k, p);
+                if (y > maxY) maxY = y;
+                points.push({ x: k, y: y });
+            }
+            
+            maxY *= 1.2;
+            const numBars = xMax - xMin + 1;
+            const barWidth = Math.min((plotWidth / numBars) * 0.4, 20);
+            
+            points.forEach(point => {
+                const canvasX = padding + ((point.x - xMin) / (xMax - xMin)) * plotWidth;
+                const canvasY = height - padding - (point.y / maxY) * plotHeight;
+                
+                compareCtx.fillStyle = color + '80';
+                compareCtx.fillRect(canvasX - barWidth/2 + (idx * barWidth), canvasY, barWidth, (height - padding) - canvasY);
+                compareCtx.strokeStyle = color;
+                compareCtx.lineWidth = 2;
+                compareCtx.strokeRect(canvasX - barWidth/2 + (idx * barWidth), canvasY, barWidth, (height - padding) - canvasY);
+            });
+        } else {
+            const steps = 200;
+            for (let i = 0; i <= steps; i++) {
+                const x = xMin + (i / steps) * (xMax - xMin);
+                const y = dist.pdf(x, p);
+                if (y > maxY && isFinite(y)) maxY = y;
+                points.push({ x: x, y: y });
+            }
+            
+            maxY *= 1.2;
+            
+            compareCtx.beginPath();
+            points.forEach((point, i) => {
+                const canvasX = padding + ((point.x - xMin) / (xMax - xMin)) * plotWidth;
+                const canvasY = height - padding - (point.y / maxY) * plotHeight;
+                if (i === 0) compareCtx.moveTo(canvasX, canvasY);
+                else compareCtx.lineTo(canvasX, canvasY);
+            });
+            compareCtx.strokeStyle = color;
+            compareCtx.lineWidth = 4;
+            compareCtx.stroke();
+        }
+    });
+    
+    // Update stats
+    const mean1 = dist1.mean(compare1Params);
+    const var1 = dist1.variance(compare1Params);
+    const mean2 = dist2.mean(compare2Params);
+    const var2 = dist2.variance(compare2Params);
+    
+    document.getElementById('compare1Stats').innerHTML = `
+        <strong>${dist1.name}</strong><br>
+        Mean: ${mean1.toFixed(3)}<br>
+        Variance: ${var1.toFixed(3)}<br>
+        Std Dev: ${Math.sqrt(var1).toFixed(3)}
+    `;
+    
+    document.getElementById('compare2Stats').innerHTML = `
+        <strong>${dist2.name}</strong><br>
+        Mean: ${mean2.toFixed(3)}<br>
+        Variance: ${var2.toFixed(3)}<br>
+        Std Dev: ${Math.sqrt(var2).toFixed(3)}
+    `;
+}
+
+// QUIZ FUNCTIONS
+function checkQuiz(questionNum, answer) {
+    const buttons = document.querySelectorAll('.quiz-btn');
+    const resultDiv = document.getElementById('quiz' + questionNum + 'Result');
+    
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.innerText.toLowerCase() === answer.toLowerCase()) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('incorrect');
+        }
+    });
+    
+    if (answer === 'binomial') {
+        resultDiv.innerHTML = '<p style="color:green; font-weight:bold; margin-top:1rem;">✓ Correct! Binomial models n independent trials with fixed probability.</p>';
     }
 }
 
@@ -476,6 +747,8 @@ window.onload = () => {
     
     window.addEventListener('resize', () => {
         resizeCanvas();
+        resizeCompareCanvas();
         render();
+        renderCompare();
     });
 };

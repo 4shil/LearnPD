@@ -17,7 +17,7 @@ body {
     background-color: var(--bg);
     color: var(--fg);
     overflow-x: hidden;
-    line-height: 1.2;
+    line-height: 1.6;
 }
 
 /* Brutal Components */
@@ -42,6 +42,10 @@ header {
     border-right: none;
     flex-wrap: wrap;
     gap: 1rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1000;
 }
 
 .logo {
@@ -54,6 +58,7 @@ header {
 nav {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 nav a {
@@ -85,11 +90,11 @@ nav a:hover, nav a.active {
 /* Hero */
 .hero {
     text-align: center;
-    margin-top: 4rem;
+    margin-top: 2rem;
 }
 
 h1 {
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: 900;
     text-transform: uppercase;
     margin-bottom: 1rem;
@@ -109,7 +114,7 @@ h1 {
 .teaser-container {
     max-width: 800px;
     height: 300px;
-    margin: 0 auto 3rem auto;
+    margin: 0 auto 2rem auto;
     position: relative;
     box-shadow: var(--shadow);
 }
@@ -119,8 +124,15 @@ h1 {
     height: 100%;
 }
 
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+}
+
 .cta {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 900;
     padding: 1.5rem 3rem;
     background: var(--accent);
@@ -132,6 +144,50 @@ h1 {
 .cta:active {
     transform: translate(4px, 4px);
     box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.cta-secondary {
+    font-size: 1.5rem;
+    font-weight: 900;
+    padding: 1.5rem 3rem;
+    background: var(--bg);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.1s;
+}
+
+.cta-secondary:hover {
+    background: var(--accent);
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.feature-card {
+    padding: 2rem;
+    box-shadow: 6px 6px 0px 0px #000000;
+    text-align: center;
+}
+
+.feature-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    font-weight: bold;
 }
 
 /* Explorer Grid */
@@ -207,6 +263,7 @@ h1 {
     font-weight: 900;
     background: var(--bg);
     cursor: pointer;
+    margin-bottom: 1rem;
 }
 
 .cta-small:hover {
@@ -215,11 +272,16 @@ h1 {
 
 .formula-box {
     margin-top: 1.5rem;
+    margin-bottom: 1rem;
     padding: 1rem;
     font-family: monospace;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     background: #eee;
     text-align: center;
+}
+
+.math-toggle {
+    margin-bottom: 0;
 }
 
 /* Graph Area */
@@ -231,7 +293,7 @@ h1 {
     background: white;
 }
 
-#mainCanvas {
+#mainCanvas, #compareCanvas {
     width: 100%;
     height: 100%;
 }
@@ -240,12 +302,13 @@ h1 {
     position: absolute;
     top: 20px;
     right: 20px;
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 900;
     background: var(--accent);
     padding: 0.5rem 1rem;
     border: 3px solid var(--fg);
     pointer-events: none;
+    line-height: 1.2;
 }
 
 /* Cards */
@@ -274,10 +337,219 @@ h1 {
     font-size: 1.1rem;
 }
 
+/* Calculator Section */
+.calculator-container, .compare-container, .learn-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.calculator-container h2, .compare-container h2, .learn-container h2 {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    background: var(--accent);
+    display: inline-block;
+    padding: 0 1rem;
+}
+
+.calc-grid, .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.calc-panel, .compare-panel {
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.calc-panel h3, .compare-panel h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 0.5rem 1rem;
+    display: inline-block;
+}
+
+.calc-panel select, .compare-panel select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 3px solid var(--fg);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    background: var(--bg);
+}
+
+.calc-panel label {
+    display: block;
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
+.calc-panel input[type="radio"] {
+    margin-right: 0.5rem;
+}
+
+.calc-inputs {
+    margin: 2rem 0;
+}
+
+.calc-inputs input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 3px solid var(--fg);
+    font-weight: bold;
+    margin-top: 0.5rem;
+    background: var(--bg);
+    font-size: 1.1rem;
+}
+
+.calc-result {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 2rem;
+    background: var(--accent);
+    border: 3px solid var(--fg);
+    min-height: 150px;
+}
+
+.calc-params {
+    margin-top: 1rem;
+}
+
+.calc-params label {
+    display: block;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.calc-params input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 3px solid var(--fg);
+    font-weight: bold;
+    background: var(--bg);
+    font-size: 1.1rem;
+}
+
+/* Compare Section */
+.compare-canvas-wrapper {
+    height: 500px;
+    margin: 2rem 0;
+    position: relative;
+    box-shadow: var(--shadow);
+    background: white;
+}
+
+.compare-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.stat-col h4 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 0.5rem 1rem;
+    display: inline-block;
+}
+
+.stat-col p {
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+/* Learn Section */
+.lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.lesson-card {
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.lesson-card h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.lesson-card h4 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    background: var(--accent);
+    padding: 0.3rem 0.8rem;
+    display: inline-block;
+}
+
+.lesson-card p {
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.lesson-card ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.lesson-card li {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.lesson-card li:before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+}
+
+.quiz-section {
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.quiz-section h3 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.quiz-btn {
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    font-weight: bold;
+    background: var(--bg);
+    cursor: pointer;
+}
+
+.quiz-btn:hover {
+    background: var(--accent);
+}
+
+.quiz-btn.correct {
+    background: #00FF00;
+}
+
+.quiz-btn.incorrect {
+    background: #FF0000;
+    color: white;
+}
+
 /* About */
 .about-content {
-    max-width: 800px;
-    margin: 4rem auto;
+    max-width: 900px;
+    margin: 2rem auto;
     padding: 3rem;
     box-shadow: var(--shadow);
 }
@@ -290,20 +562,100 @@ h1 {
     padding: 0 1rem;
 }
 
+.about-content h3 {
+    font-size: 2rem;
+    margin: 2rem 0 1rem 0;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 0.5rem 1rem;
+    display: inline-block;
+}
+
 .about-content p {
-    font-size: 1.5rem;
-    font-weight: 900;
+    font-size: 1.2rem;
+    font-weight: bold;
     margin-bottom: 1.5rem;
+    line-height: 1.8;
+}
+
+.about-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 2rem;
+}
+
+.about-content li {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    padding-left: 2rem;
+    position: relative;
+}
+
+.about-content li:before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    font-size: 1.5rem;
+}
+
+.about-content a {
+    display: inline-block;
+    margin-top: 1rem;
+    text-decoration: none;
+    color: var(--fg);
 }
 
 /* Footer */
 footer {
     padding: 2rem;
-    text-align: center;
-    font-weight: 900;
     border-bottom: none;
     border-left: none;
     border-right: none;
+    background: var(--fg);
+    color: var(--bg);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem auto;
+}
+
+.footer-section h4 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    background: var(--accent);
+    color: var(--fg);
+    padding: 0.3rem 0.8rem;
+    display: inline-block;
+}
+
+.footer-section p {
+    font-weight: bold;
+}
+
+.footer-section a {
+    display: block;
+    color: var(--bg);
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.footer-section a:hover {
+    background: var(--accent);
+    color: var(--fg);
+    padding-left: 0.5rem;
+}
+
+.footer-bottom {
+    text-align: center;
+    font-weight: 900;
+    padding-top: 2rem;
+    border-top: 3px solid var(--bg);
 }
 
 /* Animations */
@@ -326,12 +678,18 @@ footer {
 }
 
 /* Mobile */
+@media (max-width: 1200px) {
+    .lesson-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 900px) {
     .explorer-grid {
         grid-template-columns: 1fr;
     }
     h1 {
-        font-size: 3.5rem;
+        font-size: 2.5rem;
     }
     .intuition-cards {
         grid-template-columns: 1fr;
@@ -340,21 +698,47 @@ footer {
         justify-content: center;
         text-align: center;
     }
-    .canvas-wrapper {
+    .canvas-wrapper, .compare-canvas-wrapper {
         height: 350px;
     }
     .readout {
-        font-size: 2rem;
+        font-size: 1.2rem;
         top: 10px;
         right: 10px;
+        padding: 0.3rem 0.6rem;
+    }
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .cta, .cta-secondary {
+        font-size: 1.2rem;
+        padding: 1rem 2rem;
+    }
+    .compare-stats {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 600px) {
     h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
     .view {
         padding: 0 1rem 2rem 1rem;
+    }
+    nav {
+        justify-content: center;
+        width: 100%;
+    }
+    nav a {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.6rem;
+    }
+    .logo {
+        font-size: 1.2rem;
+    }
+    .calc-grid, .compare-grid {
+        grid-template-columns: 1fr;
     }
 }

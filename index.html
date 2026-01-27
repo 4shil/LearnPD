@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive probability distribution explorer with statistical tools, calculators, and educational resources.">
+    <meta name="keywords" content="probability, statistics, distributions, calculator, education">
+    <meta name="author" content="Probability Distribution">
     <title>PROBABILITY DISTRIBUTION - Interactive Explorer</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📊%3C/text%3E%3C/svg%3E">
 </head>
 <body>
     <header class="brutal-border">
@@ -12,6 +16,9 @@
         <nav>
             <a href="#home" class="nav-link active">HOME</a>
             <a href="#explorer" class="nav-link">EXPLORER</a>
+            <a href="#calculator" class="nav-link">CALCULATOR</a>
+            <a href="#compare" class="nav-link">COMPARE</a>
+            <a href="#learn" class="nav-link">LEARN</a>
             <a href="#about" class="nav-link">ABOUT</a>
         </nav>
     </header>
@@ -25,7 +32,33 @@
                 <div class="teaser-container brutal-border">
                     <canvas id="teaserCanvas"></canvas>
                 </div>
-                <button class="cta brutal-border" onclick="switchView('explorer')">ENTER EXPLORER</button>
+                <div class="hero-buttons">
+                    <button class="cta brutal-border" onclick="switchView('explorer')">START EXPLORING</button>
+                    <button class="cta-secondary brutal-border" onclick="switchView('learn')">LEARN BASICS</button>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card brutal-border">
+                        <div class="feature-icon">📊</div>
+                        <h3>6 DISTRIBUTIONS</h3>
+                        <p>Normal, Uniform, Bernoulli, Binomial, Poisson, Exponential</p>
+                    </div>
+                    <div class="feature-card brutal-border">
+                        <div class="feature-icon">🧮</div>
+                        <h3>CALCULATORS</h3>
+                        <p>PDF, CDF, quantile, and probability calculators</p>
+                    </div>
+                    <div class="feature-card brutal-border">
+                        <div class="feature-icon">📈</div>
+                        <h3>COMPARE</h3>
+                        <p>Side-by-side distribution comparison</p>
+                    </div>
+                    <div class="feature-card brutal-border">
+                        <div class="feature-icon">🎓</div>
+                        <h3>LEARN</h3>
+                        <p>Interactive tutorials and examples</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -51,6 +84,7 @@
                     <div id="formulaBox" class="formula-box brutal-border hidden">
                         <!-- Dynamic formula here -->
                     </div>
+                    <button class="cta-small brutal-border" onclick="resetParams()">RESET</button>
                 </aside>
 
                 <div class="graph-area">
@@ -76,20 +110,242 @@
             </div>
         </section>
 
+        <!-- Calculator Section -->
+        <section id="calculator" class="view">
+            <div class="calculator-container">
+                <h2>PROBABILITY CALCULATOR</h2>
+                <div class="calc-grid">
+                    <div class="calc-panel brutal-border">
+                        <h3>DISTRIBUTION</h3>
+                        <select id="calcDistSelect" onchange="updateCalcParams()">
+                            <option value="normal">Normal</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="binomial">Binomial</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
+                        </select>
+                        <div id="calcParams" class="calc-params">
+                            <!-- Dynamic parameters -->
+                        </div>
+                    </div>
+                    
+                    <div class="calc-panel brutal-border">
+                        <h3>CALCULATE</h3>
+                        <label>
+                            <input type="radio" name="calcType" value="pdf" checked onchange="updateCalcType()">
+                            PDF/PMF (Probability at x)
+                        </label>
+                        <label>
+                            <input type="radio" name="calcType" value="cdf" onchange="updateCalcType()">
+                            CDF (Probability ≤ x)
+                        </label>
+                        <label>
+                            <input type="radio" name="calcType" value="interval" onchange="updateCalcType()">
+                            P(a ≤ X ≤ b)
+                        </label>
+                        <label>
+                            <input type="radio" name="calcType" value="quantile" onchange="updateCalcType()">
+                            Quantile (inverse CDF)
+                        </label>
+                        
+                        <div id="calcInputs" class="calc-inputs">
+                            <label>Value (x):</label>
+                            <input type="number" id="calcX" step="0.01" value="0">
+                        </div>
+                        
+                        <button class="cta brutal-border" onclick="calculate()">CALCULATE</button>
+                    </div>
+                    
+                    <div class="calc-panel brutal-border">
+                        <h3>RESULT</h3>
+                        <div id="calcResult" class="calc-result">
+                            Enter values and click Calculate
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compare Section -->
+        <section id="compare" class="view">
+            <div class="compare-container">
+                <h2>COMPARE DISTRIBUTIONS</h2>
+                <div class="compare-grid">
+                    <div class="compare-panel brutal-border">
+                        <h3>DISTRIBUTION 1</h3>
+                        <select id="compare1Select" onchange="updateCompare(1)">
+                            <option value="normal">Normal</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="binomial">Binomial</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
+                        </select>
+                        <div id="compare1Params"></div>
+                    </div>
+                    
+                    <div class="compare-panel brutal-border">
+                        <h3>DISTRIBUTION 2</h3>
+                        <select id="compare2Select" onchange="updateCompare(2)">
+                            <option value="normal">Normal</option>
+                            <option value="binomial" selected>Binomial</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
+                        </select>
+                        <div id="compare2Params"></div>
+                    </div>
+                </div>
+                
+                <div class="compare-canvas-wrapper brutal-border">
+                    <canvas id="compareCanvas"></canvas>
+                </div>
+                
+                <div class="compare-stats brutal-border">
+                    <div class="stat-col">
+                        <h4>DISTRIBUTION 1</h4>
+                        <p id="compare1Stats"></p>
+                    </div>
+                    <div class="stat-col">
+                        <h4>DISTRIBUTION 2</h4>
+                        <p id="compare2Stats"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learn Section -->
+        <section id="learn" class="view">
+            <div class="learn-container">
+                <h2>LEARNING CENTER</h2>
+                
+                <div class="lesson-grid">
+                    <div class="lesson-card brutal-border">
+                        <h3>📚 BASICS</h3>
+                        <h4>What is a Probability Distribution?</h4>
+                        <p>A probability distribution describes how likely different outcomes are. Think of it as a map showing where probability "mass" is concentrated.</p>
+                        <ul>
+                            <li><strong>Random Variable (X):</strong> A quantity that can take different values randomly</li>
+                            <li><strong>PDF/PMF:</strong> Probability at each point (density vs mass)</li>
+                            <li><strong>CDF:</strong> Cumulative probability up to a point</li>
+                            <li><strong>Mean (μ):</strong> Expected value / center of mass</li>
+                            <li><strong>Variance (σ²):</strong> Spread / how scattered the values are</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="lesson-card brutal-border">
+                        <h3>📊 DISCRETE vs CONTINUOUS</h3>
+                        <h4>Two Types of Distributions</h4>
+                        <p><strong>Discrete:</strong> Countable outcomes (0, 1, 2, 3...)</p>
+                        <ul>
+                            <li>Bernoulli: Single coin flip</li>
+                            <li>Binomial: Multiple coin flips</li>
+                            <li>Poisson: Count of rare events</li>
+                        </ul>
+                        <p><strong>Continuous:</strong> Infinite possible values</p>
+                        <ul>
+                            <li>Normal: Bell curve for natural phenomena</li>
+                            <li>Uniform: Equal probability everywhere</li>
+                            <li>Exponential: Time between events</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="lesson-card brutal-border">
+                        <h3>🎯 REAL-WORLD EXAMPLES</h3>
+                        <h4>Where You See These</h4>
+                        <p><strong>Normal:</strong> Heights, test scores, measurement errors</p>
+                        <p><strong>Binomial:</strong> Quality control (n defects), free throw success</p>
+                        <p><strong>Poisson:</strong> Website visits per hour, calls to a help desk</p>
+                        <p><strong>Exponential:</strong> Time until next earthquake, product lifetime</p>
+                        <p><strong>Uniform:</strong> Random number generators, lottery draws</p>
+                        <p><strong>Bernoulli:</strong> Single yes/no event, pass/fail test</p>
+                    </div>
+                    
+                    <div class="lesson-card brutal-border">
+                        <h3>🧮 KEY FORMULAS</h3>
+                        <h4>The Math You Need</h4>
+                        <p><strong>Expected Value (Mean):</strong> E[X] = Σ(x × P(x))</p>
+                        <p><strong>Variance:</strong> Var(X) = E[(X - μ)²]</p>
+                        <p><strong>Standard Deviation:</strong> σ = √Var(X)</p>
+                        <p><strong>68-95-99.7 Rule (Normal):</strong></p>
+                        <ul>
+                            <li>68% within 1σ of mean</li>
+                            <li>95% within 2σ of mean</li>
+                            <li>99.7% within 3σ of mean</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="quiz-section brutal-border">
+                    <h3>🎓 QUICK QUIZ</h3>
+                    <div id="quizContainer">
+                        <p><strong>Question 1:</strong> If you flip a fair coin 10 times, which distribution models the number of heads?</p>
+                        <button class="quiz-btn brutal-border" onclick="checkQuiz(1, 'binomial')">Binomial</button>
+                        <button class="quiz-btn brutal-border" onclick="checkQuiz(1, 'poisson')">Poisson</button>
+                        <button class="quiz-btn brutal-border" onclick="checkQuiz(1, 'normal')">Normal</button>
+                        <div id="quiz1Result"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- About Section -->
         <section id="about" class="view">
             <div class="about-content brutal-border">
-                <h2>PHILOSOPHY</h2>
-                <p>TEXTBOOKS ARE COWARDLY. FORMULAS ARE SHIELDS.</p>
-                <p>PROB//BRUT STRIPS THE FRILLS. IT IS RAW MATH FOR THE BOLD.</p>
-                <p>NEO-BRUTALISM IS NOT JUST AN AESTHETIC. IT IS A TEACHING WEAPON.</p>
-                <button class="cta-small brutal-border" onclick="switchView('home')">BACK TO REALITY</button>
+                <h2>ABOUT</h2>
+                <p>An open-source, interactive probability distribution explorer designed for students, educators, and data professionals.</p>
+                
+                <h3>FEATURES</h3>
+                <ul>
+                    <li>✅ 6 core probability distributions with accurate mathematical implementations</li>
+                    <li>✅ Real-time parameter manipulation and visualization</li>
+                    <li>✅ Statistical calculators (PDF, CDF, quantile, intervals)</li>
+                    <li>✅ Side-by-side distribution comparison</li>
+                    <li>✅ Interactive learning modules with examples</li>
+                    <li>✅ Mobile-responsive Neo-Brutalist design</li>
+                    <li>✅ Zero dependencies - pure HTML/CSS/JavaScript</li>
+                </ul>
+                
+                <h3>TECHNICAL DETAILS</h3>
+                <p><strong>Mathematics:</strong> Implements proper overflow handling, logarithmic combinations for large factorials, Abramowitz-Stegun error function approximation, and auto-scaling algorithms.</p>
+                <p><strong>Stack:</strong> Vanilla HTML5, CSS3, JavaScript with Canvas API</p>
+                <p><strong>Performance:</strong> 60 FPS rendering, efficient re-calculation on parameter changes</p>
+                
+                <h3>OPEN SOURCE</h3>
+                <p>This project is open source and available on GitHub. Contributions welcome!</p>
+                <a href="https://github.com/4shil/probability-distribution" target="_blank" class="cta-small brutal-border">VIEW ON GITHUB</a>
+                
+                <h3>LICENSE</h3>
+                <p>MIT License - Free for educational and commercial use</p>
+                
+                <button class="cta-small brutal-border" onclick="switchView('home')">BACK TO HOME</button>
             </div>
         </section>
     </main>
 
     <footer class="brutal-border">
-        NO GRADIENTS. NO SOFTNESS. JUST TRUTH. // 2026
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>PROBABILITY DISTRIBUTION</h4>
+                <p>Interactive Statistics Education</p>
+            </div>
+            <div class="footer-section">
+                <h4>LINKS</h4>
+                <a href="https://github.com/4shil/probability-distribution" target="_blank">GitHub</a>
+                <a href="#learn" onclick="switchView('learn')">Learn</a>
+                <a href="#about" onclick="switchView('about')">About</a>
+            </div>
+            <div class="footer-section">
+                <h4>RESOURCES</h4>
+                <a href="https://en.wikipedia.org/wiki/Probability_distribution" target="_blank">Wikipedia</a>
+                <a href="https://www.stat.berkeley.edu/~stark/SticiGui/Text/probabilityPhilosophy.htm" target="_blank">Berkeley Stats</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 PROBABILITY DISTRIBUTION • MIT LICENSE • NO GRADIENTS. NO SOFTNESS. JUST TRUTH.
+        </div>
     </footer>
 
     <script src="app.js"></script>
