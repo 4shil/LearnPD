@@ -139,6 +139,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const drawChapter1Widget = () => {
+        if (store.state.currentView !== 'chapters') return;
+        ch1Renderer.resize();
+        ch1Renderer.clear();
+        ch1Renderer.drawGrid();
+        ch1Renderer.drawAxes(-3, 3, 1.0);
+
+        const xVal = parseFloat(ch1Slider.value);
+        const norm = DISTRIBUTIONS.normal;
+        const normParams = { mu: 0, sigma: 1 };
+
+        // Plot PDF or CDF curve
+        const ctx = ch1Renderer.ctx;
+        const { padding } = ch1Renderer.options;
+        const plotW = ch1Renderer.width - 2 * padding;
+        const plotH = ch1Renderer.height - 2 * padding;
+
+        const toCanvasX = (v) => padding + ((v + 3) / 6) * plotW;
+        const toCanvasY = (v) => ch1Renderer.height - padding - (v / 1.0) * plotH;
+
+        ctx.beginPath();
+        for (let i = 0; i <= 100; i++) {
+            const x = -3 + (i / 100) * 6;
+            const y = ch1Type === 'pdf' ? norm.pdf(x, normParams) : norm.cdf(x, normParams);
+            const cx = toCanvasX(x);
+            const cy = toCanvasY(y);
+            i === 0 ? ctx.moveTo(cx, cy) : ctx.lineTo(cx, cy);
+        }
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Draw active slider pointer vertical line
+        const cx = toCanvasX(xVal);
+        const yVal = ch1Type === 'pdf' ? norm.pdf(xVal, normParams) : norm.cdf(xVal, normParams);
+        const cy = toCanvasY(yVal);
+
+        ctx.strokeStyle = '#ff3366';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(cx, ch1Renderer.height - padding);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#ff3366';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+
+        document.getElementById('ch1Readout').innerText = `${ch1Type === 'pdf' ? 'f' : 'F'}(${xVal.toFixed(2)}) = ${yVal.toFixed(3)}`;
+    };
 
     // Chapter 2 Widget: Binomial Poisson Convergence
 
@@ -147,6 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Chapter 4 Widget: Law of Large Numbers Coin Flips
 
     // Trigger widgets initialization on Chapters Tab selection
+    const initChapterWidgets = () => {
+        drawChapter1Widget();
+    };
 
     // ── 8. CLT Simulator execution logic ──
 
@@ -222,6 +279,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Chapters view
+        if (state.currentView === 'chapters') {
+            initChapterWidgets();
+        }
 
         // Quiz Matching rendering
 
