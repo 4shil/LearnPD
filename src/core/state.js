@@ -21,6 +21,19 @@ class Store {
             compareOverlay: false,
             zoom: 1.0,
             
+            // Curriculum progress
+            chapters: {
+                '1': false,
+                '2': false,
+                '3': false,
+                '4': false
+            },
+            checkpoints: {
+                '1': false,
+                '2': false,
+                '3': false,
+                '4': false
+            },
             
 
         };
@@ -33,6 +46,9 @@ class Store {
         // Load progress from localStorage
     }
 
+    save() {
+        localStorage.setItem('learnpd_remake_state', JSON.stringify(this.state));
+    }
 
 
     initDistParams(distId) {
@@ -115,10 +131,24 @@ class Store {
 
     // --- Curriculum Progress ---
     
+    markChapterCompleted(chId) {
+        this.state.chapters[chId] = true;
+        this.notify();
+        this.save();
+    }
+
+    markCheckpointCompleted(chId) {
+        this.state.checkpoints[chId] = true;
+        this.notify();
+        this.save();
+    }
 
     resetAllProgress() {
+        this.state.chapters = { '1': false, '2': false, '3': false, '4': false };
+        this.state.checkpoints = { '1': false, '2': false, '3': false, '4': false };
         this.state.zoom = 1.0;
         this.notify();
+        this.save();
     }
 
     // --- Quiz Session Actions ---

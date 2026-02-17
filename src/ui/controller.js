@@ -8,6 +8,7 @@ import { DISTRIBUTIONS } from '../math/dist.js';
 export class UI {
     constructor() {
         this.initGeneralListeners();
+        this.initChapterListeners();
         this.initExplorerListeners();
         this.initCalculatorListeners();
         this.bindStore();
@@ -29,6 +30,59 @@ export class UI {
         });
     }
 
+    initChapterListeners() {
+        // Chapters Sidebar selection click
+        document.querySelectorAll('.chapter-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const chId = item.dataset.chapter;
+                this.switchChapterPane(chId);
+            });
+        });
+
+        // Next Chapter navigation buttons
+        document.querySelectorAll('.next-chapter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const nextChId = btn.dataset.next;
+                this.switchChapterPane(nextChId);
+                // Highlight corresponding sidebar card
+                document.querySelectorAll('.chapter-item').forEach(item => {
+                    item.classList.toggle('active', item.dataset.chapter === nextChId);
+                });
+            });
+        });
+
+        // Inline checkpoint question answers
+        document.querySelectorAll('.practice-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const isCorrect = btn.dataset.correct === 'true';
+                const parent = btn.closest('.practice-box');
+                const feedback = parent.querySelector('.practice__feedback');
+                const chPane = btn.closest('.chapter-pane');
+                const chId = chPane.id.replace('pane-chapter-', '');
+
+                feedback.classList.remove('hidden', 'correct', 'incorrect');
+                if (isCorrect) {
+                    feedback.innerText = 'Correct! Great job. Checkpoint completed.';
+                    feedback.classList.add('correct');
+                    store.markCheckpointCompleted(chId);
+                    store.markChapterCompleted(chId);
+                } else {
+                    feedback.innerText = 'Incorrect. Try again!';
+                    feedback.classList.add('incorrect');
+                }
+            });
+        });
+    }
+
+    switchChapterPane(chId) {
+        document.querySelectorAll('.chapter-pane').forEach(pane => {
+            pane.classList.toggle('active', pane.id === `pane-chapter-${chId}`);
+        });
+        document.querySelectorAll('.chapter-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.chapter === chId);
+        });
+        store.markChapterCompleted(chId);
+    }
 
     initExplorerListeners() {
 
