@@ -113,6 +113,32 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ── 7. Chapter Widget Subscriptions ──
+    let ch1Type = 'pdf'; // or 'cdf'
+    const btnPdf = document.getElementById('btnPdfToggle');
+    const btnCdf = document.getElementById('btnCdfToggle');
+    const ch1Slider = document.getElementById('ch1Slider');
+
+    if (btnPdf && btnCdf) {
+        btnPdf.addEventListener('click', () => {
+            ch1Type = 'pdf';
+            btnPdf.className = 'btn btn--small btn--primary';
+            btnCdf.className = 'btn btn--small btn--ghost';
+            drawChapter1Widget();
+        });
+        btnCdf.addEventListener('click', () => {
+            ch1Type = 'cdf';
+            btnPdf.className = 'btn btn--small btn--ghost';
+            btnCdf.className = 'btn btn--small btn--primary';
+            drawChapter1Widget();
+        });
+    }
+    if (ch1Slider) {
+        ch1Slider.addEventListener('input', (e) => {
+            document.getElementById('ch1XVal').innerText = parseFloat(e.target.value).toFixed(2);
+            drawChapter1Widget();
+        });
+    }
+
 
     // Chapter 2 Widget: Binomial Poisson Convergence
 

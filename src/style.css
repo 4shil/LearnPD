@@ -693,6 +693,113 @@ input[type="range"]::-moz-range-thumb {
 }
 
 
+/* ── Interactive Lesson Widgets ── */
+.widget {
+    background: var(--bg);
+    margin: 1.5rem 0 2rem;
+    padding: 1.5rem;
+    border: var(--border-w) solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: 3px 3px 0 var(--border);
+}
+
+.widget__title {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.widget__description {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.widget__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.widget__controls .slider-container {
+    flex-grow: 1;
+    min-width: 200px;
+}
+
+.widget__display {
+    position: relative;
+    border: var(--border-w) solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    overflow: hidden;
+}
+
+.widget__display canvas {
+    display: block;
+}
+
+.readout-box {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: var(--fg);
+    color: var(--accent);
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+/* Practice Checkpoints */
+.practice-box {
+    width: 100%;
+    background: var(--card);
+}
+
+.practice__title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.practice__title::before {
+    content: "⚡";
+    font-size: 1.1rem;
+}
+
+.practice__options {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.practice__feedback {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: var(--border-w) solid var(--border);
+    background: var(--bg);
+}
+
+.practice__feedback.correct {
+    background: #d4fc34;
+}
+
+.practice__feedback.incorrect {
+    background: #ff77aa;
+}
+
 
 /* ── Calculator ── */
 .calc__grid {
