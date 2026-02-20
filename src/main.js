@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("--- RUNNING MATHEMATICAL ACCURACY TESTS ---");
     try {
         const testDists = ['normal', 'uniform', 'bernoulli', 'binomial', 'poisson', 'exponential'];
+        testDists.push('geometric');
 
         testDists.forEach(dId => {
             const d = DISTRIBUTIONS[dId];

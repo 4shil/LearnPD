@@ -227,4 +227,27 @@ export const DISTRIBUTIONS = {
         mechanics: "Steep exponential decay starting at x=0. Rate λ dictates decay speed.",
         formula: "f(x) = λ e^{-λ x} for x ≥ 0"
     },
+    geometric: {
+        id: 'geometric',
+        name: 'GEOMETRIC',
+        isDiscrete: true,
+        params: [
+            { id: 'p', label: 'p (Success Prob)', min: 0.05, max: 1.0, step: 0.05, default: 0.3 }
+        ],
+        pmf: (k, p) => (k < 0) ? 0 : Math.pow(1 - p.p, k) * p.p,
+        cdf: (k, p) => (k < 0) ? 0 : 1 - Math.pow(1 - p.p, Math.floor(k) + 1),
+        mean: (p) => (1 - p.p) / p.p,
+        variance: (p) => (1 - p.p) / (p.p * p.p),
+        median: (p) => Math.max(0, Math.ceil(Math.log(0.5) / Math.log(1 - p.p)) - 1),
+        skewness: (p) => (2 - p.p) / Math.sqrt(1 - p.p),
+        kurtosis: (p) => 6 + (p.p * p.p) / (1 - p.p),
+        sample: (p) => Math.floor(Math.log(1 - Math.random()) / Math.log(1 - p.p)),
+        range: { min: 0, max: 40 },
+        autoScaleX: true,
+        autoScaleY: true,
+        what: "Models number of failures before the first success in independent trials.",
+        when: "Number of job applications rejected before offer, flips before heads.",
+        mechanics: "Discrete decay. Value at k=0 is always p (success on first try).",
+        formula: "P(X=k) = (1-p)^k p, k ∈ {0,1,2,...}"
+    },
 };
