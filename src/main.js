@@ -215,6 +215,76 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Chapter 2 Widget: Binomial Poisson Convergence
+    const ch2SliderN = document.getElementById('ch2SliderN');
+    const ch2SliderP = document.getElementById('ch2SliderP');
+
+    const drawChapter2Widget = () => {
+        if (store.state.currentView !== 'chapters') return;
+        ch2Renderer.resize();
+        ch2Renderer.clear();
+        ch2Renderer.drawGrid();
+        ch2Renderer.drawAxes(0, 30, 0.4);
+
+        const n = parseInt(ch2SliderN.value);
+        const p = parseFloat(ch2SliderP.value);
+        const lmb = n * p;
+        document.getElementById('ch2NVal').innerText = n;
+        document.getElementById('ch2PVal').innerText = p.toFixed(2);
+        document.getElementById('ch2Readout').innerText = `λ = n × p = ${lmb.toFixed(2)}`;
+
+        const ctx = ch2Renderer.ctx;
+        const { padding } = ch2Renderer.options;
+        const plotW = ch2Renderer.width - 2 * padding;
+        const plotH = ch2Renderer.height - 2 * padding;
+
+        const toX = (v) => padding + (v / 30) * plotW;
+        const toY = (v) => ch2Renderer.height - padding - (v / 0.4) * plotH;
+
+        // Plot Binomial as bar chart outlines
+        const binDist = DISTRIBUTIONS.binomial;
+        const binParams = { n, p };
+        const barW = Math.max(2, (plotW / 30) * 0.5);
+
+        for (let k = 0; k <= 30; k++) {
+            const y = binDist.pmf(k, binParams);
+            const cx = toX(k);
+            const cy = toY(y);
+            const h = (ch2Renderer.height - padding) - cy;
+
+            ctx.fillStyle = 'rgba(200, 245, 66, 0.6)';
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.rect(cx - barW/2, cy, barW, h);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // Plot Poisson approximation curve as overlay
+        const poiDist = DISTRIBUTIONS.poisson;
+        const poiParams = { lambda: lmb };
+
+        ctx.strokeStyle = '#ff3366';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let k = 0; k <= 30; k++) {
+            const y = poiDist.pmf(k, poiParams);
+            const cx = toX(k);
+            const cy = toY(y);
+            k === 0 ? ctx.moveTo(cx, cy) : ctx.lineTo(cx, cy);
+            
+            ctx.fillStyle = '#ff3366';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 3.5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        ctx.stroke();
+    };
+
+    if (ch2SliderN && ch2SliderP) {
+        ch2SliderN.addEventListener('input', drawChapter2Widget);
+        ch2SliderP.addEventListener('input', drawChapter2Widget);
+    }
 
     // Chapter 3 Widget: Normal Standardization
 
@@ -223,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Trigger widgets initialization on Chapters Tab selection
     const initChapterWidgets = () => {
         drawChapter1Widget();
+        drawChapter2Widget();
     };
 
     // ── 8. CLT Simulator execution logic ──
