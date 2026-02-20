@@ -85,6 +85,12 @@ export class UI {
     }
 
     initExplorerListeners() {
+        const distSelect = document.getElementById('distSelect');
+        if (distSelect) {
+            distSelect.addEventListener('change', (e) => {
+                store.setDistribution(e.target.value);
+            });
+        }
 
         // Show/Hide Formula toggle
         const mathToggles = document.querySelectorAll('.math-toggle');
