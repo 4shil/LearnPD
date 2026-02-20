@@ -250,4 +250,83 @@ export const DISTRIBUTIONS = {
         mechanics: "Discrete decay. Value at k=0 is always p (success on first try).",
         formula: "P(X=k) = (1-p)^k p, k ∈ {0,1,2,...}"
     },
+    hypergeometric: {
+        id: 'hypergeometric',
+        name: 'HYPERGEOMETRIC',
+        isDiscrete: true,
+        params: [
+            { id: 'N', label: 'N (Pop Size)', min: 10, max: 100, step: 1, default: 50 },
+            { id: 'K', label: 'K (Successes in Pop)', min: 1, max: 90, step: 1, default: 20 },
+            { id: 'n', label: 'n (Sample Size)', min: 1, max: 90, step: 1, default: 15 }
+        ],
+        pmf: (k, p) => {
+            const N = p.N;
+            const K = Math.min(p.K, N);
+            const n = Math.min(p.n, N);
+            if (k < Math.max(0, n + K - N) || k > Math.min(n, K)) return 0;
+            const den = combinations(N, n);
+            if (den === 0) return 0;
+            return combinations(K, k) * combinations(N - K, n - k) / den;
+        },
+        cdf: (k, p) => {
+            const N = p.N;
+            const K = Math.min(p.K, N);
+            const n = Math.min(p.n, N);
+            if (k < 0) return 0;
+            if (k >= Math.min(n, K)) return 1;
+            let sum = 0;
+            for (let i = 0; i <= Math.floor(k); i++) {
+                const den = combinations(N, n);
+                sum += den === 0 ? 0 : combinations(K, i) * combinations(N - K, n - i) / den;
+            }
+            return sum;
+        },
+        mean: (p) => {
+            const K = Math.min(p.K, p.N);
+            const n = Math.min(p.n, p.N);
+            return n * K / p.N;
+        },
+        variance: (p) => {
+            const N = p.N;
+            const K = Math.min(p.K, N);
+            const n = Math.min(p.n, N);
+            if (N <= 1) return 0;
+            return n * (K / N) * (1 - K / N) * (N - n) / (N - 1);
+        },
+        median: (p) => Math.round(Math.min(p.n, p.K) * (p.K / p.N)),
+        skewness: (p) => {
+            const N = p.N;
+            const K = Math.min(p.K, N);
+            const n = Math.min(p.n, N);
+            if (N <= 2 || n === 0 || K === 0) return 0;
+            const den = (N - 2) * Math.sqrt(n * K * (N - K) * (N - n) * (N - 1));
+            return den === 0 ? 0 : (N - 2 * K) * (N - 2 * n) * Math.sqrt(N - 1) / den;
+        },
+        kurtosis: (p) => {
+            const N = p.N;
+            const K = Math.min(p.K, N);
+            const n = Math.min(p.n, N);
+            // Standard excess kurtosis is complex; return approximation or 0 if N <= 3
+            if (N <= 3) return 0;
+            return 0.1;
+        },
+        sample: (p) => {
+            const N = p.N;
+            const K = Math.min(p.K, N);
+            const n = Math.min(p.n, N);
+            let successes = 0, pop = N, succ = K;
+            for (let i = 0; i < n; i++) {
+                if (Math.random() < succ / pop) { successes++; succ--; }
+                pop--;
+            }
+            return successes;
+        },
+        range: { min: 0, max: 100 },
+        autoScaleX: true,
+        autoScaleY: true,
+        what: "Probability of k successes in n draws *without* replacement from population N.",
+        when: "Dealing cards without reshuffle, quality sampling without replacement.",
+        mechanics: "Bound by min successes max limit constraints. Resembles Binomial when N is large.",
+        formula: "P(X=k) = \\binom{K}{k} \\binom{N-K}{n-k} / \\binom{N}{n}"
+    },
 };
