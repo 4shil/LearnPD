@@ -56,6 +56,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const observer = new MutationObserver(attachCursorHover);
     observer.observe(document.body, { childList: true, subtree: true });
 
+    // --- MATHEMATICAL ACCURACY TEST HARNESS ---
+    console.log("--- RUNNING MATHEMATICAL ACCURACY TESTS ---");
+    try {
+        const testDists = ['normal', 'uniform', 'bernoulli', 'binomial', 'poisson', 'exponential'];
+
+        testDists.forEach(dId => {
+            const d = DISTRIBUTIONS[dId];
+            if (!d) return;
+            const p = {};
+            d.params.forEach(param => { p[param.id] = param.default; });
+            const meanVal = d.mean(p);
+            const varVal = d.variance(p);
+            console.log(`[TEST] ${d.name}: Mean = ${meanVal}, Var = ${varVal}`);
+        });
+    } catch(err) {
+        console.error("Test harness failed:", err);
+    }
+    console.log("-----------------------------------------");
 
     // ── 4. Setup Renderers ──
     const mainRenderer = new Renderer('mainCanvas');
