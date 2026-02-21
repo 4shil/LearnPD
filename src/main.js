@@ -289,6 +289,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Chapter 3 Widget: Normal Standardization
+    const ch3Mu = document.getElementById('ch3SliderMu');
+    const ch3Sigma = document.getElementById('ch3SliderSigma');
+
+    const drawChapter3Widget = () => {
+        if (store.state.currentView !== 'chapters') return;
+        ch3Renderer.resize();
+        ch3Renderer.clear();
+        ch3Renderer.drawGrid();
+        ch3Renderer.drawAxes(-6, 6, 0.8);
+
+        const mu = parseFloat(ch3Mu.value);
+        const sig = parseFloat(ch3Sigma.value);
+        document.getElementById('ch3MuVal').innerText = mu.toFixed(1);
+        document.getElementById('ch3SigmaVal').innerText = sig.toFixed(1);
+        document.getElementById('ch3Readout').innerText = `Z = (X - ${mu.toFixed(1)}) / ${sig.toFixed(1)}`;
+
+        const ctx = ch3Renderer.ctx;
+        const { padding } = ch3Renderer.options;
+        const plotW = ch3Renderer.width - 2 * padding;
+        const plotH = ch3Renderer.height - 2 * padding;
+
+        const toX = (v) => padding + ((v + 6) / 12) * plotW;
+        const toY = (v) => ch3Renderer.height - padding - (v / 0.8) * plotH;
+
+        const norm = DISTRIBUTIONS.normal;
+
+        // Plot Standard Normal Target dotted line (N(0,1))
+        ctx.strokeStyle = '#ff3366';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        for (let i = 0; i <= 100; i++) {
+            const x = -6 + (i / 100) * 12;
+            const y = norm.pdf(x, { mu: 0, sigma: 1 });
+            i === 0 ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Plot active normal curve (solid line)
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let i = 0; i <= 100; i++) {
+            const x = -6 + (i / 100) * 12;
+            const y = norm.pdf(x, { mu, sigma: sig });
+            i === 0 ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
+        }
+        ctx.stroke();
+    };
+
+    if (ch3Mu && ch3Sigma) {
+        ch3Mu.addEventListener('input', drawChapter3Widget);
+        ch3Sigma.addEventListener('input', drawChapter3Widget);
+    }
 
     // Chapter 4 Widget: Law of Large Numbers Coin Flips
 
@@ -296,6 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initChapterWidgets = () => {
         drawChapter1Widget();
         drawChapter2Widget();
+        drawChapter3Widget();
     };
 
     // ── 8. CLT Simulator execution logic ──
