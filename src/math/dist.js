@@ -18,11 +18,7 @@ export const combinations = (n, k) => {
     if (k === 0 || k === n) return 1;
     if (k > n / 2) k = n - k;
     if (n > 170) {
-        let logResult = 0;
-        for (let i = 0; i < k; i++) {
-            logResult += Math.log(n - i) - Math.log(i + 1);
-        }
-        return Math.exp(logResult);
+        return Math.round(Math.exp(logCombination(n, k)));
     }
     let res = 1;
     for (let i = 1; i <= k; i++) {
@@ -31,6 +27,32 @@ export const combinations = (n, k) => {
     return res;
 };
 
+export const logGamma = (x) => {
+    if (x <= 0) return -Infinity;
+    // Lanczos approximation (g=7, n=9)
+    const p = [
+        0.99999999999980993,
+        676.5203681218851,
+        -1259.1392167224028,
+        771.32342877765307,
+        -176.61502916214059,
+        12.507343278686905,
+        -0.13857109526572012,
+        9.9843695780195716e-6,
+        1.5056327351493116e-7
+    ];
+    let sum = p[0];
+    for (let i = 1; i < 9; i++) {
+        sum += p[i] / (x + i - 1);
+    }
+    const t = x + 6.5;
+    return Math.log(Math.sqrt(2 * Math.PI)) + Math.log(sum) - t + (x - 0.5) * Math.log(t);
+};
+
+export const logCombination = (n, k) => {
+    if (k < 0 || k > n) return -Infinity;
+    return logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1);
+};
 
 
 
@@ -264,9 +286,7 @@ export const DISTRIBUTIONS = {
             const K = Math.min(p.K, N);
             const n = Math.min(p.n, N);
             if (k < Math.max(0, n + K - N) || k > Math.min(n, K)) return 0;
-            const den = combinations(N, n);
-            if (den === 0) return 0;
-            return combinations(K, k) * combinations(N - K, n - k) / den;
+            return Math.exp(logCombination(K, k) + logCombination(N - K, n - k) - logCombination(N, n));
         },
         cdf: (k, p) => {
             const N = p.N;
@@ -276,8 +296,7 @@ export const DISTRIBUTIONS = {
             if (k >= Math.min(n, K)) return 1;
             let sum = 0;
             for (let i = 0; i <= Math.floor(k); i++) {
-                const den = combinations(N, n);
-                sum += den === 0 ? 0 : combinations(K, i) * combinations(N - K, n - i) / den;
+                sum += Math.exp(logCombination(K, i) + logCombination(N - K, n - i) - logCombination(N, n));
             }
             return sum;
         },
