@@ -461,4 +461,44 @@ export const DISTRIBUTIONS = {
         mechanics: "Extremely flexible. Exponential when k=1; bell-shaped for large k.",
         formula: "f(x) = x^{k-1} e^{-x/θ} / (θ^k Γ(k)) for x > 0"
     },
+    beta: {
+        id: 'beta',
+        name: 'BETA',
+        isDiscrete: false,
+        params: [
+            { id: 'alpha', label: 'α (Alpha)', min: 0.5, max: 15, step: 0.1, default: 2 },
+            { id: 'beta', label: 'β (Beta)', min: 0.5, max: 15, step: 0.1, default: 2 }
+        ],
+        pdf: (x, p) => {
+            if (x < 0 || x > 1) return 0;
+            // Guard infinity at boundaries
+            if (x === 0 && p.alpha < 1) return Infinity;
+            if (x === 1 && p.beta < 1) return Infinity;
+            const a = p.alpha;
+            const b = p.beta;
+            const lB = logGamma(a) + logGamma(b) - logGamma(a + b);
+            return Math.exp((a - 1) * Math.log(x || 1e-30) + (b - 1) * Math.log((1 - x) || 1e-30) - lB);
+        },
+        cdf: (x, p) => (x <= 0) ? 0 : (x >= 1) ? 1 : regularizedBeta(p.alpha, p.beta, x),
+        mean: (p) => p.alpha / (p.alpha + p.beta),
+        variance: (p) => (p.alpha * p.beta) / (Math.pow(p.alpha + p.beta, 2) * (p.alpha + p.beta + 1)),
+        median: (p) => (p.alpha - 1/3) / (p.alpha + p.beta - 2/3),
+        skewness: (p) => 2 * (p.beta - p.alpha) * Math.sqrt(p.alpha + p.beta + 1) / ((p.alpha + p.beta + 2) * Math.sqrt(p.alpha * p.beta)),
+        kurtosis: (p) => {
+            const a = p.alpha;
+            const b = p.beta;
+            return 6 * (Math.pow(a - b, 2) * (a + b + 1) - a * b * (a + b + 2)) / (a * b * (a + b + 2) * (a + b + 3));
+        },
+        sample: (p) => {
+            const x = sampleGamma(p.alpha, 1);
+            const y = sampleGamma(p.beta, 1);
+            return x / (x + y || 1e-6);
+        },
+        range: { min: 0, max: 1 },
+        fixedY: 3.5,
+        what: "Family of continuous distributions defined on [0,1], widely used to model random percentages.",
+        when: "Customer conversion rates, project completion probabilities, Bayesian priors.",
+        mechanics: "Creates U-shapes, flat lines, bell shapes depending on shape parameters α, β.",
+        formula: "f(x) = x^{α-1} (1-x)^{β-1} / B(α, β) for 0 ≤ x ≤ 1"
+    },
 };
