@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const testDists = ['normal', 'uniform', 'bernoulli', 'binomial', 'poisson', 'exponential'];
         testDists.push('geometric');
         testDists.push('hypergeometric');
+        testDists.push('gamma');
 
         testDists.forEach(dId => {
             const d = DISTRIBUTIONS[dId];

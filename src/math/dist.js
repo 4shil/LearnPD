@@ -54,6 +54,42 @@ export const logCombination = (n, k) => {
     return logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1);
 };
 
+export const regularizedGammaP = (s, x) => {
+    if (x <= 0) return 0;
+    if (s <= 0) return 1;
+    const err = 1e-15;
+    const maxIt = 200;
+    const logG = logGamma(s);
+    
+    if (x < s + 1) {
+        let sum = 1 / s;
+        let term = 1 / s;
+        for (let n = 1; n < maxIt; n++) {
+            term = (term * x) / (s + n);
+            sum += term;
+            if (term < err * sum) break;
+        }
+        return Math.exp(s * Math.log(x) - x - logG) * sum;
+    }
+    
+    let b = x + 1 - s;
+    let c = 1 / 1e-30;
+    let d = 1 / b;
+    let h = d;
+    for (let i = 1; i < maxIt; i++) {
+        const a = i * (s - i);
+        b += 2;
+        d = b + a * d;
+        if (Math.abs(d) < 1e-30) d = 1e-30;
+        c = b + a / c;
+        if (Math.abs(c) < 1e-30) c = 1e-30;
+        d = 1 / d;
+        const delta = c * d;
+        h *= delta;
+        if (Math.abs(delta - 1) < err) break;
+    }
+    return 1 - Math.exp(s * Math.log(x) - x - logG) * h;
+};
 
 
 export const erf = (x) => {
@@ -347,5 +383,34 @@ export const DISTRIBUTIONS = {
         when: "Dealing cards without reshuffle, quality sampling without replacement.",
         mechanics: "Bound by min successes max limit constraints. Resembles Binomial when N is large.",
         formula: "P(X=k) = \\binom{K}{k} \\binom{N-K}{n-k} / \\binom{N}{n}"
+    },
+    gamma: {
+        id: 'gamma',
+        name: 'GAMMA',
+        isDiscrete: false,
+        params: [
+            { id: 'shape', label: 'k (Shape)', min: 0.5, max: 15, step: 0.1, default: 2 },
+            { id: 'scale', label: 'θ (Scale)', min: 0.2, max: 5, step: 0.1, default: 2 }
+        ],
+        pdf: (x, p) => {
+            if (x <= 0) return 0;
+            const k = p.shape;
+            const th = p.scale;
+            return Math.exp((k - 1) * Math.log(x) - x / th - k * Math.log(th) - logGamma(k));
+        },
+        cdf: (x, p) => (x <= 0) ? 0 : regularizedGammaP(p.shape, x / p.scale),
+        mean: (p) => p.shape * p.scale,
+        variance: (p) => p.shape * p.scale * p.scale,
+        median: (p) => p.shape * p.scale * (1 - 1 / (9 * p.shape)), // Wilson-Hilferty approx
+        skewness: (p) => 2 / Math.sqrt(p.shape),
+        kurtosis: (p) => 6 / p.shape,
+        sample: (p) => sampleGamma(p.shape, p.scale),
+        range: { min: 0, max: 40 },
+        autoScaleX: true,
+        autoScaleY: true,
+        what: "Continuous distribution modeling waiting times until k independent events occur.",
+        when: "Aggregated rain volumes, service duration, aggregate insurance claims.",
+        mechanics: "Extremely flexible. Exponential when k=1; bell-shaped for large k.",
+        formula: "f(x) = x^{k-1} e^{-x/θ} / (θ^k Γ(k)) for x > 0"
     },
 };
