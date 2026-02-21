@@ -91,6 +91,54 @@ export const regularizedGammaP = (s, x) => {
     return 1 - Math.exp(s * Math.log(x) - x - logG) * h;
 };
 
+const betaCf = (a, b, x) => {
+    const maxIt = 200;
+    const eps = 1e-15;
+    const tiny = 1e-30;
+    const qab = a + b;
+    const qap = a + 1;
+    const qam = a - 1;
+    let c = 1;
+    let d = 1 - qab * x / qap;
+    if (Math.abs(d) < tiny) d = tiny;
+    d = 1 / d;
+    let h = d;
+    
+    for (let m = 1; m <= maxIt; m++) {
+        const m2 = 2 * m;
+        let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+        d = 1 + aa * d;
+        if (Math.abs(d) < tiny) d = tiny;
+        d = 1 / d;
+        c = 1 + aa / c;
+        if (Math.abs(c) < tiny) c = tiny;
+        h *= c * d;
+        
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+        d = 1 + aa * d;
+        if (Math.abs(d) < tiny) d = tiny;
+        d = 1 / d;
+        c = 1 + aa / c;
+        if (Math.abs(c) < tiny) c = tiny;
+        const delta = c * d;
+        h *= delta;
+        if (Math.abs(delta - 1) < eps) break;
+    }
+    return h;
+};
+
+export const regularizedBeta = (a, b, x) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const lbeta = logGamma(a) + logGamma(b) - logGamma(a + b);
+    if (x < (a + 1) / (a + b + 2)) {
+        const front = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lbeta) / a;
+        return front * betaCf(a, b, x);
+    } else {
+        const front = Math.exp(b * Math.log(1 - x) + a * Math.log(x) - lbeta) / b;
+        return 1 - front * betaCf(b, a, 1 - x);
+    }
+};
 
 export const erf = (x) => {
     const a1 =  0.254829592;
