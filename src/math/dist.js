@@ -556,4 +556,39 @@ export const DISTRIBUTIONS = {
         mechanics: "Always positive, highly right-skewed. Fits right-tail heavy datasets.",
         formula: "f(x) = (1 / (x σ √(2π))) e^{-0.5 ((\\ln x - μ)/σ)^2} for x > 0"
     },
+    studentt: {
+        id: 'studentt',
+        name: 'STUDENT\'S T',
+        isDiscrete: false,
+        params: [
+            { id: 'df', label: 'df (Deg Freedom)', min: 1, max: 30, step: 1, default: 4 }
+        ],
+        pdf: (x, p) => {
+            const v = p.df;
+            const coef = logGamma((v + 1) / 2) - logGamma(v / 2) - 0.5 * Math.log(v * Math.PI);
+            return Math.exp(coef - ((v + 1) / 2) * Math.log(1 + x * x / v));
+        },
+        cdf: (x, p) => {
+            const v = p.df;
+            const xt = v / (v + x * x);
+            const ibeta = regularizedBeta(v / 2, 0.5, xt);
+            return x < 0 ? 0.5 * ibeta : 1 - 0.5 * ibeta;
+        },
+        mean: (p) => p.df > 1 ? 0 : NaN,
+        variance: (p) => p.df > 2 ? p.df / (p.df - 2) : p.df > 1 ? Infinity : NaN,
+        median: (p) => 0,
+        skewness: (p) => p.df > 3 ? 0 : NaN,
+        kurtosis: (p) => p.df > 4 ? 6 / (p.df - 4) : p.df > 2 ? Infinity : NaN,
+        sample: (p) => {
+            const z = sampleNormal(0, 1);
+            const v = sampleGamma(p.df / 2, 2);
+            return z / Math.sqrt(v / p.df);
+        },
+        range: { min: -10, max: 10 },
+        fixedY: 0.5,
+        what: "Symmetric bell curve with heavier tails than the Normal distribution.",
+        when: "Small sample size hypothesis testing (T-tests), stock market return modeling.",
+        mechanics: "Has fat tails to account for small sample uncertainty; becomes Normal as df → ∞.",
+        formula: "f(x) = Γ((df+1)/2) (1 + x^2/df)^{-(df+1)/2} / (\\sqrt{df\\pi} Γ(df/2))"
+    },
 };
