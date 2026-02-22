@@ -501,4 +501,31 @@ export const DISTRIBUTIONS = {
         mechanics: "Creates U-shapes, flat lines, bell shapes depending on shape parameters α, β.",
         formula: "f(x) = x^{α-1} (1-x)^{β-1} / B(α, β) for 0 ≤ x ≤ 1"
     },
+    chisquare: {
+        id: 'chisquare',
+        name: 'CHI-SQUARE',
+        isDiscrete: false,
+        params: [
+            { id: 'df', label: 'df (Deg Freedom)', min: 1, max: 30, step: 1, default: 4 }
+        ],
+        pdf: (x, p) => {
+            if (x <= 0) return 0;
+            const k = p.df;
+            return Math.exp((k / 2 - 1) * Math.log(x) - x / 2 - (k / 2) * Math.log(2) - logGamma(k / 2));
+        },
+        cdf: (x, p) => (x <= 0) ? 0 : regularizedGammaP(p.df / 2, x / 2),
+        mean: (p) => p.df,
+        variance: (p) => 2 * p.df,
+        median: (p) => p.df * Math.pow(1 - 2 / (9 * p.df), 3),
+        skewness: (p) => Math.sqrt(8 / p.df),
+        kurtosis: (p) => 12 / p.df,
+        sample: (p) => sampleGamma(p.df / 2, 2),
+        range: { min: 0, max: 40 },
+        autoScaleX: true,
+        autoScaleY: true,
+        what: "Distribution of sum of squares of df independent standard normal random variables.",
+        when: "Hypothesis testing (Pearson chi-square test), goodness-of-fit evaluations.",
+        mechanics: "Extremely right-skewed for df=1, df=2; moves to Gaussian as degrees increase.",
+        formula: "f(x) = x^{(df/2)-1} e^{-x/2} / (2^{df/2} Γ(df/2)) for x > 0"
+    },
 };

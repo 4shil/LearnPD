@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         testDists.push('hypergeometric');
         testDists.push('gamma');
         testDists.push('beta');
+        testDists.push('chisquare');
 
         testDists.forEach(dId => {
             const d = DISTRIBUTIONS[dId];
