@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         testDists.push('chisquare');
         testDists.push('lognormal');
         testDists.push('studentt');
+        testDists.push('weibull');
 
         testDists.forEach(dId => {
             const d = DISTRIBUTIONS[dId];

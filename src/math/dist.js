@@ -591,4 +591,53 @@ export const DISTRIBUTIONS = {
         mechanics: "Has fat tails to account for small sample uncertainty; becomes Normal as df → ∞.",
         formula: "f(x) = Γ((df+1)/2) (1 + x^2/df)^{-(df+1)/2} / (\\sqrt{df\\pi} Γ(df/2))"
     },
+    weibull: {
+        id: 'weibull',
+        name: 'WEIBULL',
+        isDiscrete: false,
+        params: [
+            { id: 'scale', label: 'λ (Scale)', min: 0.2, max: 10, step: 0.1, default: 1.5 },
+            { id: 'shape', label: 'k (Shape)', min: 0.5, max: 10, step: 0.1, default: 2.0 }
+        ],
+        pdf: (x, p) => {
+            if (x < 0) return 0;
+            if (x === 0 && p.shape < 1) return Infinity;
+            const k = p.shape;
+            const lam = p.scale;
+            return (k / lam) * Math.pow(x / lam, k - 1) * Math.exp(-Math.pow(x / lam, k));
+        },
+        cdf: (x, p) => (x < 0) ? 0 : 1 - Math.exp(-Math.pow(x / p.scale, p.shape)),
+        mean: (p) => p.scale * Math.exp(logGamma(1 + 1 / p.shape)),
+        variance: (p) => {
+            const m1 = Math.exp(logGamma(1 + 1 / p.shape));
+            const m2 = Math.exp(logGamma(1 + 2 / p.shape));
+            return p.scale * p.scale * (m2 - m1 * m1);
+        },
+        median: (p) => p.scale * Math.pow(Math.log(2), 1 / p.shape),
+        skewness: (p) => {
+            const k = p.shape;
+            const g1 = Math.exp(logGamma(1 + 1/k));
+            const g2 = Math.exp(logGamma(1 + 2/k));
+            const g3 = Math.exp(logGamma(1 + 3/k));
+            const sig = Math.sqrt(g2 - g1*g1);
+            return sig === 0 ? 0 : (g3 - 3*g1*g2 + 2*g1*g1*g1) / (sig*sig*sig);
+        },
+        kurtosis: (p) => {
+            const k = p.shape;
+            const g1 = Math.exp(logGamma(1 + 1/k));
+            const g2 = Math.exp(logGamma(1 + 2/k));
+            const g3 = Math.exp(logGamma(1 + 3/k));
+            const g4 = Math.exp(logGamma(1 + 4/k));
+            const var_val = g2 - g1*g1;
+            return var_val === 0 ? 0 : (g4 - 4*g1*g3 + 6*g1*g1*g2 - 3*g1*g1*g1*g1) / (var_val*var_val) - 3;
+        },
+        sample: (p) => p.scale * Math.pow(-Math.log(1 - Math.random()), 1 / p.shape),
+        range: { min: 0, max: 20 },
+        autoScaleX: true,
+        autoScaleY: true,
+        what: "Highly versatile distribution modeling failure rates and material lifetime tests.",
+        when: "Predicting time-to-failure in mechanical designs, wind speeds, insurance analysis.",
+        mechanics: "Shape k determines behavior: k < 1 (decreasing hazard), k=1 (exponential), k > 1 (increasing).",
+        formula: "f(x) = (k/λ) (x/λ)^{k-1} e^{-(x/λ)^k} for x ≥ 0"
+    }
 };
