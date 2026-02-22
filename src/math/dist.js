@@ -528,4 +528,32 @@ export const DISTRIBUTIONS = {
         mechanics: "Extremely right-skewed for df=1, df=2; moves to Gaussian as degrees increase.",
         formula: "f(x) = x^{(df/2)-1} e^{-x/2} / (2^{df/2} Γ(df/2)) for x > 0"
     },
+    lognormal: {
+        id: 'lognormal',
+        name: 'LOG-NORMAL',
+        isDiscrete: false,
+        params: [
+            { id: 'mu', label: 'μ (Location)', min: -2, max: 3, step: 0.1, default: 0 },
+            { id: 'sigma', label: 'σ (Scale)', min: 0.1, max: 2, step: 0.1, default: 0.5 }
+        ],
+        pdf: (x, p) => {
+            if (x <= 0) return 0;
+            const exp = -Math.pow(Math.log(x) - p.mu, 2) / (2 * p.sigma * p.sigma);
+            return (1 / (x * p.sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exp);
+        },
+        cdf: (x, p) => (x <= 0) ? 0 : 0.5 * (1 + erf((Math.log(x) - p.mu) / (p.sigma * Math.sqrt(2)))),
+        mean: (p) => Math.exp(p.mu + p.sigma * p.sigma / 2),
+        variance: (p) => (Math.exp(p.sigma * p.sigma) - 1) * Math.exp(2 * p.mu + p.sigma * p.sigma),
+        median: (p) => Math.exp(p.mu),
+        skewness: (p) => (Math.exp(p.sigma * p.sigma) + 2) * Math.sqrt(Math.exp(p.sigma * p.sigma) - 1),
+        kurtosis: (p) => Math.exp(4 * p.sigma * p.sigma) + 2 * Math.exp(3 * p.sigma * p.sigma) + 3 * Math.exp(2 * p.sigma * p.sigma) - 6,
+        sample: (p) => Math.exp(sampleNormal(p.mu, p.sigma)),
+        range: { min: 0, max: 25 },
+        autoScaleX: true,
+        autoScaleY: true,
+        what: "Continuous distribution of a random variable whose logarithm is normally distributed.",
+        when: "Income sizes, geological sizes, stock prices, city populations.",
+        mechanics: "Always positive, highly right-skewed. Fits right-tail heavy datasets.",
+        formula: "f(x) = (1 / (x σ √(2π))) e^{-0.5 ((\\ln x - μ)/σ)^2} for x > 0"
+    },
 };
