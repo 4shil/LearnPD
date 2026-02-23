@@ -277,6 +277,37 @@ export class Renderer {
     }
 
     // --- LLN Convergence Line Widget ---
+    drawLlnPath(data, targetValue) {
+        if (!this.ctx || data.length === 0) return;
+        const { padding, fg } = this.options;
+        const plotWidth = this.width - 2 * padding;
+        const plotHeight = this.height - 2 * padding;
+
+        const maxIt = data.length;
+        const toCanvasX = (idx) => padding + (idx / maxIt) * plotWidth;
+        const toCanvasY = (val) => this.height - padding - (val / 1.0) * plotHeight; // Normal proportion bounds [0, 1]
+
+        // Draw Target dotted line (0.50)
+        this.ctx.strokeStyle = 'rgba(26, 26, 26, 0.5)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.setLineDash([4, 4]);
+        this.ctx.beginPath();
+        this.ctx.moveTo(padding, toCanvasY(targetValue));
+        this.ctx.lineTo(this.width - padding, toCanvasY(targetValue));
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+
+        // Draw Running Average path
+        this.ctx.strokeStyle = fg;
+        this.ctx.lineWidth = 2.5;
+        this.ctx.beginPath();
+        data.forEach((val, idx) => {
+            const cx = toCanvasX(idx);
+            const cy = toCanvasY(val);
+            idx === 0 ? this.ctx.moveTo(cx, cy) : this.ctx.lineTo(cx, cy);
+        });
+        this.ctx.stroke();
+    }
 
     // --- Tooltip coordinate conversion ---
 }

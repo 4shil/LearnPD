@@ -350,12 +350,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Chapter 4 Widget: Law of Large Numbers Coin Flips
+    const btnRunLln = document.getElementById('btnRunLln');
+    const btnClearLln = document.getElementById('btnClearLln');
+    let llnFlips = [];
+    let llnAverages = [];
+    let llnTotal = 0;
+    let llnHeads = 0;
+
+    const runLlnFlips = () => {
+        if (store.state.currentView !== 'chapters') return;
+        
+        for (let i = 0; i < 100; i++) {
+            const result = Math.random() < 0.5 ? 1 : 0;
+            llnFlips.push(result);
+            llnTotal++;
+            if (result === 1) llnHeads++;
+            llnAverages.push(llnHeads / llnTotal);
+        }
+
+        document.getElementById('llnStats').innerText = `Total Flips: ${llnTotal} | Heads: ${llnHeads} (${(llnHeads / llnTotal * 100).toFixed(1)}%)`;
+        drawChapter4Widget();
+    };
+
+    const clearLln = () => {
+        llnFlips = [];
+        llnAverages = [];
+        llnTotal = 0;
+        llnHeads = 0;
+        document.getElementById('llnStats').innerText = `Total Flips: 0 | Heads: 0 (0.0%)`;
+        drawChapter4Widget();
+    };
+
+    const drawChapter4Widget = () => {
+        if (store.state.currentView !== 'chapters') return;
+        ch4Renderer.resize();
+        ch4Renderer.clear();
+        ch4Renderer.drawGrid();
+        ch4Renderer.drawAxes(0, Math.max(100, llnTotal), 1.0);
+        ch4Renderer.drawLlnPath(llnAverages, 0.50);
+    };
+
+    if (btnRunLln && btnClearLln) {
+        btnRunLln.addEventListener('click', runLlnFlips);
+        btnClearLln.addEventListener('click', clearLln);
+    }
 
     // Trigger widgets initialization on Chapters Tab selection
     const initChapterWidgets = () => {
         drawChapter1Widget();
         drawChapter2Widget();
         drawChapter3Widget();
+        drawChapter4Widget();
     };
 
     // ── 8. CLT Simulator execution logic ──
