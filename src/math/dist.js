@@ -162,6 +162,24 @@ export const sampleNormal = (mu, sigma) => {
     return mu + sigma * z;
 };
 
+export const sampleGamma = (k, theta) => {
+    if (k < 1) {
+        return sampleGamma(k + 1, theta) * Math.pow(Math.random(), 1 / k);
+    }
+    const d = k - 1/3;
+    const c = 1 / Math.sqrt(9 * d);
+    while (true) {
+        let x, v, u;
+        do {
+            x = sampleNormal(0, 1);
+            v = 1 + c * x;
+        } while (v <= 0);
+        v = v * v * v;
+        u = Math.random();
+        if (u < 1 - 0.0331 * x * x * x * x) return d * v * theta;
+        if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v * theta;
+    }
+};
 
 // --- DISTRIBUTIONS DEFINITIONS ---
 
@@ -217,6 +235,7 @@ export const DISTRIBUTIONS = {
         median: (p) => (p.a + p.b) / 2,
         skewness: (p) => 0,
         kurtosis: (p) => -1.2,
+        sample: (p) => p.a + (p.b - p.a) * Math.random(),
         range: { min: -15, max: 15 },
         fixedY: 1.2,
         what: "Constant probability density across an interval [a, b]. All equal intervals are equally likely.",
