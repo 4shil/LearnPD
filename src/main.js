@@ -359,6 +359,52 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ── 8. CLT Simulator execution logic ──
+    const btnSimOne = document.getElementById('btnSimulateOne');
+    const btnSimBatch = document.getElementById('btnSimulateBatch');
+    const btnSimLarge = document.getElementById('btnSimulateLarge');
+
+    const runSimulationBatch = (count) => {
+        const sim = store.state.simulator;
+        const dist = DISTRIBUTIONS[sim.dist];
+        const n = sim.sampleSize;
+
+        let step = 0;
+        const addSampleMeanStep = () => {
+            if (step >= count) {
+                store.state.simulator.isRunning = false;
+                store.notify();
+                return;
+            }
+            
+            // Draw n samples and find mean
+            let sum = 0;
+            for (let i = 0; i < n; i++) {
+                sum += dist.sample(sim.params);
+            }
+            const meanVal = sum / n;
+            store.addSimSample(meanVal);
+
+            step++;
+            
+            // Stagger animation rendering steps only for small batches
+            if (count <= 10) {
+                setTimeout(addSampleMeanStep, 80);
+            } else if (step % 20 === 0 || step === count) {
+                // Batch updates
+                store.notify();
+                requestAnimationFrame(addSampleMeanStep);
+            } else {
+                addSampleMeanStep();
+            }
+        };
+
+        store.state.simulator.isRunning = true;
+        addSampleMeanStep();
+    };
+
+    if (btnSimOne) btnSimOne.addEventListener('click', () => runSimulationBatch(1));
+    if (btnSimBatch) btnSimBatch.addEventListener('click', () => runSimulationBatch(100));
+    if (btnSimLarge) btnSimLarge.addEventListener('click', () => runSimulationBatch(1000));
 
     // ── 9. Store Subscription rendering updates ──
     let lastView = null;
