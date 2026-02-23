@@ -312,6 +312,15 @@ export const DISTRIBUTIONS = {
         median: (p) => Math.floor(p.lambda + 1/3 - 0.02 / p.lambda),
         skewness: (p) => 1 / Math.sqrt(p.lambda),
         kurtosis: (p) => 1 / p.lambda,
+        sample: (p) => {
+            const L = Math.exp(-p.lambda);
+            let k = 0, pr = 1;
+            do {
+                k++;
+                pr *= Math.random();
+            } while (pr > L && k < 1000);
+            return k - 1;
+        },
         range: { min: 0, max: 50 },
         autoScaleX: true,
         autoScaleY: true,
