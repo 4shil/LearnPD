@@ -237,6 +237,44 @@ export class Renderer {
     }
 
     // --- Histogram for Sampling CLT Simulator ---
+    drawHistogram(samples, xMinVal, xMaxVal, yMaxVal) {
+        if (!this.ctx || !samples || samples.length === 0) return;
+        const { padding } = this.options;
+        const plotWidth = this.width - 2 * padding;
+        const plotHeight = this.height - 2 * padding;
+
+        // Count samples in bins
+        const binCount = 25;
+        const bins = new Array(binCount).fill(0);
+        
+        samples.forEach(s => {
+            let binIdx = Math.floor(((s - xMinVal) / (xMaxVal - xMinVal)) * binCount);
+            binIdx = Math.max(0, Math.min(binCount - 1, binIdx));
+            bins[binIdx]++;
+        });
+
+        const maxBinVal = Math.max(...bins) || 1;
+        const barW = plotWidth / binCount;
+
+        // Draw histogram bars in semi-transparent light green
+        bins.forEach((count, i) => {
+            const countDensity = count / (samples.length * (xMaxVal - xMinVal) / binCount); // Relative frequency density
+            
+            // Map height relative to yMaxVal
+            const h = (countDensity / yMaxVal) * plotHeight;
+            const cx = padding + i * barW;
+            const cy = this.height - padding - h;
+
+            this.ctx.fillStyle = 'rgba(200, 245, 66, 0.4)';
+            this.ctx.strokeStyle = '#1a1a1a';
+            this.ctx.lineWidth = 1;
+            
+            this.ctx.beginPath();
+            this.ctx.rect(cx, cy, barW - 1, h);
+            this.ctx.fill();
+            this.ctx.stroke();
+        });
+    }
 
     // --- LLN Convergence Line Widget ---
 

@@ -486,6 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Target scaling boundaries for sampling distributions
             const plotYMax = 1 / (theorySe * Math.sqrt(2 * Math.PI)) * 1.25;
 
+            simRenderer.drawHistogram(sim.results, xMin, xMax, plotYMax);
 
 
             simRenderer.drawAxes(xMin, xMax, plotYMax);
