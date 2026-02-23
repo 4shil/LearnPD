@@ -239,6 +239,7 @@ export const DISTRIBUTIONS = {
         median: (p) => (p.p > 0.5 ? 1 : p.p < 0.5 ? 0 : 0.5),
         skewness: (p) => (1 - 2 * p.p) / Math.sqrt(p.p * (1 - p.p) || 1e-6),
         kurtosis: (p) => (1 - 6 * p.p * (1 - p.p)) / (p.p * (1 - p.p) || 1e-6),
+        sample: (p) => (Math.random() < p.p ? 1 : 0),
         range: { min: -0.5, max: 1.5 },
         fixedY: 1.1,
         what: "Single trial with binary outcomes: success (1) with probability p, or failure (0).",
