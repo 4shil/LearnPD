@@ -280,6 +280,11 @@ export const DISTRIBUTIONS = {
         median: (p) => Math.round(p.n * p.p),
         skewness: (p) => (1 - 2 * p.p) / Math.sqrt(p.n * p.p * (1 - p.p) || 1e-6),
         kurtosis: (p) => (1 - 6 * p.p * (1 - p.p)) / (p.n * p.p * (1 - p.p) || 1e-6),
+        sample: (p) => {
+            let s = 0;
+            for (let i = 0; i < p.n; i++) if (Math.random() < p.p) s++;
+            return s;
+        },
         range: { min: 0, max: 100 },
         autoScaleX: true,
         autoScaleY: true,
