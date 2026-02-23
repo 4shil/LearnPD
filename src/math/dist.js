@@ -334,6 +334,7 @@ export const DISTRIBUTIONS = {
         median: (p) => Math.log(2) / p.lambda,
         skewness: (p) => 2,
         kurtosis: (p) => 6,
+        sample: (p) => -Math.log(1 - Math.random()) / p.lambda,
         range: { min: 0, max: 10 },
         fixedY: 5.5,
         what: "Models waiting times between independent Poisson events. Famously 'memoryless'.",
