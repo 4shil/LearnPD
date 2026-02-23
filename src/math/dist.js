@@ -155,6 +155,12 @@ export const erf = (x) => {
 };
 
 // --- BASE RANDOM SAMPLERS ---
+export const sampleNormal = (mu, sigma) => {
+    const u1 = Math.random();
+    const u2 = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    return mu + sigma * z;
+};
 
 
 // --- DISTRIBUTIONS DEFINITIONS ---
@@ -178,6 +184,7 @@ export const DISTRIBUTIONS = {
         median: (p) => p.mu,
         skewness: (p) => 0,
         kurtosis: (p) => 0,
+        sample: (p) => sampleNormal(p.mu, p.sigma),
         range: { min: -15, max: 15 },
         fixedY: 1.0,
         what: "The symmetric bell curve. Describes natural variations around a central mean.",
