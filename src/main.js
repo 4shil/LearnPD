@@ -439,6 +439,57 @@ document.addEventListener('DOMContentLoaded', () => {
         // Quiz Matching rendering
 
         // Sampling CLT Simulator Rendering
+        if (state.currentView === 'simulator') {
+            simRenderer.resize();
+            simRenderer.clear();
+            simRenderer.drawGrid();
+
+            const sim = state.simulator;
+            const dist = DISTRIBUTIONS[sim.dist];
+            const n = sim.sampleSize;
+
+            // Define mathematical bounds of source distribution
+            let xMin = dist.range.min;
+            let xMax = dist.range.max;
+            if (dist.autoScaleX) {
+                const mean = dist.mean(sim.params);
+                const std = Math.sqrt(dist.variance(sim.params)) || 1;
+                xMin = Math.max(dist.range.min, mean - 3.5 * std);
+                xMax = Math.min(dist.range.max, mean + 3.5 * std);
+            }
+
+            // Theoretical Expected values of Sample Means
+            const theoryMean = dist.mean(sim.params);
+            const theoryVariance = dist.variance(sim.params);
+            const theorySe = Math.sqrt(theoryVariance / n);
+
+            // Observed values
+            let obsMean = 0;
+            let obsSe = 0;
+            
+            if (sim.results.length > 0) {
+                let sum = 0;
+                sim.results.forEach(val => sum += val);
+                obsMean = sum / sim.results.length;
+
+                let sqDiffSum = 0;
+                sim.results.forEach(val => sqDiffSum += Math.pow(val - obsMean, 2));
+                obsSe = Math.sqrt(sqDiffSum / (sim.results.length || 1));
+            }
+
+            document.getElementById('simTheoryMean').innerText = isNaN(theoryMean) ? 'NaN' : theoryMean.toFixed(3);
+            document.getElementById('simObsMean').innerText = obsMean === 0 ? '0.000' : obsMean.toFixed(3);
+            document.getElementById('simTheorySe').innerText = isNaN(theorySe) ? 'NaN' : theorySe.toFixed(3);
+            document.getElementById('simObsSe').innerText = obsSe === 0 ? '0.000' : obsSe.toFixed(3);
+
+            // Plot sample histograms
+            // Target scaling boundaries for sampling distributions
+            const plotYMax = 1 / (theorySe * Math.sqrt(2 * Math.PI)) * 1.25;
+
+
+
+            simRenderer.drawAxes(xMin, xMax, plotYMax);
+        }
 
         // Handle view change transition animations
         if (lastView !== state.currentView) {

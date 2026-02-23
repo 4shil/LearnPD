@@ -11,6 +11,7 @@ export class UI {
         this.initChapterListeners();
         this.initExplorerListeners();
         this.initCalculatorListeners();
+        this.initSimulatorListeners();
         this.bindStore();
     }
 
@@ -160,6 +161,29 @@ export class UI {
     }
 
 
+    initSimulatorListeners() {
+        const simSelect = document.getElementById('simDistSelect');
+        if (simSelect) {
+            simSelect.addEventListener('change', (e) => {
+                store.setSimDistribution(e.target.value);
+            });
+            // Initial call to populate parameters
+            store.setSimDistribution(simSelect.value);
+        }
+
+        const simSize = document.getElementById('simSampleSize');
+        if (simSize) {
+            simSize.addEventListener('change', (e) => {
+                store.setSimSampleSize(e.target.value);
+            });
+        }
+
+        const clearBtn = document.getElementById('btnClearSim');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => store.clearSim());
+        }
+    }
+
 
 
     bindStore() {
@@ -168,6 +192,7 @@ export class UI {
             this.updateExplorerUI(state);
             this.updateCompareUI(state);
             this.updateCalculatorUI(state);
+            this.updateSimulatorUI(state);
         });
     }
 
@@ -355,6 +380,41 @@ export class UI {
     }
 
 
+
+    updateSimulatorUI(state) {
+        const sim = state.simulator;
+        const select = document.getElementById('simDistSelect');
+        if (select && select.value !== sim.dist) {
+            select.value = sim.dist;
+        }
+
+        const paramsDiv = document.getElementById('simParams');
+        if (paramsDiv && paramsDiv.dataset.dist !== sim.dist) {
+            paramsDiv.dataset.dist = sim.dist;
+            paramsDiv.innerHTML = '';
+            
+            const distObj = DISTRIBUTIONS[sim.dist];
+            distObj.params.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'param-control';
+                div.innerHTML = `
+                    <label><span>${p.label}</span> <span id="sim-val-${p.id}">${sim.params[p.id]}</span></label>
+                    <input type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${sim.params[p.id]}" id="sim-input-${p.id}">
+                `;
+
+                const input = div.querySelector('input');
+                input.addEventListener('input', (e) => {
+                    store.updateSimParam(p.id, e.target.value);
+                    document.getElementById(`sim-val-${p.id}`).innerText = e.target.value;
+                });
+
+                paramsDiv.appendChild(div);
+            });
+        }
+
+        // Update stats readouts
+        document.getElementById('simReadout').innerText = `Sample Means: ${sim.results.length}`;
+    }
 
 
 
