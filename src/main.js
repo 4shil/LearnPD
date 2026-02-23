@@ -488,6 +488,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             simRenderer.drawHistogram(sim.results, xMin, xMax, plotYMax);
 
+            // Overlay theoretical Central Limit Theorem Normal approximation curve (in dotted red)
+            const norm = DISTRIBUTIONS.normal;
+            const cltParams = { mu: theoryMean, sigma: theorySe };
+            
+            const ctx = simRenderer.ctx;
+            const { padding } = simRenderer.options;
+            const plotW = simRenderer.width - 2 * padding;
+            const plotH = simRenderer.height - 2 * padding;
+
+            const toX = (v) => padding + ((v - xMin) / (xMax - xMin)) * plotW;
+            const toY = (v) => simRenderer.height - padding - (v / plotYMax) * plotH;
+
+            ctx.strokeStyle = '#ff3366';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i <= 100; i++) {
+                const x = xMin + (i / 100) * (xMax - xMin);
+                const y = norm.pdf(x, cltParams);
+                i === 0 ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
+            }
+            ctx.stroke();
 
             simRenderer.drawAxes(xMin, xMax, plotYMax);
         }
