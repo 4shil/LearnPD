@@ -5,10 +5,40 @@ import { UI } from './ui/controller.js';
 import { Renderer } from './renderer/canvas.js';
 import { store } from './core/state.js';
 import { DISTRIBUTIONS } from './math/dist.js';
+import Lenis from 'lenis';
+import gsap from 'gsap';
 import './style.css';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ui = new UI();
+
+    // Initialize Lenis
+    const lenis = new Lenis();
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Custom Cursor Logic
+    const cursor = document.createElement('div');
+    cursor.className = 'custom-cursor';
+    document.body.appendChild(cursor);
+
+    window.addEventListener('mousemove', (e) => {
+        gsap.to(cursor, {
+            x: e.clientX,
+            y: e.clientY,
+            duration: 0.1,
+            ease: 'power2.out'
+        });
+    });
+
+    document.querySelectorAll('a, button, input, select').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor-active'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-active'));
+    });
+
     const mainRenderer = new Renderer('mainCanvas');
     const compareRenderer = new Renderer('compareCanvas', { accent: '#FF0000' });
 
