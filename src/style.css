@@ -107,10 +107,11 @@ body {
 /* Glassmorphism */
 .glass {
     background: var(--glass);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 /* Brutal Border Modifier */
@@ -119,26 +120,21 @@ body {
     box-shadow: var(--shadow);
 }
 
-/* Views */
-.view {
-    display: none;
-    animation: fadeIn 0.4s ease-out;
-}
-
-.view.active {
-    display: block;
-}
-
-@keyframes fadeIn {
+@keyframes viewEnter {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: scale(0.98) translateY(10px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1) translateY(0);
     }
+}
+
+.view.active {
+    display: block;
+    animation: viewEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Components Styles... (truncated for brevity, will add in chunks) */

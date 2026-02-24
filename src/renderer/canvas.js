@@ -116,13 +116,38 @@ export class Renderer {
                 const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
                 const canvasY = this.height - padding - (p.y / maxY) * plotHeight;
 
-                this.ctx.fillStyle = isCompare ? accent + '80' : accent;
+                // Gradient fill for bars
+                const grad = this.ctx.createLinearGradient(0, canvasY, 0, this.height - padding);
+                grad.addColorStop(0, isCompare ? accent + 'CC' : accent);
+                grad.addColorStop(1, isCompare ? accent + '44' : accent + '88');
+
+                this.ctx.fillStyle = grad;
                 this.ctx.fillRect(canvasX - barWidth / 2, canvasY, barWidth, (this.height - padding) - canvasY);
                 this.ctx.strokeStyle = fg;
-                this.ctx.lineWidth = 2;
+                this.ctx.lineWidth = 1;
                 this.ctx.strokeRect(canvasX - barWidth / 2, canvasY, barWidth, (this.height - padding) - canvasY);
             });
         } else {
+            // Area fill with gradient
+            if (!isCompare) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(padding + ((points[0].x - xMin) / (xMax - xMin)) * plotWidth, this.height - padding);
+                points.forEach(p => {
+                    const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
+                    const canvasY = this.height - padding - (p.y / maxY) * plotHeight;
+                    this.ctx.lineTo(canvasX, canvasY);
+                });
+                this.ctx.lineTo(padding + plotWidth, this.height - padding);
+                this.ctx.closePath();
+
+                const grad = this.ctx.createLinearGradient(0, padding, 0, this.height - padding);
+                grad.addColorStop(0, accent + 'AA');
+                grad.addColorStop(1, accent + '22');
+                this.ctx.fillStyle = grad;
+                this.ctx.fill();
+            }
+
+            // Line plot
             this.ctx.beginPath();
             points.forEach((p, i) => {
                 const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
@@ -131,15 +156,8 @@ export class Renderer {
                 else this.ctx.lineTo(canvasX, canvasY);
             });
 
-            if (!isCompare) {
-                this.ctx.lineTo(padding + plotWidth, this.height - padding);
-                this.ctx.lineTo(padding, this.height - padding);
-                this.ctx.fillStyle = accent;
-                this.ctx.fill();
-            }
-
-            this.ctx.strokeStyle = fg;
-            this.ctx.lineWidth = 6;
+            this.ctx.strokeStyle = isCompare ? accent : fg;
+            this.ctx.lineWidth = isCompare ? 4 : 6;
             this.ctx.stroke();
         }
 
