@@ -5,139 +5,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Professional Probability Distribution Web App - High-res interactive statistical explorer.">
-    <title>LearnPD - Probability Explorer</title>
+        content="LearnPD — Interactive probability distribution explorer. Visualize, compare, and calculate with 6 statistical models.">
+    <title>LearnPD — Probability Explorer</title>
     <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📊%3C/text%3E%3C/svg%3E">
-  <script type="module" crossorigin src="/assets/index-C4KZffb8.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CL0FNZTp.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <script type="module" crossorigin src="/assets/index-Cmqshji7.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CfNbjpyp.css">
 </head>
 
-<body class="app-shell">
-    <div class="pre-loader">
-        <div class="loader-text">LEARNPD</div>
+<body>
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <span class="preloader__text">LearnPD</span>
     </div>
-    <!-- Sidebar Navigation (Desktop) / Bottom Nav (Mobile) -->
-    <nav class="app-nav">
-        <div class="logo-box">
-            <span class="logo-icon">📊</span>
-            <span class="logo-text">LearnPD</span>
-        </div>
-        <div class="nav-links">
-            <a href="#home" class="nav-link active" data-tooltip="Home">
-                <span class="icon">🏠</span>
-                <span class="label">HOME</span>
-            </a>
-            <a href="#explorer" class="nav-link" data-tooltip="Explorer">
-                <span class="icon">📈</span>
-                <span class="label">EXPLORER</span>
-            </a>
-            <a href="#calculator" class="nav-link" data-tooltip="Calculator">
-                <span class="icon">🧮</span>
-                <span class="label">CALC</span>
-            </a>
-            <a href="#compare" class="nav-link" data-tooltip="Compare">
-                <span class="icon">⚖️</span>
-                <span class="label">COMPARE</span>
-            </a>
-            <a href="#learn" class="nav-link" data-tooltip="Learn">
-                <span class="icon">📚</span>
-                <span class="label">LEARN</span>
-            </a>
-            <a href="#about" class="nav-link" data-tooltip="About">
-                <span class="icon">ℹ️</span>
-                <span class="label">ABOUT</span>
-            </a>
-        </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor cursor--follower" id="cursorFollower"></div>
+
+    <!-- Navigation Dock -->
+    <nav class="dock" id="dock">
+        <a href="#home" class="dock__link active" data-view="home">
+            <span class="dock__icon">⌂</span>
+            <span class="dock__label">Home</span>
+        </a>
+        <a href="#explorer" class="dock__link" data-view="explorer">
+            <span class="dock__icon">◎</span>
+            <span class="dock__label">Explorer</span>
+        </a>
+        <a href="#calculator" class="dock__link" data-view="calculator">
+            <span class="dock__icon">⊞</span>
+            <span class="dock__label">Calc</span>
+        </a>
+        <a href="#compare" class="dock__link" data-view="compare">
+            <span class="dock__icon">⇔</span>
+            <span class="dock__label">Compare</span>
+        </a>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="app-content">
+    <!-- Views -->
+    <main class="main">
+
+        <!-- HOME -->
         <section id="home" class="view active">
-            <div class="app-hero glass">
-                <h1 class="glitch" data-text="LEARN PD">LEARN PD</h1>
-                <p class="subtitle">PROBABILITY DISTRIBUTION EXPLORER</p>
-                <div class="teaser-wrapper brutal-border">
-                    <canvas id="teaserCanvas"></canvas>
-                </div>
-                <div class="hero-actions">
-                    <button class="btn primary brutal-border" onclick="window.location.hash='#explorer'">LAUNCH
-                        EXPLORER</button>
-                    <button class="btn secondary brutal-border" onclick="window.location.hash='#learn'">VIEW
-                        LESSONS</button>
+            <div class="hero">
+                <p class="hero__eyebrow">Interactive Statistical Tool</p>
+                <h1 class="hero__title">
+                    <span class="hero__line">Probability</span>
+                    <span class="hero__line hero__line--accent">Distributions</span>
+                    <span class="hero__line">Explored.</span>
+                </h1>
+                <p class="hero__body">Visualize, manipulate, and understand 6 core probability models with real-time
+                    interactive charts and precise calculations.</p>
+                <div class="hero__actions">
+                    <button class="btn btn--primary" onclick="window.location.hash='#explorer'">Open Explorer</button>
+                    <button class="btn btn--ghost" onclick="window.location.hash='#calculator'">Calculator →</button>
                 </div>
             </div>
-
-            <div class="stats-overview">
-                <div class="stat-tile glass brutal-border">
-                    <div class="tile-icon">🎯</div>
-                    <h3>6 MODELS</h3>
-                    <p>Accurate Continuous & Discrete Distributions</p>
+            <div class="features">
+                <div class="feature card">
+                    <span class="feature__icon">◎</span>
+                    <h3 class="feature__title">6 Models</h3>
+                    <p class="feature__body">Normal, Uniform, Bernoulli, Binomial, Poisson, Exponential — continuous &
+                        discrete.</p>
                 </div>
-                <div class="stat-tile glass brutal-border">
-                    <div class="tile-icon">⚡</div>
-                    <h3>REAL-TIME</h3>
-                    <p>Instant visual feedback and calculations</p>
+                <div class="feature card">
+                    <span class="feature__icon">⚡</span>
+                    <h3 class="feature__title">Real-Time</h3>
+                    <p class="feature__body">Instant visual feedback. Drag sliders and watch distributions reshape live.
+                    </p>
+                </div>
+                <div class="feature card">
+                    <span class="feature__icon">⊞</span>
+                    <h3 class="feature__title">Calculate</h3>
+                    <p class="feature__body">PDF, CDF, interval probabilities — precise values at your fingertips.</p>
                 </div>
             </div>
         </section>
 
+        <!-- EXPLORER -->
         <section id="explorer" class="view">
-            <div class="explorer-layout">
-                <aside class="explorer-sidebar glass brutal-border">
+            <div class="explorer">
+                <aside class="explorer__sidebar card">
+                    <h2 class="sidebar__title">Explorer</h2>
                     <div class="control-group">
-                        <label>DISTRIBUTION</label>
-                        <select id="distSelect">
-                            <option value="normal">NORMAL (GAUSSIAN)</option>
-                            <option value="uniform">UNIFORM</option>
-                            <option value="bernoulli">BERNOULLI</option>
-                            <option value="binomial">BINOMIAL</option>
-                            <option value="poisson">POISSON</option>
-                            <option value="exponential">EXPONENTIAL</option>
+                        <label class="control__label">Distribution</label>
+                        <select id="distSelect" class="control__select">
+                            <option value="normal">Normal (Gaussian)</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="binomial">Binomial</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
                         </select>
                     </div>
                     <div id="paramSliders" class="sliders-list"></div>
-                    <div class="extra-controls">
-                        <button class="btn-sm brutal-border math-toggle">SHOW FORMULA</button>
-                        <div id="formulaBox" class="formula-box brutal-border hidden"></div>
-                        <button class="btn-sm brutal-border"
-                            onclick="store.initDistParams(store.state.currentDist)">RESET PARAMS</button>
+                    <div class="sidebar__actions">
+                        <button class="btn btn--small btn--ghost math-toggle">Show Formula</button>
+                        <div id="formulaBox" class="formula-box hidden"></div>
+                        <button class="btn btn--small btn--ghost"
+                            onclick="store.initDistParams(store.state.currentDist); store.notify();">Reset</button>
                     </div>
                 </aside>
-
-                <div class="chart-main">
-                    <div class="canvas-container glass brutal-border">
+                <div class="explorer__main">
+                    <div class="chart-container card card--flush">
                         <canvas id="mainCanvas"></canvas>
-                        <div id="brutalReadout" class="readout-overlay"></div>
+                        <div id="brutalReadout" class="chart__readout"></div>
                     </div>
-                    <div class="info-grid">
-                        <div class="info-card glass brutal-border">
-                            <h3>DEFINITION</h3>
-                            <p id="whatText"></p>
+                    <div class="info-row">
+                        <div class="info-card card">
+                            <h4 class="info-card__title">What</h4>
+                            <p id="whatText" class="info-card__body"></p>
                         </div>
-                        <div class="info-card glass brutal-border">
-                            <h3>APPLICATIONS</h3>
-                            <p id="whenText"></p>
+                        <div class="info-card card">
+                            <h4 class="info-card__title">When</h4>
+                            <p id="whenText" class="info-card__body"></p>
                         </div>
-                        <div class="info-card glass brutal-border">
-                            <h3>MECHANICS</h3>
-                            <p id="mechanicsText"></p>
+                        <div class="info-card card">
+                            <h4 class="info-card__title">How</h4>
+                            <p id="mechanicsText" class="info-card__body"></p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- CALCULATOR -->
         <section id="calculator" class="view">
-            <div class="calc-wrapper glass brutal-border">
-                <header class="section-header">
-                    <h2>STATISTICAL CALCULATOR</h2>
-                </header>
-                <div class="calc-grid">
-                    <div class="calc-column">
-                        <h3>1. SELECT MODEL</h3>
-                        <select id="calcDistSelect">
+            <div class="calc">
+                <h2 class="section-title">Calculator</h2>
+                <div class="calc__grid card">
+                    <div class="calc__col">
+                        <h3 class="calc__step">1 — Model</h3>
+                        <select id="calcDistSelect" class="control__select">
                             <option value="normal">Normal</option>
                             <option value="uniform">Uniform</option>
                             <option value="bernoulli">Bernoulli</option>
@@ -145,32 +147,37 @@
                             <option value="poisson">Poisson</option>
                             <option value="exponential">Exponential</option>
                         </select>
-                        <div id="calcParams" class="calc-inputs-group"></div>
+                        <div id="calcParams" class="calc__params"></div>
                     </div>
-                    <div class="calc-column">
-                        <h3>2. OPERATION</h3>
+                    <div class="calc__col">
+                        <h3 class="calc__step">2 — Operation</h3>
                         <div class="radio-group">
-                            <label><input type="radio" name="calcType" value="pdf" checked> <span>PDF/PMF</span></label>
-                            <label><input type="radio" name="calcType" value="cdf"> <span>CDF (P ≤ x)</span></label>
-                            <label><input type="radio" name="calcType" value="interval"> <span>INTERVAL</span></label>
+                            <label class="radio"><input type="radio" name="calcType" value="pdf" checked><span>PDF /
+                                    PMF</span></label>
+                            <label class="radio"><input type="radio" name="calcType" value="cdf"><span>CDF P(X ≤
+                                    x)</span></label>
+                            <label class="radio"><input type="radio" name="calcType"
+                                    value="interval"><span>Interval</span></label>
                         </div>
-                        <div id="calcInputs" class="calc-inputs-group"></div>
-                        <button class="btn primary btn-calc brutal-border">CALCULATE</button>
+                        <div id="calcInputs" class="calc__params"></div>
+                        <button class="btn btn--primary btn-calc">Calculate</button>
                     </div>
-                    <div class="calc-column">
-                        <h3>3. RESULT</h3>
-                        <div id="calcResult" class="result-display brutal-border">---</div>
+                    <div class="calc__col">
+                        <h3 class="calc__step">3 — Result</h3>
+                        <div id="calcResult" class="calc__result">—</div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- COMPARE -->
         <section id="compare" class="view">
-            <div class="compare-wrapper">
-                <div class="compare-inputs glass brutal-border">
-                    <div class="comp-col">
-                        <label>DISTRIBUTION A</label>
-                        <select id="compare1Select">
+            <div class="compare">
+                <h2 class="section-title">Compare</h2>
+                <div class="compare__controls">
+                    <div class="compare__side card">
+                        <label class="control__label">Model A</label>
+                        <select id="compare1Select" class="control__select">
                             <option value="normal">Normal</option>
                             <option value="uniform">Uniform</option>
                             <option value="bernoulli">Bernoulli</option>
@@ -179,11 +186,11 @@
                             <option value="exponential">Exponential</option>
                         </select>
                         <div id="compare1Params"></div>
+                        <div id="compare1Stats" class="compare__stat"></div>
                     </div>
-                    <div class="comp-col v-divider"></div>
-                    <div class="comp-col">
-                        <label>DISTRIBUTION B</label>
-                        <select id="compare2Select">
+                    <div class="compare__side card">
+                        <label class="control__label">Model B</label>
+                        <select id="compare2Select" class="control__select">
                             <option value="normal">Normal</option>
                             <option value="binomial" selected>Binomial</option>
                             <option value="uniform">Uniform</option>
@@ -192,43 +199,21 @@
                             <option value="exponential">Exponential</option>
                         </select>
                         <div id="compare2Params"></div>
+                        <div id="compare2Stats" class="compare__stat"></div>
                     </div>
                 </div>
-
-                <div class="compare-chart glass brutal-border">
+                <div class="chart-container card card--flush">
                     <canvas id="compareCanvas"></canvas>
-                    <div class="compare-legend">
-                        <div class="leg-item"><span class="dot red"></span> MODEL A</div>
-                        <div class="leg-item"><span class="dot blue"></span> MODEL B</div>
+                    <div class="compare__legend">
+                        <span class="legend legend--a">● Model A</span>
+                        <span class="legend legend--b">● Model B</span>
                     </div>
                 </div>
-
-                <div class="compare-stats-row glass brutal-border">
-                    <div id="compare1Stats"></div>
-                    <div id="compare2Stats"></div>
-                </div>
             </div>
         </section>
 
-        <section id="learn" class="view">
-            <div class="learn-grid">
-                <div class="lesson-card glass brutal-border">
-                    <h2>📚 FUNDAMENTALS</h2>
-                    <p>Understand the core concepts of probability density and cumulative mass.</p>
-                </div>
-                <!-- ... More lessons will be re-added ... -->
-            </div>
-        </section>
-
-        <section id="about" class="view">
-            <div class="about-card glass brutal-border">
-                <h2>ABOUT LEARNPD</h2>
-                <p>A professional-grade web application for statistical visualization and educational excellence.</p>
-            </div>
-        </section>
     </main>
 
-    <div class="custom-cursor"></div>
 </body>
 
 </html>

@@ -12,9 +12,10 @@ export class UI {
 
     initEventListeners() {
         // Nav links
-        document.querySelectorAll('.nav-link').forEach(link => {
+        document.querySelectorAll('.dock__link').forEach(link => {
             link.addEventListener('click', (e) => {
-                const viewId = link.getAttribute('href').substring(1);
+                e.preventDefault();
+                const viewId = link.dataset.view || link.getAttribute('href').substring(1);
                 store.switchView(viewId);
             });
         });
@@ -71,8 +72,9 @@ export class UI {
             v.classList.toggle('active', v.id === viewId);
         });
 
-        document.querySelectorAll('.nav-link').forEach(l => {
-            l.classList.toggle('active', l.getAttribute('href') === `#${viewId}`);
+        document.querySelectorAll('.dock__link').forEach(l => {
+            const linkView = l.dataset.view || l.getAttribute('href').substring(1);
+            l.classList.toggle('active', linkView === viewId);
         });
     }
 

@@ -1,5 +1,6 @@
 /**
- * LearnPD - Professional Entry Point
+ * LearnPD — Main Entry Point
+ * Soft Neo-Brutalist Edition
  */
 import { UI } from './ui/controller.js';
 import { Renderer } from './renderer/canvas.js';
@@ -10,138 +11,109 @@ import gsap from 'gsap';
 import './style.css';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Entrance Animation (Brutalist)
-    const TlEntrance = gsap.timeline({ defaults: { ease: 'expo.inOut' } });
-    TlEntrance.fromTo('.loader-text', { y: 100, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 })
-        .to('.loader-text', { x: 50, opacity: 0, duration: 0.4, delay: 0.2 })
-        .to('.pre-loader', { y: '-100%', duration: 0.8, ease: 'expo.inOut' })
-        .set('.pre-loader', { display: 'none' });
 
+    // ── Preloader ──
+    const tl = gsap.timeline({ defaults: { ease: 'expo.inOut' } });
+    tl.to('.preloader__text', { y: -20, opacity: 0, duration: 0.6, delay: 0.8 })
+        .to('.preloader', { yPercent: -100, duration: 0.8 })
+        .set('.preloader', { display: 'none' });
+
+    // ── UI Controller ──
     const ui = new UI();
 
-    // Initialize Lenis
+    // ── Smooth Scroll ──
     const lenis = new Lenis();
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-    }
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
-    // Custom Cursor Logic
-    const cursor = document.createElement('div');
-    cursor.className = 'custom-cursor';
-    document.body.appendChild(cursor);
+    // ── Custom Cursor ──
+    const dot = document.getElementById('cursor');
+    const ring = document.getElementById('cursorFollower');
+    let mx = 0, my = 0;
 
     window.addEventListener('mousemove', (e) => {
-        gsap.to(cursor, {
-            x: e.clientX,
-            y: e.clientY,
-            duration: 0.05, // Much faster
-            ease: 'none'
-        });
+        mx = e.clientX; my = e.clientY;
+        gsap.to(dot, { x: mx, y: my, duration: 0.08, ease: 'power2.out' });
+        gsap.to(ring, { x: mx, y: my, duration: 0.35, ease: 'power2.out' });
     });
 
-    const mainRenderer = new Renderer('mainCanvas');
-    const compareRenderer = new Renderer('compareCanvas', { accent: '#FF3E00' });
+    // Interactive hover state
+    const attachCursorHover = () => {
+        document.querySelectorAll('a, button, select, input, .card').forEach(el => {
+            if (el.dataset.cursorBound) return;
+            el.dataset.cursorBound = 'true';
+            el.addEventListener('mouseenter', () => ring.classList.add('active'));
+            el.addEventListener('mouseleave', () => ring.classList.remove('active'));
+        });
+    };
+    attachCursorHover();
 
-    // View Entry Animations
+    // Re-attach on DOM mutations
+    const observer = new MutationObserver(attachCursorHover);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // ── Renderers ──
+    const mainRenderer = new Renderer('mainCanvas');
+    const compareRenderer = new Renderer('compareCanvas');
+
+    // ── View Animations ──
     const animateView = (viewId) => {
-        gsap.fromTo(`#${viewId} > *`,
-            { y: 30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: 'power4.out', delay: 0.2 }
+        const targets = document.querySelectorAll(`#${viewId} .card, #${viewId} .hero, #${viewId} .section-title, #${viewId} .chart-container`);
+        gsap.fromTo(targets,
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, stagger: 0.06, ease: 'expo.out', clearProps: 'transform' }
         );
     };
 
-    // Subscribe renderer to store
+    // ── Store Subscription ──
+    let lastView = null;
     store.subscribe((state) => {
+        // Explorer
         if (state.currentView === 'explorer') {
+            mainRenderer.resize();
             mainRenderer.clear();
             mainRenderer.drawGrid();
             mainRenderer.drawAxes();
-
             const dist = DISTRIBUTIONS[state.currentDist];
             mainRenderer.plotDistribution(dist, state.params);
-
-            // Update readout
             const mean = dist.mean(state.params);
-            const varVal = dist.variance(state.params);
+            const variance = dist.variance(state.params);
             const readout = document.getElementById('brutalReadout');
-            if (readout) {
-                readout.innerText = `MEAN: ${mean.toFixed(2)} | VAR: ${varVal.toFixed(2)}`;
-            }
-        } else if (state.currentView === 'compare') {
+            if (readout) readout.innerText = `μ ${mean.toFixed(2)}  σ² ${variance.toFixed(2)}`;
+        }
+        // Compare
+        if (state.currentView === 'compare') {
+            compareRenderer.resize();
             compareRenderer.clear();
             compareRenderer.drawGrid();
             compareRenderer.drawAxes();
-
             const d1 = DISTRIBUTIONS[state.compare.dist1];
             const d2 = DISTRIBUTIONS[state.compare.dist2];
-
-            compareRenderer.options.accent = '#FF3E00'; // Reddish
+            compareRenderer.options.accent = '#FF3E00';
             compareRenderer.plotDistribution(d1, state.compare.params1, true);
-
-            compareRenderer.options.accent = '#0066FF'; // Bluish
+            compareRenderer.options.accent = '#0066FF';
             compareRenderer.plotDistribution(d2, state.compare.params2, true);
-
-            // Update stats
             const s1 = document.getElementById('compare1Stats');
             const s2 = document.getElementById('compare2Stats');
-            if (s1) s1.innerHTML = `MEAN: ${d1.mean(state.compare.params1).toFixed(2)}`;
-            if (s2) s2.innerHTML = `MEAN: ${d2.mean(state.compare.params2).toFixed(2)}`;
+            if (s1) s1.innerHTML = `μ = ${d1.mean(state.compare.params1).toFixed(3)}`;
+            if (s2) s2.innerHTML = `μ = ${d2.mean(state.compare.params2).toFixed(3)}`;
         }
-
-        // Trigger view animation if the view changed
-        if (ui.lastView !== state.currentView) {
+        // View change animation
+        if (lastView !== state.currentView) {
             animateView(state.currentView);
-            ui.lastView = state.currentView;
+            lastView = state.currentView;
         }
     });
 
-    // Handle resize
+    // ── Resize ──
     window.addEventListener('resize', () => {
         mainRenderer.resize();
         compareRenderer.resize();
-        store.notify(); // Force redraw
+        store.notify();
     });
 
-    // Initial boot
+    // ── Boot ──
     const hash = window.location.hash.substring(1) || 'home';
     store.switchView(hash);
-    ui.lastView = hash;
-
-    // Dynamic magnetic attachment
-    const observer = new MutationObserver(() => {
-        applyMagnetic();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    function applyMagnetic() {
-        document.querySelectorAll('.btn, .nav-link, button, select').forEach(el => {
-            if (el.dataset.magnetic) return;
-            el.dataset.magnetic = "true";
-
-            el.addEventListener('mouseenter', () => {
-                gsap.to(cursor, { scale: 3, duration: 0.3 });
-            });
-            el.addEventListener('mouseleave', () => {
-                gsap.to(cursor, { scale: 1, duration: 0.3 });
-            });
-
-            el.addEventListener('mousemove', (e) => {
-                const rect = el.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                gsap.to(el, {
-                    x: x * 0.3,
-                    y: y * 0.3,
-                    duration: 0.5,
-                    ease: 'power2.out'
-                });
-            });
-            el.addEventListener('mouseleave', () => {
-                gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
-            });
-        });
-    }
-    applyMagnetic();
+    lastView = hash;
 });

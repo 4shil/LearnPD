@@ -1,8 +1,7 @@
 /**
- * Professional Canvas rendering engine.
- * Handles High-DPI scaling, grids, and distribution plotting.
+ * Canvas Renderer — Clean, instant plotting.
+ * No GSAP in the render path. High-DPI aware.
  */
-import gsap from 'gsap';
 
 export class Renderer {
     constructor(canvasId, options = {}) {
@@ -10,11 +9,11 @@ export class Renderer {
         if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
         this.options = {
-            padding: 60,
-            accent: '#E6FF00',
-            fg: '#1D1D1F',
-            grid: '#e0e0e0',
-            lineWidth: 3,
+            padding: 50,
+            accent: '#c8f542',
+            fg: '#1a1a1a',
+            grid: '#e8e3dd',
+            lineWidth: 2.5,
             ...options
         };
         this.resize();
@@ -24,41 +23,52 @@ export class Renderer {
         if (!this.canvas) return;
         const parent = this.canvas.parentElement;
         const rect = parent.getBoundingClientRect();
-
-        // High-DPI scaling
         const dpr = window.devicePixelRatio || 1;
         this.canvas.width = rect.width * dpr;
         this.canvas.height = rect.height * dpr;
         this.canvas.style.width = `${rect.width}px`;
         this.canvas.style.height = `${rect.height}px`;
         this.ctx.scale(dpr, dpr);
-
         this.width = rect.width;
         this.height = rect.height;
     }
 
     clear() {
+        if (!this.ctx) return;
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
     drawGrid() {
+        if (!this.ctx) return;
         const { padding, grid } = this.options;
         this.ctx.strokeStyle = grid;
         this.ctx.lineWidth = 1;
+        const plotW = this.width - 2 * padding;
+        const plotH = this.height - 2 * padding;
 
+        // Vertical lines
         for (let i = 0; i <= 10; i++) {
-            let x = padding + (i * (this.width - 2 * padding) / 10);
+            const x = padding + (i / 10) * plotW;
             this.ctx.beginPath();
             this.ctx.moveTo(x, padding);
-            this.ctx.lineTo(x, this.height - padding);
+            this.ctx.lineTo(x, padding + plotH);
+            this.ctx.stroke();
+        }
+        // Horizontal lines
+        for (let i = 0; i <= 5; i++) {
+            const y = padding + (i / 5) * plotH;
+            this.ctx.beginPath();
+            this.ctx.moveTo(padding, y);
+            this.ctx.lineTo(padding + plotW, y);
             this.ctx.stroke();
         }
     }
 
     drawAxes() {
-        const { padding, fg, lineWidth } = this.options;
+        if (!this.ctx) return;
+        const { padding, fg } = this.options;
         this.ctx.strokeStyle = fg;
-        this.ctx.lineWidth = lineWidth;
+        this.ctx.lineWidth = 2;
         this.ctx.beginPath();
         this.ctx.moveTo(padding, padding);
         this.ctx.lineTo(padding, this.height - padding);
@@ -67,6 +77,7 @@ export class Renderer {
     }
 
     plotDistribution(dist, params, isCompare = false) {
+        if (!this.ctx) return;
         const { padding, accent, fg } = this.options;
         const plotWidth = this.width - 2 * padding;
         const plotHeight = this.height - 2 * padding;
@@ -76,8 +87,7 @@ export class Renderer {
 
         if (dist.autoScaleX && dist.isDiscrete) {
             const mean = dist.mean(params);
-            const variance = dist.variance(params);
-            const std = Math.sqrt(variance);
+            const std = Math.sqrt(dist.variance(params));
             xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std));
             xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std));
         }
@@ -89,7 +99,7 @@ export class Renderer {
             for (let k = Math.floor(xMin); k <= Math.ceil(xMax); k++) {
                 const y = dist.pmf(k, params);
                 if (y > maxY) maxY = y;
-                points.push({ x: k, y: y });
+                points.push({ x: k, y });
             }
         } else {
             const steps = 300;
@@ -97,85 +107,66 @@ export class Renderer {
                 const x = xMin + (i / steps) * (xMax - xMin);
                 const y = dist.pdf(x, params);
                 if (y > maxY && isFinite(y)) maxY = y;
-                points.push({ x: x, y: y });
+                points.push({ x, y });
             }
         }
 
-        if (dist.fixedY) {
-            maxY = dist.fixedY;
-        } else if (dist.autoScaleY) {
-            maxY *= 1.2;
-        } else {
-            maxY = 1.0;
-        }
+        if (dist.fixedY) maxY = dist.fixedY;
+        else if (dist.autoScaleY) maxY *= 1.2;
+        else maxY = 1.0;
+
+        const toCanvasX = (val) => padding + ((val - xMin) / (xMax - xMin)) * plotWidth;
+        const toCanvasY = (val) => this.height - padding - (val / maxY) * plotHeight;
 
         if (dist.isDiscrete) {
             const numBars = xMax - xMin + 1;
-            const barWidth = Math.min((plotWidth / numBars) * 0.8, 40);
+            const barW = Math.min((plotWidth / numBars) * 0.7, 36);
 
             points.forEach(p => {
-                const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
-                const canvasY = this.height - padding - (p.y / maxY) * plotHeight;
+                const cx = toCanvasX(p.x);
+                const cy = toCanvasY(p.y);
+                const h = (this.height - padding) - cy;
 
-                // Gradient fill for bars
-                const grad = this.ctx.createLinearGradient(0, canvasY, 0, this.height - padding);
-                grad.addColorStop(0, isCompare ? accent + 'CC' : accent);
-                grad.addColorStop(1, isCompare ? accent + '44' : accent + '88');
+                // Gradient bar
+                const grad = this.ctx.createLinearGradient(0, cy, 0, this.height - padding);
+                grad.addColorStop(0, isCompare ? accent : accent);
+                grad.addColorStop(1, isCompare ? accent + '44' : accent + '66');
 
                 this.ctx.fillStyle = grad;
-                this.ctx.fillRect(canvasX - barWidth / 2, canvasY, barWidth, (this.height - padding) - canvasY);
+                this.ctx.beginPath();
+                this.ctx.roundRect(cx - barW / 2, cy, barW, h, [4, 4, 0, 0]);
+                this.ctx.fill();
                 this.ctx.strokeStyle = fg;
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(canvasX - barWidth / 2, canvasY, barWidth, (this.height - padding) - canvasY);
+                this.ctx.lineWidth = 1.5;
+                this.ctx.stroke();
             });
         } else {
-            // Area fill with gradient
+            // Area fill
             if (!isCompare) {
                 this.ctx.beginPath();
-                this.ctx.moveTo(padding + ((points[0].x - xMin) / (xMax - xMin)) * plotWidth, this.height - padding);
-                points.forEach(p => {
-                    const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
-                    const canvasY = this.height - padding - (p.y / maxY) * plotHeight;
-                    this.ctx.lineTo(canvasX, canvasY);
-                });
-                this.ctx.lineTo(padding + plotWidth, this.height - padding);
+                this.ctx.moveTo(toCanvasX(points[0].x), this.height - padding);
+                points.forEach(p => this.ctx.lineTo(toCanvasX(p.x), toCanvasY(p.y)));
+                this.ctx.lineTo(toCanvasX(points[points.length - 1].x), this.height - padding);
                 this.ctx.closePath();
-
                 const grad = this.ctx.createLinearGradient(0, padding, 0, this.height - padding);
-                grad.addColorStop(0, accent + 'AA');
-                grad.addColorStop(1, accent + '22');
+                grad.addColorStop(0, accent + '55');
+                grad.addColorStop(1, accent + '08');
                 this.ctx.fillStyle = grad;
                 this.ctx.fill();
             }
 
-            // Line plot
-            const pathData = { length: 0 };
-            const fullLength = points.length;
-
+            // Line
             this.ctx.beginPath();
-            this.ctx.strokeStyle = isCompare ? accent : fg;
-            this.ctx.lineWidth = isCompare ? 4 : 6;
-
-            gsap.to(pathData, {
-                length: fullLength,
-                duration: 0.6, // Much faster
-                ease: 'expo.out', // Mechanical
-                onUpdate: () => {
-                    this.clear();
-                    this.drawGrid();
-                    this.drawAxes();
-
-                    this.ctx.beginPath();
-                    for (let j = 0; j < Math.ceil(pathData.length); j++) {
-                        const p = points[j];
-                        const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
-                        const canvasY = this.height - padding - (p.y / maxY) * plotHeight;
-                        if (j === 0) this.ctx.moveTo(canvasX, canvasY);
-                        else this.ctx.lineTo(canvasX, canvasY);
-                    }
-                    this.ctx.stroke();
-                }
+            points.forEach((p, i) => {
+                const cx = toCanvasX(p.x);
+                const cy = toCanvasY(p.y);
+                i === 0 ? this.ctx.moveTo(cx, cy) : this.ctx.lineTo(cx, cy);
             });
+            this.ctx.strokeStyle = isCompare ? accent : fg;
+            this.ctx.lineWidth = isCompare ? 2.5 : 3;
+            this.ctx.lineJoin = 'round';
+            this.ctx.lineCap = 'round';
+            this.ctx.stroke();
         }
 
         return { xMin, xMax, maxY, points };
