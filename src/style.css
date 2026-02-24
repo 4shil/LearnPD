@@ -1,17 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
-    --bg: #F0F2F5;
+    --bg: #FBFBFB;
     --fg: #1D1D1F;
     --accent: #E6FF00;
     --accent-dark: #B8CC00;
-    --glass: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --border-width: 2px;
-    --shadow: 10px 10px 0px 0px rgba(0, 0, 0, 0.1);
-    --radius: 12px;
-    --nav-width: 260px;
-    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --border-width: 2.5px;
+    --shadow-color: var(--fg);
+    --shadow: 5px 5px 0px 0px var(--shadow-color);
+    --shadow-large: 10px 10px 0px 0px var(--shadow-color);
+    --radius: 4px;
+    /* Sharper edges for brutalism */
+    --transition: 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    /* Faster, snappier */
 }
 
 * {
@@ -35,15 +36,40 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     cursor: none;
-    /* Hide default cursor */
 }
 
-a,
-button,
-input,
-select {
-    cursor: none;
-    /* Hide on interactive elements too */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Loader */
+.pre-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--fg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.loader-text {
+    color: var(--accent);
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: -2px;
 }
 
 /* App Shell Layout */
@@ -52,24 +78,22 @@ select {
     min-height: 100vh;
 }
 
-/* Floating Dock Navigation */
+/* Floating Dock Navigation (Brutalist) */
 .app-nav {
     width: auto;
     height: auto;
-    background: rgba(29, 29, 31, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: white;
+    border: var(--border-width) solid var(--fg);
     border-radius: 40px;
     display: flex;
     flex-direction: row;
-    padding: 0.6rem;
+    padding: 0.5rem;
     position: fixed;
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2000;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-large);
 }
 
 .logo-box {
@@ -79,45 +103,49 @@ select {
 .nav-links {
     display: flex;
     flex-direction: row;
-    gap: 0.3rem;
+    gap: 0.4rem;
     align-items: center;
 }
 
 .nav-link {
     text-decoration: none;
-    color: #999;
-    padding: 0.8rem 1.2rem;
+    color: var(--fg);
+    padding: 0.8rem 1.4rem;
     border-radius: 30px;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 500;
-    font-size: 0.9rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     transition: var(--transition);
+    border: 1px solid transparent;
 }
 
 .nav-link.active {
     background: var(--accent);
-    color: var(--fg);
+    border: var(--border-width) solid var(--fg);
+}
+
+.nav-link:hover:not(.active) {
+    background: #f0f0f0;
 }
 
 /* Main Content Area */
 .app-content {
     flex: 1;
     margin-left: 0;
-    /* No sidebar anymore */
-    padding: 4rem 2rem 10rem 2rem;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    padding: 6rem 2rem 12rem 2rem;
+    overflow: visible;
 }
 
-/* Glassmorphism */
+/* Brutalist Containers */
 .glass {
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
+    background: white;
+    border: var(--border-width) solid var(--fg);
     border-radius: var(--radius);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    box-shadow: var(--shadow);
 }
 
 /* Brutal Border Modifier */
@@ -129,31 +157,47 @@ select {
 @keyframes viewEnter {
     from {
         opacity: 0;
-        transform: scale(0.98) translateY(10px);
+        transform: translateY(20px);
     }
 
     to {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: translateY(0);
     }
 }
 
 .view.active {
     display: block;
-    animation: viewEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: viewEnter 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 /* Components Styles... (truncated for brevity, will add in chunks) */
-h1 {
-    font-size: 4rem;
-    font-weight: 900;
-    margin-bottom: 0.5rem;
+.btn {
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-weight: 700;
+    transition: var(--transition);
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.subtitle {
-    font-weight: 700;
-    color: #666;
-    margin-bottom: 2rem;
+.btn.primary {
+    background: var(--accent);
+    color: var(--fg);
+}
+
+.btn.secondary {
+    background: white;
+    color: var(--fg);
+}
+
+.btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0px 0px var(--fg);
+}
+
+.btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px var(--fg);
 }
 
 /* Responsive */
@@ -193,16 +237,16 @@ h1 {
     font-size: 1.5rem;
 }
 
-/* Explorer Layout */
 .explorer-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 2rem;
+    grid-template-columns: 350px 1fr;
+    gap: 3rem;
+    align-items: start;
 }
 
 .explorer-sidebar {
-    padding: 2rem;
-    height: fit-content;
+    padding: 2.5rem;
+    background: white;
 }
 
 .control-group {

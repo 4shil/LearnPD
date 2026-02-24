@@ -11,10 +11,10 @@ export class Renderer {
         this.ctx = this.canvas.getContext('2d');
         this.options = {
             padding: 60,
-            accent: '#FFFF00',
-            fg: '#000000',
-            grid: '#eeeeee',
-            lineWidth: 4,
+            accent: '#E6FF00',
+            fg: '#1D1D1F',
+            grid: '#e0e0e0',
+            lineWidth: 3,
             ...options
         };
         this.resize();
@@ -158,8 +158,8 @@ export class Renderer {
 
             gsap.to(pathData, {
                 length: fullLength,
-                duration: 1.2,
-                ease: 'power2.out',
+                duration: 0.6, // Much faster
+                ease: 'expo.out', // Mechanical
                 onUpdate: () => {
                     this.clear();
                     this.drawGrid();
