@@ -1,10 +1,11 @@
 /**
  * LearnPD - Professional Entry Point
  */
-import { UI } from './src/ui/controller.js';
-import { Renderer } from './src/renderer/canvas.js';
-import { store } from './src/core/state.js';
-import { DISTRIBUTIONS } from './src/math/dist.js';
+import { UI } from './ui/controller.js';
+import { Renderer } from './renderer/canvas.js';
+import { store } from './core/state.js';
+import { DISTRIBUTIONS } from './math/dist.js';
+import './style.css';
 
 document.addEventListener('DOMContentLoaded', () => {
     const ui = new UI();
