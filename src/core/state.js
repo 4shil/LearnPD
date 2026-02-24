@@ -23,6 +23,27 @@ class Store {
         this.initDistParams('normal');
         this.initCompareParams(1, 'normal');
         this.initCompareParams(2, 'binomial');
+
+        // Load from persistence
+        this.load();
+    }
+
+    save() {
+        localStorage.setItem('learnpd_state', JSON.stringify(this.state));
+    }
+
+    load() {
+        const saved = localStorage.getItem('learnpd_state');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                this.state = { ...this.state, ...parsed };
+                // Ensure currentView doesn't break routing on refresh if hash is different
+                this.state.currentView = window.location.hash.substring(1) || parsed.currentView || 'home';
+            } catch (e) {
+                console.warn('Failed to load state', e);
+            }
+        }
     }
 
     initDistParams(distId) {
@@ -56,28 +77,33 @@ class Store {
     setState(newState) {
         this.state = { ...this.state, ...newState };
         this.notify();
+        this.save();
     }
 
     updateParam(id, val) {
         this.state.params[id] = parseFloat(val);
         this.notify();
+        this.save();
     }
 
     updateCompareParam(which, id, val) {
         const target = which === 1 ? 'params1' : 'params2';
         this.state.compare[target][id] = parseFloat(val);
         this.notify();
+        this.save();
     }
 
     switchView(viewId) {
         this.state.currentView = viewId;
         this.notify();
+        this.save();
     }
 
     setDistribution(distId) {
         this.state.currentDist = distId;
         this.initDistParams(distId);
         this.notify();
+        this.save();
     }
 
     setCompareDist(which, distId) {
@@ -85,6 +111,7 @@ class Store {
         this.state.compare[target] = distId;
         this.initCompareParams(which, distId);
         this.notify();
+        this.save();
     }
 }
 

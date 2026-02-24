@@ -29,15 +29,25 @@ export class UI {
         const calcSelect = document.getElementById('calcDistSelect');
         if (calcSelect) {
             calcSelect.addEventListener('change', (e) => this.updateCalcParams());
+            this.updateCalcParams(); // Initial populate
         }
 
         document.querySelectorAll('input[name="calcType"]').forEach(radio => {
             radio.addEventListener('change', () => this.updateCalcType());
         });
 
-        const calcBtn = document.querySelector('#calculator .cta');
+        const calcBtn = document.querySelector('.btn-calc');
         if (calcBtn) {
             calcBtn.addEventListener('click', () => this.calculate());
+        }
+
+        const mathToggle = document.querySelector('.math-toggle');
+        if (mathToggle) {
+            mathToggle.addEventListener('click', () => {
+                const box = document.getElementById('formulaBox');
+                box.classList.toggle('hidden');
+                mathToggle.innerText = box.classList.contains('hidden') ? 'SHOW FORMULA' : 'HIDE FORMULA';
+            });
         }
 
         // Compare
