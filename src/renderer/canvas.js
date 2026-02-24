@@ -2,6 +2,7 @@
  * Professional Canvas rendering engine.
  * Handles High-DPI scaling, grids, and distribution plotting.
  */
+import gsap from 'gsap';
 
 export class Renderer {
     constructor(canvasId, options = {}) {
@@ -148,17 +149,33 @@ export class Renderer {
             }
 
             // Line plot
-            this.ctx.beginPath();
-            points.forEach((p, i) => {
-                const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
-                const canvasY = this.height - padding - (p.y / maxY) * plotHeight;
-                if (i === 0) this.ctx.moveTo(canvasX, canvasY);
-                else this.ctx.lineTo(canvasX, canvasY);
-            });
+            const pathData = { length: 0 };
+            const fullLength = points.length;
 
+            this.ctx.beginPath();
             this.ctx.strokeStyle = isCompare ? accent : fg;
             this.ctx.lineWidth = isCompare ? 4 : 6;
-            this.ctx.stroke();
+
+            gsap.to(pathData, {
+                length: fullLength,
+                duration: 1.2,
+                ease: 'power2.out',
+                onUpdate: () => {
+                    this.clear();
+                    this.drawGrid();
+                    this.drawAxes();
+
+                    this.ctx.beginPath();
+                    for (let j = 0; j < Math.ceil(pathData.length); j++) {
+                        const p = points[j];
+                        const canvasX = padding + ((p.x - xMin) / (xMax - xMin)) * plotWidth;
+                        const canvasY = this.height - padding - (p.y / maxY) * plotHeight;
+                        if (j === 0) this.ctx.moveTo(canvasX, canvasY);
+                        else this.ctx.lineTo(canvasX, canvasY);
+                    }
+                    this.ctx.stroke();
+                }
+            });
         }
 
         return { xMin, xMax, maxY, points };

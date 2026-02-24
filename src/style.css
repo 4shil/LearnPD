@@ -19,6 +19,14 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Outfit', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: initial;
+    /* Lenis handles this */
 }
 
 body {
@@ -26,68 +34,66 @@ body {
     color: var(--fg);
     min-height: 100vh;
     overflow-x: hidden;
+    cursor: none;
+    /* Hide default cursor */
+}
+
+a,
+button,
+input,
+select {
+    cursor: none;
+    /* Hide on interactive elements too */
 }
 
 /* App Shell Layout */
 .app-shell {
-    display: flex;
-    height: 100vh;
+    display: block;
+    min-height: 100vh;
 }
 
-/* Sidebar Navigation */
+/* Floating Dock Navigation */
 .app-nav {
-    width: var(--nav-width);
-    height: 100%;
-    background: var(--fg);
-    color: white;
+    width: auto;
+    height: auto;
+    background: rgba(29, 29, 31, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 40px;
     display: flex;
-    flex-direction: column;
-    padding: 2rem 1.5rem;
+    flex-direction: row;
+    padding: 0.6rem;
     position: fixed;
-    z-index: 1000;
-    transition: var(--transition);
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .logo-box {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 3rem;
-    padding: 0.5rem;
-}
-
-.logo-icon {
-    font-size: 2rem;
-}
-
-.logo-text {
-    font-weight: 900;
-    font-size: 1.5rem;
-    letter-spacing: -1px;
+    display: none;
 }
 
 .nav-links {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    gap: 0.3rem;
+    align-items: center;
 }
 
 .nav-link {
     text-decoration: none;
     color: #999;
-    padding: 1rem 1.5rem;
-    border-radius: var(--radius);
+    padding: 0.8rem 1.2rem;
+    border-radius: 30px;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    font-weight: 700;
+    gap: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
     transition: var(--transition);
-}
-
-.nav-link:hover,
-.nav-link.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--accent);
 }
 
 .nav-link.active {
@@ -152,41 +158,18 @@ h1 {
 
 /* Responsive */
 @media (max-width: 900px) {
-    .app-shell {
-        flex-direction: column;
-    }
-
     .app-nav {
-        width: 100%;
-        height: auto;
-        position: fixed;
-        bottom: 0;
-        top: auto;
-        flex-direction: row;
-        padding: 0.5rem;
-        justify-content: space-around;
-    }
-
-    .logo-box {
-        display: none;
-    }
-
-    .nav-links {
-        flex-direction: row;
-        width: 100%;
-        justify-content: space-around;
+        width: 90%;
+        bottom: 1rem;
     }
 
     .nav-link {
-        padding: 0.8rem;
-        flex-direction: column;
-        gap: 0.2rem;
-        font-size: 0.6rem;
+        padding: 0.6rem;
+        font-size: 0.7rem;
     }
 
     .app-content {
-        margin-left: 0;
-        margin-bottom: 80px;
+        padding: 2rem 1rem 8rem 1rem;
     }
 }
 

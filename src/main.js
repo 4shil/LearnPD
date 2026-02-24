@@ -35,8 +35,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('a, button, input, select').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('cursor-active'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-active'));
+        el.addEventListener('mouseenter', () => {
+            cursor.classList.add('cursor-active');
+            gsap.to(cursor, { scale: 3, duration: 0.3 });
+        });
+        el.addEventListener('mouseleave', () => {
+            cursor.classList.remove('cursor-active');
+            gsap.to(cursor, { scale: 1, duration: 0.3 });
+        });
+
+        // Magnetic Effect
+        if (el.classList.contains('btn') || el.classList.contains('nav-link')) {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(el, {
+                    x: x * 0.3,
+                    y: y * 0.3,
+                    duration: 0.5,
+                    ease: 'power2.out'
+                });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
+            });
+        }
+    });
+
+    // View Entry Animations
+    store.subscribe((state) => {
+        gsap.from('.view.active > *', {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: 'power4.out',
+            clearProps: 'all'
+        });
     });
 
     const mainRenderer = new Renderer('mainCanvas');
