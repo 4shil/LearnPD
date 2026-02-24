@@ -3,7 +3,8 @@
 :root {
     --bg: #FAFAFA;
     --fg: #1A1A1A;
-    --accent: #E6FF00; /* Vibrant Lime */
+    --accent: #E6FF00;
+    /* Vibrant Lime */
     --accent-dark: #B8CC00;
     --border-width: 3px;
     --shadow: 6px 6px 0px 0px #1A1A1A;
@@ -20,7 +21,10 @@
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-code, pre, .formula-box, .readout {
+code,
+pre,
+.formula-box,
+.readout {
     font-family: 'JetBrains Mono', monospace;
 }
 
@@ -82,7 +86,8 @@ nav a {
     font-size: 0.8rem;
 }
 
-nav a:hover, nav a.active {
+nav a:hover,
+nav a.active {
     background: var(--accent);
     border: 2px solid var(--fg);
 }
@@ -113,12 +118,13 @@ h1 {
 }
 
 .subtitle {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
     background: var(--fg);
     color: var(--bg);
     display: inline-block;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.5rem;
     margin-bottom: 2rem;
 }
 
@@ -153,8 +159,12 @@ h1 {
 }
 
 .cta:active {
-    transform: translate(4px, 4px);
-    box-shadow: 4px 4px 0px 0px #000000;
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px 0px var(--fg);
+}
+
+.cta:hover {
+    background: var(--accent-dark);
 }
 
 .cta-secondary {
@@ -252,6 +262,7 @@ h1 {
 
 .param-control input[type="range"] {
     -webkit-appearance: none;
+    appearance: none;
     width: 100%;
     height: 20px;
     border: 3px solid var(--fg);
@@ -261,11 +272,18 @@ h1 {
 
 .param-control input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     width: 30px;
     height: 30px;
     background: var(--accent);
     border: 3px solid var(--fg);
     cursor: pointer;
+    transition: var(--transition);
+}
+
+.param-control input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    background: var(--accent-dark);
 }
 
 .cta-small {
@@ -304,7 +322,8 @@ h1 {
     background: white;
 }
 
-#mainCanvas, #compareCanvas {
+#mainCanvas,
+#compareCanvas {
     width: 100%;
     height: 100%;
 }
@@ -349,13 +368,17 @@ h1 {
 }
 
 /* Calculator Section */
-.calculator-container, .compare-container, .learn-container {
+.calculator-container,
+.compare-container,
+.learn-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 2rem 0;
 }
 
-.calculator-container h2, .compare-container h2, .learn-container h2 {
+.calculator-container h2,
+.compare-container h2,
+.learn-container h2 {
     font-size: 3rem;
     text-align: center;
     margin-bottom: 2rem;
@@ -364,19 +387,22 @@ h1 {
     padding: 0 1rem;
 }
 
-.calc-grid, .compare-grid {
+.calc-grid,
+.compare-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
 }
 
-.calc-panel, .compare-panel {
+.calc-panel,
+.compare-panel {
     padding: 2rem;
     box-shadow: var(--shadow);
 }
 
-.calc-panel h3, .compare-panel h3 {
+.calc-panel h3,
+.compare-panel h3 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
     background: var(--fg);
@@ -385,7 +411,8 @@ h1 {
     display: inline-block;
 }
 
-.calc-panel select, .compare-panel select {
+.calc-panel select,
+.compare-panel select {
     width: 100%;
     padding: 0.8rem;
     border: 3px solid var(--fg);
@@ -678,17 +705,49 @@ footer {
 
 /* Animations */
 @keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-    100% { transform: translate(1px, -2px) rotate(-1deg); }
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
 }
 
 .shake {
@@ -706,33 +765,43 @@ footer {
     .explorer-grid {
         grid-template-columns: 1fr;
     }
+
     h1 {
         font-size: 2.5rem;
     }
+
     .intuition-cards {
         grid-template-columns: 1fr;
     }
+
     header {
         justify-content: center;
         text-align: center;
     }
-    .canvas-wrapper, .compare-canvas-wrapper {
+
+    .canvas-wrapper,
+    .compare-canvas-wrapper {
         height: 350px;
     }
+
     .readout {
         font-size: 1.2rem;
         top: 10px;
         right: 10px;
         padding: 0.3rem 0.6rem;
     }
+
     .hero-buttons {
         flex-direction: column;
         align-items: center;
     }
-    .cta, .cta-secondary {
+
+    .cta,
+    .cta-secondary {
         font-size: 1.2rem;
         padding: 1rem 2rem;
     }
+
     .compare-stats {
         grid-template-columns: 1fr;
     }
@@ -742,21 +811,27 @@ footer {
     h1 {
         font-size: 2rem;
     }
+
     .view {
         padding: 0 1rem 2rem 1rem;
     }
+
     nav {
         justify-content: center;
         width: 100%;
     }
+
     nav a {
         font-size: 0.7rem;
         padding: 0.4rem 0.6rem;
     }
+
     .logo {
         font-size: 1.2rem;
     }
-    .calc-grid, .compare-grid {
+
+    .calc-grid,
+    .compare-grid {
         grid-template-columns: 1fr;
     }
 }
