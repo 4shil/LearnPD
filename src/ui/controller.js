@@ -730,4 +730,15 @@ export class UI {
 
 
     // --- PNG download exporter ---
+    downloadChartPng() {
+        const canvas = document.getElementById('mainCanvas');
+        if (!canvas) return;
+        
+        const link = document.createElement('a');
+        link.download = `learnpd_${store.state.currentDist}_chart.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 }
