@@ -62,12 +62,37 @@ class Store {
         this.initSimParams('normal');
 
         // Load progress from localStorage
+        this.load();
     }
 
     save() {
         localStorage.setItem('learnpd_remake_state', JSON.stringify(this.state));
     }
 
+    load() {
+        const saved = localStorage.getItem('learnpd_remake_state');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                // Merge carefully, preserving structure
+                this.state = {
+                    ...this.state,
+                    ...parsed,
+                    compare: { ...this.state.compare, ...parsed.compare },
+                    chapters: { ...this.state.chapters, ...parsed.chapters },
+                    checkpoints: { ...this.state.checkpoints, ...parsed.checkpoints },
+                    quiz: { ...this.state.quiz, ...parsed.quiz },
+                    simulator: { ...this.state.simulator, ...parsed.simulator }
+                };
+                
+                // Keep routing aligned to location hash
+                const hash = window.location.hash.substring(1);
+                if (hash) this.state.currentView = hash;
+            } catch (e) {
+                console.warn('Failed to load state', e);
+            }
+        }
+    }
 
     initDistParams(distId) {
         const dist = DISTRIBUTIONS[distId];
