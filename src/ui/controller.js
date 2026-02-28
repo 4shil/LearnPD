@@ -533,6 +533,54 @@ export class UI {
     }
 
 
+    submitQuizValue() {
+        const quiz = store.state.quiz;
+        const qIndex = quiz.currentIndex;
+        const q = quiz.questions[qIndex];
+        const selection = quiz.selections[qIndex];
+
+        if (selection === null) {
+            alert('Please select an option or adjust sliders before submitting.');
+            return;
+        }
+
+        let isCorrect = false;
+        if (q.type === 'mc') {
+            isCorrect = store.submitQuizAnswer(selection);
+        } else if (q.type === 'match') {
+            // Evaluate curve matching distance
+            const distObj = DISTRIBUTIONS[q.dist];
+            let error = 0;
+            distObj.params.forEach(p => {
+                error += Math.pow(selection[p.id] - q.targetParams[p.id], 2);
+            });
+            error = Math.sqrt(error);
+            
+            // Accept match if parameter Euclidean distance is below 0.1
+            isCorrect = (error <= 0.15);
+            store.submitQuizAnswer(selection);
+        }
+
+        // Show Feedback details
+        const feedback = document.getElementById('quizFeedbackBox');
+        feedback.classList.remove('hidden');
+        
+        const status = feedback.querySelector('.feedback-status');
+        status.classList.remove('correct', 'incorrect');
+        if (isCorrect) {
+            status.innerText = 'CORRECT!';
+            status.classList.add('correct');
+        } else {
+            status.innerText = 'INCORRECT';
+            status.classList.add('incorrect');
+        }
+
+        feedback.querySelector('.feedback-text').innerText = q.explanation;
+
+        document.getElementById('btnSubmitAnswer').classList.add('hidden');
+        document.getElementById('btnNextQuestion').classList.remove('hidden');
+    }
+
 
     updateSimulatorUI(state) {
         const sim = state.simulator;
