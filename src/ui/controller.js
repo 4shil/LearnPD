@@ -143,6 +143,10 @@ export class UI {
         }
 
         // Canvas Zoom
+        const zoomIn = document.getElementById('btnZoomIn');
+        const zoomOut = document.getElementById('btnZoomOut');
+        if (zoomIn) zoomIn.addEventListener('click', () => store.adjustZoom(-0.1)); // Zoom in expands curve bounds
+        if (zoomOut) zoomOut.addEventListener('click', () => store.adjustZoom(0.1));
     }
 
     initCalculatorListeners() {
