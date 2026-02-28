@@ -528,6 +528,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Quiz Matching rendering
+        if (state.currentView === 'quiz' && state.quiz.started && !state.quiz.completed) {
+            const q = state.quiz.questions[state.quiz.currentIndex];
+            if (q.type === 'match') {
+                quizRenderer.resize();
+                quizRenderer.clear();
+                quizRenderer.drawGrid();
+                
+                const distObj = DISTRIBUTIONS[q.dist];
+                const userParams = state.quiz.selections[state.quiz.currentIndex];
+
+                // 1. Plot target distribution (dotted red)
+                const targetRes = quizRenderer.plotDistribution(distObj, q.targetParams, false, true);
+
+                // 2. Plot user active distribution (solid dark)
+                const userRes = quizRenderer.plotDistribution(distObj, userParams, false, false);
+                
+                quizRenderer.drawAxes(targetRes.xMin, targetRes.xMax, Math.max(targetRes.maxY, userRes.maxY));
+
+                // Calculate match accuracy distance percentage
+                let distDistance = 0;
+                distObj.params.forEach(p => {
+                    const normRange = p.max - p.min;
+                    distDistance += Math.pow((userParams[p.id] - q.targetParams[p.id]) / normRange, 2);
+                });
+                distDistance = Math.sqrt(distDistance);
+                const accuracyPercent = Math.max(0, Math.min(100, Math.round((1 - distDistance) * 100)));
+
+                document.getElementById('quizMatchReadout').innerText = `Match: ${accuracyPercent}%`;
+            }
+        }
 
         // Sampling CLT Simulator Rendering
         if (state.currentView === 'simulator') {
