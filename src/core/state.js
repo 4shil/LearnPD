@@ -170,6 +170,59 @@ class Store {
 
     // --- Quiz Session Actions ---
 
+    initQuiz() {
+        // Quiz Questions Database
+        const questionsList = [
+            {
+                type: 'mc',
+                question: 'Which of the following distributions is famously "memoryless"?',
+                options: ['A) Normal', 'B) Binomial', 'C) Exponential', 'D) Poisson'],
+                answer: 2,
+                explanation: 'The Exponential distribution is memoryless. The probability of an event occurring in the future does not depend on how much time has elapsed.'
+            },
+            {
+                type: 'mc',
+                question: 'A Binomial distribution has n = 50 trials and a success probability p = 0.4. What is its expected value (mean)?',
+                options: ['A) 12.5', 'B) 20.0', 'C) 30.0', 'D) 10.0'],
+                answer: 1,
+                explanation: 'The expected value (mean) of a binomial distribution is E(X) = n × p = 50 × 0.4 = 20.0.'
+            },
+            {
+                type: 'mc',
+                question: 'According to the Central Limit Theorem, what distribution shape will sample averages take as sample size n grows large?',
+                options: ['A) Uniform', 'B) Exponential', 'C) Normal (Gaussian)', 'D) Student\'s T'],
+                answer: 2,
+                explanation: 'The CLT states that the distribution of sample means approaches a Normal (Gaussian) distribution as sample size n increases (n ≥ 30), regardless of the source distribution shape.'
+            },
+            {
+                type: 'match',
+                question: 'Curve Matching: Standardize the active Normal curve to match standard normal N(0, 1) (dotted red line).',
+                dist: 'normal',
+                targetParams: { mu: 0, sigma: 1 },
+                initialParams: { mu: 2, sigma: 2 },
+                explanation: 'By setting the mean μ = 0 and standard deviation σ = 1, you successfully standardized the normal distribution curve.'
+            },
+            {
+                type: 'match',
+                question: 'Curve Matching: Adjust Poisson parameters (λ) to match the target Poisson rate λ = 8 (dotted red bars).',
+                dist: 'poisson',
+                targetParams: { lambda: 8 },
+                initialParams: { lambda: 2 },
+                explanation: 'A Poisson distribution with rate λ = 8 has its peak centered at x = 7 and 8, proving that mean equals rate λ.'
+            }
+        ];
+
+        this.state.quiz = {
+            started: true,
+            completed: false,
+            currentIndex: 0,
+            score: 0,
+            questions: questionsList,
+            selections: new Array(questionsList.length).fill(null)
+        };
+        this.notify();
+        this.save();
+    }
 
 
     // --- Simulator Actions ---
