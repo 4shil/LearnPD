@@ -11,6 +11,7 @@ export class UI {
         this.initChapterListeners();
         this.initExplorerListeners();
         this.initCalculatorListeners();
+        this.initQuizListeners();
         this.initSimulatorListeners();
         this.bindStore();
     }
@@ -160,6 +161,40 @@ export class UI {
         }
     }
 
+    initQuizListeners() {
+        const startBtnBig = document.getElementById('btnStartQuizBig');
+        const startBtnSide = document.getElementById('btnStartQuiz');
+        const restartBtn = document.getElementById('btnRestartQuiz');
+
+        const launchQuiz = () => {
+            store.initQuiz();
+            document.getElementById('quizWelcomeCard').classList.add('hidden');
+            document.getElementById('quizScoreCard').classList.add('hidden');
+            document.getElementById('quizCard').classList.remove('hidden');
+        };
+
+        if (startBtnBig) startBtnBig.addEventListener('click', launchQuiz);
+        if (startBtnSide) startBtnSide.addEventListener('click', launchQuiz);
+        if (restartBtn) restartBtn.addEventListener('click', launchQuiz);
+
+        // Submit answer button
+        const submitBtn = document.getElementById('btnSubmitAnswer');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => this.submitQuizValue());
+        }
+
+        // Next question click
+        const nextBtn = document.getElementById('btnNextQuestion');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                store.advanceQuiz();
+                submitBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+                document.getElementById('quizFeedbackBox').classList.add('hidden');
+            });
+        }
+    }
+
 
     initSimulatorListeners() {
         const simSelect = document.getElementById('simDistSelect');
@@ -192,6 +227,7 @@ export class UI {
             this.updateExplorerUI(state);
             this.updateCompareUI(state);
             this.updateCalculatorUI(state);
+            this.updateQuizUI(state);
             this.updateSimulatorUI(state);
         });
     }
@@ -377,6 +413,123 @@ export class UI {
             result = 'Error: ' + e.message;
         }
         if (resultDiv) resultDiv.innerText = result;
+    }
+
+    updateQuizUI(state) {
+        if (state.currentView !== 'quiz') return;
+
+        const quiz = state.quiz;
+        
+        // Progress Sidebar
+        const progressFill = document.getElementById('quizProgressFill');
+        if (progressFill) {
+            const percent = quiz.started ? ((quiz.currentIndex) / quiz.questions.length) * 100 : 0;
+            progressFill.style.width = quiz.completed ? '100%' : `${percent}%`;
+        }
+
+        const qNumSpan = document.getElementById('quizCurrentNum');
+        if (qNumSpan) {
+            qNumSpan.innerText = quiz.started ? `${Math.min(quiz.currentIndex + 1, quiz.questions.length)}/${quiz.questions.length}` : '0/5';
+        }
+
+        const scoreSpan = document.getElementById('quizScore');
+        if (scoreSpan) {
+            scoreSpan.innerText = `${quiz.score}/${quiz.started ? quiz.currentIndex : 0}`;
+        }
+
+        // Show correct screen states
+        const welcome = document.getElementById('quizWelcomeCard');
+        const qCard = document.getElementById('quizCard');
+        const scoreCard = document.getElementById('quizScoreCard');
+
+        if (!quiz.started) {
+            welcome.classList.remove('hidden');
+            qCard.classList.add('hidden');
+            scoreCard.classList.add('hidden');
+        } else if (quiz.completed) {
+            welcome.classList.add('hidden');
+            qCard.classList.add('hidden');
+            scoreCard.classList.remove('hidden');
+            
+            const title = document.getElementById('quizScoreTitle');
+            const body = document.getElementById('quizScoreBody');
+            
+            if (quiz.score === quiz.questions.length) {
+                title.innerText = 'Perfect Score! 🏆';
+                body.innerText = `You scored ${quiz.score}/${quiz.questions.length}! You have mastered probability distributions and unlocked the final badge.`;
+                store.markCheckpointCompleted('4'); // Unlocks master badge
+            } else {
+                title.innerText = 'Quiz Completed';
+                body.innerText = `You scored ${quiz.score}/${quiz.questions.length}. Get 5/5 to claim your master badge!`;
+            }
+        } else {
+            welcome.classList.add('hidden');
+            qCard.classList.remove('hidden');
+            scoreCard.classList.add('hidden');
+
+            // Render active question
+            const q = quiz.questions[quiz.currentIndex];
+            document.getElementById('quizQIndex').innerText = `Q${quiz.currentIndex + 1}`;
+            document.getElementById('quizQuestionText').innerText = q.question;
+
+            const mcOptionsList = document.getElementById('quizOptionsList');
+            const matchingArea = document.getElementById('quizMatchingArea');
+
+            if (q.type === 'mc') {
+                mcOptionsList.classList.remove('hidden');
+                matchingArea.classList.add('hidden');
+                document.getElementById('quizQType').innerText = 'Multiple Choice';
+
+                mcOptionsList.innerHTML = '';
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `quiz-option-btn card ${quiz.selections[quiz.currentIndex] === idx ? 'selected' : ''}`;
+                    btn.innerText = opt;
+                    
+                    btn.addEventListener('click', () => {
+                        // Mark active selection in local node structure before submission
+                        document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        quiz.selections[quiz.currentIndex] = idx;
+                    });
+                    
+                    mcOptionsList.appendChild(btn);
+                });
+            } else if (q.type === 'match') {
+                mcOptionsList.classList.add('hidden');
+                matchingArea.classList.remove('hidden');
+                document.getElementById('quizQType').innerText = 'Interactive Matching';
+
+                // Initial setup of matching parameters state if null
+                if (quiz.selections[quiz.currentIndex] === null) {
+                    quiz.selections[quiz.currentIndex] = { ...q.initialParams };
+                }
+
+                // Render matching sliders inside container
+                const slidersDiv = document.getElementById('quizMatchingSliders');
+                slidersDiv.innerHTML = '';
+                const activeParams = quiz.selections[quiz.currentIndex];
+                const distObj = DISTRIBUTIONS[q.dist];
+
+                distObj.params.forEach(p => {
+                    const controlDiv = document.createElement('div');
+                    controlDiv.className = 'param-control';
+                    controlDiv.innerHTML = `
+                        <label><span>${p.label}</span> <span id="match-val-${p.id}">${activeParams[p.id]}</span></label>
+                        <input type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${activeParams[p.id]}" id="match-input-${p.id}">
+                    `;
+
+                    const input = controlDiv.querySelector('input');
+                    input.addEventListener('input', (e) => {
+                        activeParams[p.id] = parseFloat(e.target.value);
+                        document.getElementById(`match-val-${p.id}`).innerText = e.target.value;
+                        store.notify(); // Re-trigger canvas draws
+                    });
+
+                    slidersDiv.appendChild(controlDiv);
+                });
+            }
+        }
     }
 
 
