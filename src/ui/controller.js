@@ -13,6 +13,7 @@ export class UI {
         this.initCalculatorListeners();
         this.initQuizListeners();
         this.initSimulatorListeners();
+        this.initProgressListeners();
         this.bindStore();
     }
 
@@ -220,6 +221,17 @@ export class UI {
     }
 
 
+    initProgressListeners() {
+        const resetProgressBtn = document.getElementById('btnResetProgress');
+        if (resetProgressBtn) {
+            resetProgressBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear your learning records?')) {
+                    store.resetAllProgress();
+                }
+            });
+        }
+    }
+
 
     bindStore() {
         store.subscribe((state) => {
@@ -229,6 +241,7 @@ export class UI {
             this.updateCalculatorUI(state);
             this.updateQuizUI(state);
             this.updateSimulatorUI(state);
+            this.updateProgressUI(state);
         });
     }
 
@@ -617,6 +630,57 @@ export class UI {
         document.getElementById('simReadout').innerText = `Sample Means: ${sim.results.length}`;
     }
 
+
+    updateProgressUI(state) {
+        // Overall Dashboard Dial
+        let completedChaptersCount = 0;
+        let completedCheckpointsCount = 0;
+        
+        Object.keys(state.chapters).forEach(k => {
+            if (state.chapters[k]) completedChaptersCount++;
+            if (state.checkpoints[k]) completedCheckpointsCount++;
+        });
+
+        // 4 chapters, 4 checkpoints, 1 quiz. Let's calculate total weight
+        const totalSteps = 9;
+        let stepsTaken = completedChaptersCount + completedCheckpointsCount;
+        if (state.quiz.completed && state.quiz.score === state.quiz.questions.length) {
+            stepsTaken += 1;
+        }
+        const percentage = Math.round((stepsTaken / totalSteps) * 100);
+
+        const dialText = document.getElementById('dashTotalPercent');
+        if (dialText) dialText.innerText = `${percentage}%`;
+
+        const chSpan = document.getElementById('dashChaptersRead');
+        if (chSpan) chSpan.innerText = `${completedChaptersCount}/4`;
+
+        const chkSpan = document.getElementById('dashCheckpointsDone');
+        if (chkSpan) chkSpan.innerText = `${completedCheckpointsCount}/4`;
+
+        const quizSpan = document.getElementById('dashQuizScore');
+        if (quizSpan) {
+            const highscore = localStorage.getItem('learnpd_remake_quiz_highscore') || (state.quiz.completed ? state.quiz.score : 0);
+            if (state.quiz.completed && state.quiz.score > parseInt(highscore)) {
+                localStorage.setItem('learnpd_remake_quiz_highscore', state.quiz.score);
+            }
+            quizSpan.innerText = `${Math.max(state.quiz.score, parseInt(highscore) || 0)}/5`;
+        }
+
+        // Badges Lock States toggling
+        const toggleBadge = (elId, condition) => {
+            const el = document.getElementById(elId);
+            if (el) {
+                el.classList.toggle('locked', !condition);
+            }
+        };
+
+        toggleBadge('badgeFoundations', state.checkpoints['1']);
+        toggleBadge('badgeDiscrete', state.checkpoints['2']);
+        toggleBadge('badgeContinuous', state.checkpoints['3']);
+        toggleBadge('badgeSimulator', state.checkpoints['4']);
+        toggleBadge('badgeMaster', state.quiz.completed && state.quiz.score === 5);
+    }
 
 
     // --- CSV data exporter ---

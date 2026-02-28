@@ -53,6 +53,10 @@
             <span class="dock__icon">⚙</span>
             <span class="dock__label">Simulator</span>
         </a>
+        <a href="#progress" class="dock__link" data-view="progress">
+            <span class="dock__icon">🏆</span>
+            <span class="dock__label">Progress</span>
+        </a>
     </nav>
 
     <!-- Views -->
@@ -641,6 +645,80 @@
         </section>
 
         <!-- PROGRESS DASHBOARD -->
+        <section id="progress" class="view">
+            <h2 class="section-title">Course Progress Dashboard</h2>
+            <div class="progress-grid">
+                <div class="card progress-overview">
+                    <h3 class="dashboard-card-title">Overall Progress</h3>
+                    <div class="progress-dial-container">
+                        <div class="progress-dial">
+                            <span class="progress-percentage" id="dashTotalPercent">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress-stats-summary">
+                        <div class="progress-sum-item">
+                            <span class="sum-label">Chapters Read</span>
+                            <span class="sum-val" id="dashChaptersRead">0/4</span>
+                        </div>
+                        <div class="progress-sum-item">
+                            <span class="sum-label">Practice Questions Completed</span>
+                            <span class="sum-val" id="dashCheckpointsDone">0/4</span>
+                        </div>
+                        <div class="progress-sum-item">
+                            <span class="sum-label">Quiz Highscore</span>
+                            <span class="sum-val" id="dashQuizScore">0/5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card progress-badges">
+                    <h3 class="dashboard-card-title">Unlocked Badges</h3>
+                    <div class="badges-list">
+                        <div class="badge-item locked" id="badgeFoundations">
+                            <span class="badge-icon">📖</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Foundations Explorer</span>
+                                <span class="badge-desc">Complete Chapter 1 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeDiscrete">
+                            <span class="badge-icon">⊞</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Discrete Specialist</span>
+                                <span class="badge-desc">Complete Chapter 2 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeContinuous">
+                            <span class="badge-icon">◎</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Continuous Specialist</span>
+                                <span class="badge-desc">Complete Chapter 3 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeSimulator">
+                            <span class="badge-icon">⚙</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Limit Prover</span>
+                                <span class="badge-desc">Complete Chapter 4 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeMaster">
+                            <span class="badge-icon">👑</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Probability Master</span>
+                                <span class="badge-desc">Score 5/5 in the final exam.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card clear-data-card" style="margin-top: 2rem;">
+                <h3 class="dashboard-card-title">Profile Settings</h3>
+                <p>Reset your progress and quiz high scores to start learning from scratch.</p>
+                <button class="btn btn--primary" id="btnResetProgress" style="margin-top: 1rem; background-color: #ff3366; color: white;">Reset All Progress</button>
+            </div>
+        </section>
 
     </main>
 

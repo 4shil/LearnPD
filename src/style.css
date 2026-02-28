@@ -1172,6 +1172,121 @@ input[type="range"]::-moz-range-thumb {
 }
 
 
+/* ── Progress Dashboard ── */
+.progress-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.dashboard-card-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+}
+
+.progress-dial-container {
+    display: grid;
+    place-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.progress-dial {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 10px solid var(--fg);
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    box-shadow: 4px 4px 0 var(--border);
+}
+
+.progress-percentage {
+    font-size: 2rem;
+    font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.progress-stats-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.progress-sum-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: var(--bg);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: var(--border-w) solid var(--border);
+}
+
+.sum-label {
+    color: var(--muted);
+}
+
+.sum-val {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.badges-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.badge-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: var(--bg);
+    border: var(--border-w) solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.5rem;
+    box-shadow: 2px 2px 0 var(--border);
+    transition: all var(--dur) var(--ease);
+}
+
+.badge-item.locked {
+    opacity: 0.35;
+    background: #e8e3dd;
+    filter: grayscale(1);
+}
+
+.badge-icon {
+    font-size: 2rem;
+    background: var(--card);
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    border: var(--border-w) solid var(--border);
+    border-radius: 50%;
+    box-shadow: 2px 2px 0 var(--border);
+}
+
+.badge-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.badge-name {
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.badge-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+}
+
 
 /* ── Responsive ── */
 @media (max-width: 960px) {
