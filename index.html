@@ -45,6 +45,10 @@
             <span class="dock__icon">⊞</span>
             <span class="dock__label">Calc</span>
         </a>
+        <a href="#quiz" class="dock__link" data-view="quiz">
+            <span class="dock__icon">⚡</span>
+            <span class="dock__label">Quiz</span>
+        </a>
         <a href="#simulator" class="dock__link" data-view="simulator">
             <span class="dock__icon">⚙</span>
             <span class="dock__label">Simulator</span>
@@ -498,6 +502,79 @@
         </section>
 
         <!-- QUIZ CENTER -->
+        <section id="quiz" class="view">
+            <div class="quiz-container">
+                <div class="quiz-sidebar card">
+                    <h2 class="sidebar__title">Quiz Center</h2>
+                    <p class="quiz-desc">Test your understanding of probability distributions. Complete all 5 challenges to earn your certificate.</p>
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" id="quizProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="quiz-stats-sidebar">
+                        <div>Question: <span id="quizCurrentNum">1/5</span></div>
+                        <div>Score: <span id="quizScore">0/0</span></div>
+                    </div>
+                    <button class="btn btn--primary" id="btnStartQuiz" style="width: 100%; margin-top: 1rem;">Reset / Start Quiz</button>
+                </div>
+                
+                <div class="quiz-main-area">
+                    <!-- Question Card -->
+                    <div class="card quiz-card hidden" id="quizCard">
+                        <div class="quiz-card-header">
+                            <span class="quiz-card-qtype" id="quizQType">Multiple Choice</span>
+                            <span class="quiz-card-qnum" id="quizQIndex">Q1</span>
+                        </div>
+                        <h3 class="quiz-question" id="quizQuestionText">What is the mean of a binomial distribution with n=20, p=0.5?</h3>
+                        
+                        <!-- Answers (for MC) -->
+                        <div class="quiz-options-list" id="quizOptionsList">
+                            <button class="quiz-option-btn card">A) 5</button>
+                            <button class="quiz-option-btn card">B) 10</button>
+                            <button class="quiz-option-btn card card--selected">C) 15</button>
+                            <button class="quiz-option-btn card">D) 20</button>
+                        </div>
+                        
+                        <!-- Interactive Canvas (for curve matching) -->
+                        <div class="quiz-matching-area hidden" id="quizMatchingArea">
+                            <p class="matching-desc">Slide the parameter controls below so that your active curve (solid line) matches the target distribution curve (dotted red line).</p>
+                            <div class="chart-container card card--flush" style="height: 300px;">
+                                <canvas id="quizCanvas"></canvas>
+                                <div id="quizMatchReadout" class="chart__readout">Match: 0%</div>
+                            </div>
+                            <div class="quiz-matching-sliders" id="quizMatchingSliders">
+                                <!-- Dynamically populated range sliders -->
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-card-footer">
+                            <button class="btn btn--primary" id="btnSubmitAnswer">Submit Answer</button>
+                            <button class="btn btn--ghost hidden" id="btnNextQuestion">Next Question →</button>
+                        </div>
+                        <div class="quiz-feedback-box hidden" id="quizFeedbackBox">
+                            <div class="feedback-status status--correct">CORRECT!</div>
+                            <p class="feedback-text">The expected value of a binomial variable is simply n × p = 20 × 0.5 = 10.</p>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Intro/Welcome -->
+                    <div class="card quiz-welcome-card" id="quizWelcomeCard">
+                        <span class="feature__icon">⚡</span>
+                        <h2 class="welcome-title">Ready for the Challenge?</h2>
+                        <p class="welcome-body">This quiz consists of 5 questions including conceptual choices, formula calculations, and interactive curve parameter-matching puzzles. Complete the quiz with 100% accuracy to log it in your progress tracker.</p>
+                        <button class="btn btn--primary" id="btnStartQuizBig">Start Quiz</button>
+                    </div>
+
+                    <!-- Quiz Score Screen -->
+                    <div class="card quiz-score-card hidden" id="quizScoreCard">
+                        <span class="feature__icon">🏆</span>
+                        <h2 class="score-title" id="quizScoreTitle">Quiz Completed!</h2>
+                        <p class="score-body" id="quizScoreBody">You scored 5 out of 5! That is a perfect score. You have unlocked the Probability Master badge.</p>
+                        <button class="btn btn--primary" onclick="window.location.hash='#progress'">View Dashboard</button>
+                        <button class="btn btn--ghost" id="btnRestartQuiz">Retake Quiz</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- SAMPLING SIMULATOR -->
         <section id="simulator" class="view">
