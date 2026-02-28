@@ -35,6 +35,15 @@ class Store {
                 '4': false
             },
             
+            // Quiz Engine state
+            quiz: {
+                started: false,
+                completed: false,
+                currentIndex: 0,
+                score: 0,
+                questions: [],
+                selections: [] // User answers
+            },
 
             // Simulator state
             simulator: {
@@ -162,6 +171,7 @@ class Store {
     resetAllProgress() {
         this.state.chapters = { '1': false, '2': false, '3': false, '4': false };
         this.state.checkpoints = { '1': false, '2': false, '3': false, '4': false };
+        this.state.quiz = { started: false, completed: false, currentIndex: 0, score: 0, questions: [], selections: [] };
         this.state.simulator.results = [];
         this.state.zoom = 1.0;
         this.notify();
@@ -224,6 +234,36 @@ class Store {
         this.save();
     }
 
+    submitQuizAnswer(answerIndexOrParams) {
+        const q = this.state.quiz.questions[this.state.quiz.currentIndex];
+        this.state.quiz.selections[this.state.quiz.currentIndex] = answerIndexOrParams;
+        
+        let isCorrect = false;
+        if (q.type === 'mc') {
+            isCorrect = (answerIndexOrParams === q.answer);
+        } else if (q.type === 'match') {
+            // Match is evaluated by client distance, we assume check logic passed before calling
+            isCorrect = true;
+        }
+
+        if (isCorrect) {
+            this.state.quiz.score++;
+        }
+        
+        this.notify();
+        this.save();
+        return isCorrect;
+    }
+
+    advanceQuiz() {
+        if (this.state.quiz.currentIndex < this.state.quiz.questions.length - 1) {
+            this.state.quiz.currentIndex++;
+        } else {
+            this.state.quiz.completed = true;
+        }
+        this.notify();
+        this.save();
+    }
 
     // --- Simulator Actions ---
     
