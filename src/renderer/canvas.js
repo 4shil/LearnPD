@@ -310,4 +310,10 @@ export class Renderer {
     }
 
     // --- Tooltip coordinate conversion ---
+    canvasXToMathX(canvasX) {
+        const { padding } = this.options;
+        const plotW = this.width - 2 * padding;
+        const relX = (canvasX - padding) / plotW;
+        return this.xMin + relX * (this.xMax - this.xMin);
+    }
 }
