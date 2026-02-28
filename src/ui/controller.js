@@ -684,6 +684,50 @@ export class UI {
 
 
     // --- CSV data exporter ---
+    exportCsvData() {
+        const state = store.state;
+        const dist = DISTRIBUTIONS[state.currentDist];
+        
+        let xMin = dist.range.min;
+        let xMax = dist.range.max;
+        
+        if (dist.autoScaleX && dist.isDiscrete) {
+            const mean = dist.mean(state.params);
+            const std = Math.sqrt(dist.variance(state.params)) || 1;
+            xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std));
+            xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std));
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += `Distribution,${dist.name}\n`;
+        csvContent += `Parameters,${JSON.stringify(state.params).replace(/,/g, ';')}\n\n`;
+        csvContent += "X,Probability Density (PDF/PMF),Cumulative Density (CDF)\n";
+
+        if (dist.isDiscrete) {
+            for (let k = Math.floor(xMin); k <= Math.ceil(xMax); k++) {
+                const pdf = dist.pmf(k, state.params);
+                const cdf = dist.cdf(k, state.params);
+                csvContent += `${k},${pdf.toFixed(8)},${cdf.toFixed(8)}\n`;
+            }
+        } else {
+            const steps = 200;
+            for (let i = 0; i <= steps; i++) {
+                const x = xMin + (i / steps) * (xMax - xMin);
+                const pdf = dist.pdf(x, state.params);
+                const cdf = dist.cdf(x, state.params);
+                csvContent += `${x.toFixed(6)},${pdf.toFixed(8)},${cdf.toFixed(8)}\n`;
+            }
+        }
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `learnpd_${state.currentDist}_data.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
 
     // --- PNG download exporter ---
 }
