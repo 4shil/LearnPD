@@ -448,11 +448,12 @@ export const DISTRIBUTIONS = {
             { id: 'n', label: 'n (Sample Size)', min: 1, max: 90, step: 1, default: 15 }
         ],
         pmf: (k, p) => {
-            const N = p.N;
-            const K = Math.min(p.K, N);
-            const n = Math.min(p.n, N);
-            if (k < Math.max(0, n + K - N) || k > Math.min(n, K)) return 0;
-            return Math.exp(logCombination(K, k) + logCombination(N - K, n - k) - logCombination(N, n));
+            const N = Math.round(p.N);
+            const K = Math.min(Math.round(p.K), N);
+            const n = Math.min(Math.round(p.n), N);
+            const rK = Math.round(k);
+            if (rK < Math.max(0, n + K - N) || rK > Math.min(n, K)) return 0;
+            return Math.exp(logCombination(K, rK) + logCombination(N - K, n - rK) - logCombination(N, n));
         },
         cdf: (k, p) => {
             const N = p.N;
