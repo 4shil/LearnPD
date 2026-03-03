@@ -45,6 +45,19 @@ export class Renderer {
         return width > 1 && height > 1;
     }
 
+    getPlotBounds() {
+        const padding = Math.min(this.options.padding, Math.max(8, Math.floor(Math.min(this.width, this.height) / 4)));
+        const plotWidth = this.width - 2 * padding;
+        const plotHeight = this.height - 2 * padding;
+
+        return {
+            padding,
+            plotWidth,
+            plotHeight,
+            drawable: Number.isFinite(plotWidth) && Number.isFinite(plotHeight) && plotWidth > 0 && plotHeight > 0
+        };
+    }
+
     clear() {
         if (!this.ctx) return;
         this.ctx.clearRect(0, 0, this.width, this.height);
@@ -118,12 +131,11 @@ export class Renderer {
 
     plotDistribution(dist, params, isCompare = false, isTarget = false, zoom = 1.0) {
         if (!this.ctx) return;
-        const { padding, fg } = this.options;
+        const { fg } = this.options;
+        const { padding, plotWidth, plotHeight, drawable } = this.getPlotBounds();
+        if (!drawable) return null;
         let accent = isCompare ? (this.options.accent || '#FF3E00') : '#c8f542';
         if (isTarget) accent = '#ff3366'; // Highlight target curves in red
-
-        const plotWidth = this.width - 2 * padding;
-        const plotHeight = this.height - 2 * padding;
 
         // Apply zoom adjustments to base boundaries
         let xMin = dist.range.min * zoom;

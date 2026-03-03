@@ -77,6 +77,13 @@ describe('Renderer', () => {
     expect(renderer.maxY).toBe(result.maxY);
   });
 
+  it('skips plotting when the canvas has no drawable plot area', () => {
+    installCanvas({ width: 0, height: 0 });
+    const renderer = new Renderer('chart');
+
+    expect(renderer.plotDistribution(DISTRIBUTIONS.normal, { mu: 0, sigma: 1 })).toBeNull();
+  });
+
   it('keeps discrete bars inside a finite render domain', () => {
     const renderer = new Renderer('chart');
     const binomial = DISTRIBUTIONS.binomial;
