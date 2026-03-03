@@ -107,7 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const rect = canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
-            
+            if (!mainRenderer.isCanvasPointInPlot(mouseX, mouseY)) {
+                tooltip.classList.add('hidden');
+                return;
+            }
+
             // Map pixel location to mathematical X coord
             const mathX = mainRenderer.canvasXToMathX(mouseX);
             const dist = DISTRIBUTIONS[store.state.currentDist];
@@ -118,8 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {}
 
             tooltip.classList.remove('hidden');
-            tooltip.style.left = `${e.clientX - rect.left}px`;
-            tooltip.style.top = `${e.clientY - rect.top}px`;
+            const tooltipX = Math.max(8, Math.min(rect.width - 120, mouseX + 12));
+            const tooltipY = Math.max(8, Math.min(rect.height - 60, mouseY + 12));
+            tooltip.style.left = `${tooltipX}px`;
+            tooltip.style.top = `${tooltipY}px`;
             
             const labelX = dist.isDiscrete ? Math.round(mathX) : mathX.toFixed(3);
             tooltip.innerText = `X: ${labelX}\nY: ${prob.toFixed(4)}`;

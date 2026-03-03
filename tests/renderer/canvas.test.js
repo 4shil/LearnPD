@@ -94,6 +94,17 @@ describe('Renderer', () => {
     expect(weibullResult.points.every((point) => Number.isFinite(point.y))).toBe(true);
   });
 
+  it('clamps tooltip x conversion to the drawable plot bounds', () => {
+    const renderer = new Renderer('chart');
+    renderer.xMin = -10;
+    renderer.xMax = 10;
+
+    expect(renderer.canvasXToMathX(-1000)).toBe(-10);
+    expect(renderer.canvasXToMathX(1000)).toBe(10);
+    expect(renderer.isCanvasPointInPlot(10, 10)).toBe(false);
+    expect(renderer.isCanvasPointInPlot(320, 180)).toBe(true);
+  });
+
   it('narrows the plot domain around the same center when zooming in', () => {
     const renderer = new Renderer('chart');
 

@@ -322,10 +322,16 @@ export class Renderer {
     }
 
     // --- Tooltip coordinate conversion ---
+    isCanvasPointInPlot(canvasX, canvasY) {
+        const { padding, plotWidth, plotHeight, drawable } = this.getPlotBounds();
+        return drawable && canvasX >= padding && canvasX <= padding + plotWidth && canvasY >= padding && canvasY <= padding + plotHeight;
+    }
+
     canvasXToMathX(canvasX) {
-        const { padding } = this.options;
-        const plotW = this.width - 2 * padding;
-        const relX = (canvasX - padding) / plotW;
+        const { padding, plotWidth, drawable } = this.getPlotBounds();
+        if (!drawable || this.xMax === this.xMin) return this.xMin;
+        const clampedX = Math.max(padding, Math.min(padding + plotWidth, canvasX));
+        const relX = (clampedX - padding) / plotWidth;
         return this.xMin + relX * (this.xMax - this.xMin);
     }
 }
