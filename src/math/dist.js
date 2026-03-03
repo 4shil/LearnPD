@@ -384,8 +384,14 @@ export const DISTRIBUTIONS = {
         params: [
             { id: 'lambda', label: 'λ (Rate)', min: 0.1, max: 5, step: 0.1, default: 1 }
         ],
-        pdf: (x, p) => (x < 0) ? 0 : p.lambda * Math.exp(-p.lambda * x),
-        cdf: (x, p) => (x < 0) ? 0 : 1 - Math.exp(-p.lambda * x),
+        pdf: (x, p) => {
+            const lmb = Math.max(1e-9, p.lambda);
+            return (x < 0) ? 0 : lmb * Math.exp(-lmb * x);
+        },
+        cdf: (x, p) => {
+            const lmb = Math.max(1e-9, p.lambda);
+            return (x < 0) ? 0 : 1 - Math.exp(-lmb * x);
+        },
         mean: (p) => 1 / p.lambda,
         variance: (p) => 1 / (p.lambda * p.lambda),
         median: (p) => Math.log(2) / p.lambda,
