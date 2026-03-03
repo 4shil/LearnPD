@@ -14,6 +14,7 @@ const createContext = () => ({
   roundRect: vi.fn(),
   scale: vi.fn(),
   setLineDash: vi.fn(),
+  setTransform: vi.fn(),
   stroke: vi.fn(),
 });
 
@@ -49,15 +50,18 @@ describe('Renderer', () => {
     installCanvas();
   });
 
-  it('sizes the canvas backing store for the device pixel ratio', () => {
-    const { canvas } = installCanvas({ width: 320, height: 180 });
+  it('sizes the canvas backing store for the device pixel ratio without stacking transforms', () => {
+    const { canvas, context } = installCanvas({ width: 320, height: 180 });
 
-    new Renderer('chart');
+    const renderer = new Renderer('chart');
+    renderer.resize();
 
     expect(canvas.width).toBe(640);
     expect(canvas.height).toBe(360);
     expect(canvas.style.width).toBe('320px');
     expect(canvas.style.height).toBe('180px');
+    expect(context.scale).not.toHaveBeenCalled();
+    expect(context.setTransform).toHaveBeenLastCalledWith(2, 0, 0, 2, 0, 0);
   });
 
   it('caches the plotted domain and y-scale for tooltip mapping', () => {

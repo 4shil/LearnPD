@@ -27,17 +27,22 @@ export class Renderer {
     }
 
     resize() {
-        if (!this.canvas) return;
+        if (!this.canvas || !this.ctx) return false;
         const parent = this.canvas.parentElement;
-        const rect = parent.getBoundingClientRect();
+        const rect = parent?.getBoundingClientRect?.();
         const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = rect.width * dpr;
-        this.canvas.height = rect.height * dpr;
-        this.canvas.style.width = `${rect.width}px`;
-        this.canvas.style.height = `${rect.height}px`;
-        this.ctx.scale(dpr, dpr);
-        this.width = rect.width;
-        this.height = rect.height;
+        const width = Math.max(1, Math.floor(rect?.width || 0));
+        const height = Math.max(1, Math.floor(rect?.height || 0));
+
+        this.canvas.width = Math.floor(width * dpr);
+        this.canvas.height = Math.floor(height * dpr);
+        this.canvas.style.width = `${width}px`;
+        this.canvas.style.height = `${height}px`;
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.width = width;
+        this.height = height;
+
+        return width > 1 && height > 1;
     }
 
     clear() {
