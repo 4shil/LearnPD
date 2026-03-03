@@ -158,6 +158,7 @@ export class Renderer {
         if (dist.isDiscrete) {
             for (let k = Math.floor(xMin); k <= Math.ceil(xMax); k++) {
                 const y = dist.pmf(k, params);
+                if (!Number.isFinite(y) || y < 0) continue;
                 if (y > maxY) maxY = y;
                 points.push({ x: k, y });
             }
@@ -166,10 +167,13 @@ export class Renderer {
             for (let i = 0; i <= steps; i++) {
                 const x = xMin + (i / steps) * (xMax - xMin);
                 const y = dist.pdf(x, params);
-                if (y > maxY && isFinite(y)) maxY = y;
+                if (!Number.isFinite(y) || y < 0) continue;
+                if (y > maxY) maxY = y;
                 points.push({ x, y });
             }
         }
+
+        if (points.length === 0) return null;
 
         if (dist.fixedY) maxY = dist.fixedY;
         else if (dist.autoScaleY) maxY *= 1.25;

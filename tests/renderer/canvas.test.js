@@ -84,6 +84,16 @@ describe('Renderer', () => {
     expect(renderer.plotDistribution(DISTRIBUTIONS.normal, { mu: 0, sigma: 1 })).toBeNull();
   });
 
+  it('filters singular continuous PDF points before drawing curves', () => {
+    const renderer = new Renderer('chart');
+
+    const betaResult = renderer.plotDistribution(DISTRIBUTIONS.beta, { alpha: 0.5, beta: 0.5 });
+    const weibullResult = renderer.plotDistribution(DISTRIBUTIONS.weibull, { scale: 1, shape: 0.5 });
+
+    expect(betaResult.points.every((point) => Number.isFinite(point.y))).toBe(true);
+    expect(weibullResult.points.every((point) => Number.isFinite(point.y))).toBe(true);
+  });
+
   it('keeps discrete bars inside a finite render domain', () => {
     const renderer = new Renderer('chart');
     const binomial = DISTRIBUTIONS.binomial;
