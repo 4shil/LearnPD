@@ -156,7 +156,7 @@ export const erf = (x) => {
 
 // --- BASE RANDOM SAMPLERS ---
 export const sampleNormal = (mu, sigma) => {
-    const u1 = Math.random();
+    const u1 = Math.max(1e-15, Math.random());
     const u2 = Math.random();
     const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
     return mu + sigma * z;
@@ -206,7 +206,7 @@ export const DISTRIBUTIONS = {
         median: (p) => p.mu,
         skewness: (p) => 0,
         kurtosis: (p) => 0,
-        sample: (p) => sampleNormal(p.mu, p.sigma),
+        sample: (p) => sampleNormal(p.mu, Math.max(1e-9, p.sigma)),
         range: { min: -15, max: 15 },
         fixedY: 1.0,
         what: "The symmetric bell curve. Describes natural variations around a central mean.",
@@ -266,15 +266,26 @@ export const DISTRIBUTIONS = {
             return 0;
         },
         cdf: (k, p) => {
-            if (k < 0) return 0;
-            if (k < 1) return 1 - p.p;
+            const rK = Math.floor(k);
+            const prob = Math.max(0, Math.min(1, p.p));
+            if (rK < 0) return 0;
+            if (rK < 1) return 1 - prob;
             return 1;
         },
-        mean: (p) => p.p,
-        variance: (p) => p.p * (1 - p.p),
+        mean: (p) => Math.max(0, Math.min(1, p.p)),
+        variance: (p) => {
+            const prob = Math.max(0, Math.min(1, p.p));
+            return prob * (1 - prob);
+        },
         median: (p) => (p.p > 0.5 ? 1 : p.p < 0.5 ? 0 : 0.5),
-        skewness: (p) => (1 - 2 * p.p) / Math.sqrt(p.p * (1 - p.p) || 1e-6),
-        kurtosis: (p) => (1 - 6 * p.p * (1 - p.p)) / (p.p * (1 - p.p) || 1e-6),
+        skewness: (p) => {
+            const prob = Math.max(0, Math.min(1, p.p));
+            return (1 - 2 * prob) / Math.sqrt(prob * (1 - prob) || 1e-6);
+        },
+        kurtosis: (p) => {
+            const prob = Math.max(0, Math.min(1, p.p));
+            return (1 - 6 * prob * (1 - prob)) / (prob * (1 - prob) || 1e-6);
+        },
         sample: (p) => (Math.random() < p.p ? 1 : 0),
         range: { min: -0.5, max: 1.5 },
         fixedY: 1.1,
@@ -314,14 +325,15 @@ export const DISTRIBUTIONS = {
             }
             return Math.min(1.0, sum);
         },
-        mean: (p) => p.n * p.p,
-        variance: (p) => p.n * p.p * (1 - p.p),
-        median: (p) => Math.round(p.n * p.p),
-        skewness: (p) => (1 - 2 * p.p) / Math.sqrt(p.n * p.p * (1 - p.p) || 1e-6),
-        kurtosis: (p) => (1 - 6 * p.p * (1 - p.p)) / (p.n * p.p * (1 - p.p) || 1e-6),
+        mean: (p) => Math.round(p.n) * p.p,
+        variance: (p) => Math.round(p.n) * p.p * (1 - p.p),
+        median: (p) => Math.round(Math.round(p.n) * p.p),
+        skewness: (p) => (1 - 2 * p.p) / Math.sqrt(Math.round(p.n) * p.p * (1 - p.p) || 1e-6),
+        kurtosis: (p) => (1 - 6 * p.p * (1 - p.p)) / (Math.round(p.n) * p.p * (1 - p.p) || 1e-6),
         sample: (p) => {
+            const n = Math.round(p.n);
             let s = 0;
-            for (let i = 0; i < p.n; i++) if (Math.random() < p.p) s++;
+            for (let i = 0; i < n; i++) if (Math.random() < p.p) s++;
             return s;
         },
         range: { min: 0, max: 100 },
@@ -361,7 +373,8 @@ export const DISTRIBUTIONS = {
         skewness: (p) => 1 / Math.sqrt(p.lambda),
         kurtosis: (p) => 1 / p.lambda,
         sample: (p) => {
-            const L = Math.exp(-p.lambda);
+            const lmb = Math.max(1e-9, p.lambda);
+            const L = Math.exp(-lmb);
             let k = 0, pr = 1;
             do {
                 k++;
@@ -392,12 +405,12 @@ export const DISTRIBUTIONS = {
             const lmb = Math.max(1e-9, p.lambda);
             return (x < 0) ? 0 : 1 - Math.exp(-lmb * x);
         },
-        mean: (p) => 1 / p.lambda,
-        variance: (p) => 1 / (p.lambda * p.lambda),
-        median: (p) => Math.log(2) / p.lambda,
+        mean: (p) => 1 / Math.max(1e-9, p.lambda),
+        variance: (p) => 1 / (Math.max(1e-9, p.lambda) * Math.max(1e-9, p.lambda)),
+        median: (p) => Math.log(2) / Math.max(1e-9, p.lambda),
         skewness: (p) => 2,
         kurtosis: (p) => 6,
-        sample: (p) => -Math.log(1 - Math.random()) / p.lambda,
+        sample: (p) => -Math.log(1 - Math.max(1e-15, Math.random())) / Math.max(1e-9, p.lambda),
         range: { min: 0, max: 10 },
         fixedY: 5.5,
         what: "Models waiting times between independent Poisson events. Famously 'memoryless'.",
@@ -424,12 +437,27 @@ export const DISTRIBUTIONS = {
             const prob = Math.max(0.0001, Math.min(1, p.p));
             return 1 - Math.pow(1 - prob, rK + 1);
         },
-        mean: (p) => (1 - p.p) / p.p,
-        variance: (p) => (1 - p.p) / (p.p * p.p),
-        median: (p) => Math.max(0, Math.ceil(Math.log(0.5) / Math.log(1 - p.p)) - 1),
-        skewness: (p) => (2 - p.p) / Math.sqrt(1 - p.p),
-        kurtosis: (p) => 6 + (p.p * p.p) / (1 - p.p),
-        sample: (p) => Math.floor(Math.log(1 - Math.random()) / Math.log(1 - p.p)),
+        mean: (p) => (1 - p.p) / Math.max(1e-9, p.p),
+        variance: (p) => (1 - p.p) / Math.pow(Math.max(1e-9, p.p), 2),
+        median: (p) => {
+            const prob = Math.max(0.0001, Math.min(1, p.p));
+            if (prob === 1) return 0;
+            return Math.max(0, Math.ceil(Math.log(0.5) / Math.log(1 - prob)) - 1);
+        },
+        skewness: (p) => {
+            const prob = Math.max(0.0001, Math.min(1, p.p));
+            return (2 - prob) / Math.sqrt(1 - prob);
+        },
+        kurtosis: (p) => {
+            const prob = Math.max(0.0001, Math.min(1, p.p));
+            if (prob === 1) return 0;
+            return 6 + (prob * prob) / (1 - prob);
+        },
+        sample: (p) => {
+            const prob = Math.max(0.0001, Math.min(1, p.p));
+            if (prob === 1) return 0;
+            return Math.floor(Math.log(1 - Math.random()) / Math.log(1 - prob));
+        },
         range: { min: 0, max: 40 },
         autoScaleX: true,
         autoScaleY: true,
@@ -469,40 +497,44 @@ export const DISTRIBUTIONS = {
             return Math.min(1.0, sum);
         },
         mean: (p) => {
-            const K = Math.min(p.K, p.N);
-            const n = Math.min(p.n, p.N);
-            return n * K / p.N;
+            const N = Math.round(p.N);
+            const K = Math.min(Math.round(p.K), N);
+            const n = Math.min(Math.round(p.n), N);
+            return N === 0 ? 0 : n * K / N;
         },
         variance: (p) => {
-            const N = p.N;
-            const K = Math.min(p.K, N);
-            const n = Math.min(p.n, N);
+            const N = Math.round(p.N);
+            const K = Math.min(Math.round(p.K), N);
+            const n = Math.min(Math.round(p.n), N);
             if (N <= 1) return 0;
             return n * (K / N) * (1 - K / N) * (N - n) / (N - 1);
         },
-        median: (p) => Math.round(Math.min(p.n, p.K) * (p.K / p.N)),
+        median: (p) => {
+            const N = Math.round(p.N);
+            const K = Math.min(Math.round(p.K), N);
+            const n = Math.min(Math.round(p.n), N);
+            return N === 0 ? 0 : Math.round(n * (K / N));
+        },
         skewness: (p) => {
-            const N = p.N;
-            const K = Math.min(p.K, N);
-            const n = Math.min(p.n, N);
+            const N = Math.round(p.N);
+            const K = Math.min(Math.round(p.K), N);
+            const n = Math.min(Math.round(p.n), N);
             if (N <= 2 || n === 0 || K === 0) return 0;
             const den = (N - 2) * Math.sqrt(n * K * (N - K) * (N - n) * (N - 1));
             return den === 0 ? 0 : (N - 2 * K) * (N - 2 * n) * Math.sqrt(N - 1) / den;
         },
         kurtosis: (p) => {
-            const N = p.N;
-            const K = Math.min(p.K, N);
-            const n = Math.min(p.n, N);
-            // Standard excess kurtosis is complex; return approximation or 0 if N <= 3
+            const N = Math.round(p.N);
             if (N <= 3) return 0;
             return 0.1;
         },
         sample: (p) => {
-            const N = p.N;
-            const K = Math.min(p.K, N);
-            const n = Math.min(p.n, N);
+            const N = Math.round(p.N);
+            const K = Math.min(Math.round(p.K), N);
+            const n = Math.min(Math.round(p.n), N);
             let successes = 0, pop = N, succ = K;
             for (let i = 0; i < n; i++) {
+                if (pop <= 0) break;
                 if (Math.random() < succ / pop) { successes++; succ--; }
                 pop--;
             }
@@ -530,13 +562,20 @@ export const DISTRIBUTIONS = {
             const th = Math.max(1e-9, p.scale);
             return Math.exp((k - 1) * Math.log(x) - x / th - k * Math.log(th) - logGamma(k));
         },
-        cdf: (x, p) => (x <= 0) ? 0 : regularizedGammaP(p.shape, x / p.scale),
+        cdf: (x, p) => {
+            const k = Math.max(1e-9, p.shape);
+            const th = Math.max(1e-9, p.scale);
+            return (x <= 0) ? 0 : regularizedGammaP(k, x / th);
+        },
         mean: (p) => p.shape * p.scale,
         variance: (p) => p.shape * p.scale * p.scale,
-        median: (p) => p.shape * p.scale * (1 - 1 / (9 * p.shape)), // Wilson-Hilferty approx
-        skewness: (p) => 2 / Math.sqrt(p.shape),
-        kurtosis: (p) => 6 / p.shape,
-        sample: (p) => sampleGamma(p.shape, p.scale),
+        median: (p) => {
+            const k = Math.max(1e-9, p.shape);
+            return k * p.scale * (1 - 1 / (9 * k));
+        },
+        skewness: (p) => 2 / Math.sqrt(Math.max(1e-9, p.shape)),
+        kurtosis: (p) => 6 / Math.max(1e-9, p.shape),
+        sample: (p) => sampleGamma(Math.max(1e-9, p.shape), Math.max(1e-9, p.scale)),
         range: { min: 0, max: 40 },
         autoScaleX: true,
         autoScaleY: true,
@@ -563,19 +602,41 @@ export const DISTRIBUTIONS = {
             const lB = logGamma(a) + logGamma(b) - logGamma(a + b);
             return Math.exp((a - 1) * Math.log(x || 1e-30) + (b - 1) * Math.log((1 - x) || 1e-30) - lB);
         },
-        cdf: (x, p) => (x <= 0) ? 0 : (x >= 1) ? 1 : regularizedBeta(p.alpha, p.beta, x),
-        mean: (p) => p.alpha / (p.alpha + p.beta),
-        variance: (p) => (p.alpha * p.beta) / (Math.pow(p.alpha + p.beta, 2) * (p.alpha + p.beta + 1)),
-        median: (p) => (p.alpha - 1/3) / (p.alpha + p.beta - 2/3),
-        skewness: (p) => 2 * (p.beta - p.alpha) * Math.sqrt(p.alpha + p.beta + 1) / ((p.alpha + p.beta + 2) * Math.sqrt(p.alpha * p.beta)),
+        cdf: (x, p) => {
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
+            return (x <= 0) ? 0 : (x >= 1) ? 1 : regularizedBeta(a, b, x);
+        },
+        mean: (p) => {
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
+            return a / (a + b);
+        },
+        variance: (p) => {
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
+            return (a * b) / (Math.pow(a + b, 2) * (a + b + 1));
+        },
+        median: (p) => {
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
+            return (a - 1/3) / (a + b - 2/3);
+        },
+        skewness: (p) => {
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
+            return 2 * (b - a) * Math.sqrt(a + b + 1) / ((a + b + 2) * Math.sqrt(a * b));
+        },
         kurtosis: (p) => {
-            const a = p.alpha;
-            const b = p.beta;
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
             return 6 * (Math.pow(a - b, 2) * (a + b + 1) - a * b * (a + b + 2)) / (a * b * (a + b + 2) * (a + b + 3));
         },
         sample: (p) => {
-            const x = sampleGamma(p.alpha, 1);
-            const y = sampleGamma(p.beta, 1);
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
+            const x = sampleGamma(a, 1);
+            const y = sampleGamma(b, 1);
             return x / (x + y || 1e-6);
         },
         range: { min: 0, max: 1 },
@@ -597,13 +658,19 @@ export const DISTRIBUTIONS = {
             const k = Math.max(1e-9, p.df);
             return Math.exp((k / 2 - 1) * Math.log(x) - x / 2 - (k / 2) * Math.log(2) - logGamma(k / 2));
         },
-        cdf: (x, p) => (x <= 0) ? 0 : regularizedGammaP(p.df / 2, x / 2),
-        mean: (p) => p.df,
-        variance: (p) => 2 * p.df,
-        median: (p) => p.df * Math.pow(1 - 2 / (9 * p.df), 3),
-        skewness: (p) => Math.sqrt(8 / p.df),
-        kurtosis: (p) => 12 / p.df,
-        sample: (p) => sampleGamma(p.df / 2, 2),
+        cdf: (x, p) => {
+            const k = Math.max(1e-9, p.df);
+            return (x <= 0) ? 0 : regularizedGammaP(k / 2, x / 2);
+        },
+        mean: (p) => Math.max(0, p.df),
+        variance: (p) => 2 * Math.max(0, p.df),
+        median: (p) => {
+            const k = Math.max(1e-9, p.df);
+            return k * Math.pow(1 - 2 / (9 * k), 3);
+        },
+        skewness: (p) => Math.sqrt(8 / Math.max(1e-9, p.df)),
+        kurtosis: (p) => 12 / Math.max(1e-9, p.df),
+        sample: (p) => sampleGamma(Math.max(1e-9, p.df) / 2, 2),
         range: { min: 0, max: 40 },
         autoScaleX: true,
         autoScaleY: true,
@@ -626,13 +693,16 @@ export const DISTRIBUTIONS = {
             const exp = -Math.pow(Math.log(x) - p.mu, 2) / (2 * sigma * sigma);
             return (1 / (x * sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exp);
         },
-        cdf: (x, p) => (x <= 0) ? 0 : 0.5 * (1 + erf((Math.log(x) - p.mu) / (p.sigma * Math.sqrt(2)))),
+        cdf: (x, p) => {
+            const sigma = Math.max(1e-9, p.sigma);
+            return (x <= 0) ? 0 : 0.5 * (1 + erf((Math.log(x) - p.mu) / (sigma * Math.sqrt(2))));
+        },
         mean: (p) => Math.exp(p.mu + p.sigma * p.sigma / 2),
         variance: (p) => (Math.exp(p.sigma * p.sigma) - 1) * Math.exp(2 * p.mu + p.sigma * p.sigma),
         median: (p) => Math.exp(p.mu),
         skewness: (p) => (Math.exp(p.sigma * p.sigma) + 2) * Math.sqrt(Math.exp(p.sigma * p.sigma) - 1),
         kurtosis: (p) => Math.exp(4 * p.sigma * p.sigma) + 2 * Math.exp(3 * p.sigma * p.sigma) + 3 * Math.exp(2 * p.sigma * p.sigma) - 6,
-        sample: (p) => Math.exp(sampleNormal(p.mu, p.sigma)),
+        sample: (p) => Math.exp(sampleNormal(p.mu, Math.max(1e-9, p.sigma))),
         range: { min: 0, max: 25 },
         autoScaleX: true,
         autoScaleY: true,
@@ -654,7 +724,7 @@ export const DISTRIBUTIONS = {
             return Math.exp(coef - ((v + 1) / 2) * Math.log(1 + x * x / v));
         },
         cdf: (x, p) => {
-            const v = p.df;
+            const v = Math.max(1e-9, p.df);
             const xt = v / (v + x * x);
             const ibeta = regularizedBeta(v / 2, 0.5, xt);
             return x < 0 ? 0.5 * ibeta : 1 - 0.5 * ibeta;
@@ -665,9 +735,10 @@ export const DISTRIBUTIONS = {
         skewness: (p) => p.df > 3 ? 0 : NaN,
         kurtosis: (p) => p.df > 4 ? 6 / (p.df - 4) : p.df > 2 ? Infinity : NaN,
         sample: (p) => {
+            const v = Math.max(1e-9, p.df);
             const z = sampleNormal(0, 1);
-            const v = sampleGamma(p.df / 2, 2);
-            return z / Math.sqrt(v / p.df);
+            const g = sampleGamma(v / 2, 2);
+            return z / Math.sqrt(g / v);
         },
         range: { min: -10, max: 10 },
         fixedY: 0.5,
@@ -686,21 +757,32 @@ export const DISTRIBUTIONS = {
         ],
         pdf: (x, p) => {
             if (x < 0) return 0;
-            if (x === 0 && p.shape < 1) return Infinity;
-            const k = p.shape;
-            const lam = p.scale;
+            const k = Math.max(1e-9, p.shape);
+            const lam = Math.max(1e-9, p.scale);
+            if (x === 0 && k < 1) return Infinity;
             return (k / lam) * Math.pow(x / lam, k - 1) * Math.exp(-Math.pow(x / lam, k));
         },
-        cdf: (x, p) => (x < 0) ? 0 : 1 - Math.exp(-Math.pow(x / p.scale, p.shape)),
-        mean: (p) => p.scale * Math.exp(logGamma(1 + 1 / p.shape)),
+        cdf: (x, p) => {
+            const k = Math.max(1e-9, p.shape);
+            const lam = Math.max(1e-9, p.scale);
+            return (x < 0) ? 0 : 1 - Math.exp(-Math.pow(x / lam, k));
+        },
+        mean: (p) => {
+            const k = Math.max(1e-9, p.shape);
+            return p.scale * Math.exp(logGamma(1 + 1 / k));
+        },
         variance: (p) => {
-            const m1 = Math.exp(logGamma(1 + 1 / p.shape));
-            const m2 = Math.exp(logGamma(1 + 2 / p.shape));
+            const k = Math.max(1e-9, p.shape);
+            const m1 = Math.exp(logGamma(1 + 1 / k));
+            const m2 = Math.exp(logGamma(1 + 2 / k));
             return p.scale * p.scale * (m2 - m1 * m1);
         },
-        median: (p) => p.scale * Math.pow(Math.log(2), 1 / p.shape),
+        median: (p) => {
+            const k = Math.max(1e-9, p.shape);
+            return p.scale * Math.pow(Math.log(2), 1 / k);
+        },
         skewness: (p) => {
-            const k = p.shape;
+            const k = Math.max(1e-9, p.shape);
             const g1 = Math.exp(logGamma(1 + 1/k));
             const g2 = Math.exp(logGamma(1 + 2/k));
             const g3 = Math.exp(logGamma(1 + 3/k));
@@ -708,7 +790,7 @@ export const DISTRIBUTIONS = {
             return sig === 0 ? 0 : (g3 - 3*g1*g2 + 2*g1*g1*g1) / (sig*sig*sig);
         },
         kurtosis: (p) => {
-            const k = p.shape;
+            const k = Math.max(1e-9, p.shape);
             const g1 = Math.exp(logGamma(1 + 1/k));
             const g2 = Math.exp(logGamma(1 + 2/k));
             const g3 = Math.exp(logGamma(1 + 3/k));
@@ -716,7 +798,11 @@ export const DISTRIBUTIONS = {
             const var_val = g2 - g1*g1;
             return var_val === 0 ? 0 : (g4 - 4*g1*g3 + 6*g1*g1*g2 - 3*g1*g1*g1*g1) / (var_val*var_val) - 3;
         },
-        sample: (p) => p.scale * Math.pow(-Math.log(1 - Math.random()), 1 / p.shape),
+        sample: (p) => {
+            const k = Math.max(1e-9, p.shape);
+            const lam = Math.max(1e-9, p.scale);
+            return lam * Math.pow(-Math.log(1 - Math.max(1e-15, Math.random())), 1 / k);
+        },
         range: { min: 0, max: 20 },
         autoScaleX: true,
         autoScaleY: true,
