@@ -259,8 +259,10 @@ export const DISTRIBUTIONS = {
             { id: 'p', label: 'p (Success Prob)', min: 0, max: 1, step: 0.01, default: 0.5 }
         ],
         pmf: (k, p) => {
-            if (k === 1) return p.p;
-            if (k === 0) return 1 - p.p;
+            const rK = Math.round(k);
+            const prob = Math.max(0, Math.min(1, p.p));
+            if (rK === 1) return prob;
+            if (rK === 0) return 1 - prob;
             return 0;
         },
         cdf: (k, p) => {
