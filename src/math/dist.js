@@ -555,11 +555,11 @@ export const DISTRIBUTIONS = {
         ],
         pdf: (x, p) => {
             if (x < 0 || x > 1) return 0;
+            const a = Math.max(1e-9, p.alpha);
+            const b = Math.max(1e-9, p.beta);
             // Guard infinity at boundaries
-            if (x === 0 && p.alpha < 1) return Infinity;
-            if (x === 1 && p.beta < 1) return Infinity;
-            const a = p.alpha;
-            const b = p.beta;
+            if (x === 0 && a < 1) return Infinity;
+            if (x === 1 && b < 1) return Infinity;
             const lB = logGamma(a) + logGamma(b) - logGamma(a + b);
             return Math.exp((a - 1) * Math.log(x || 1e-30) + (b - 1) * Math.log((1 - x) || 1e-30) - lB);
         },
