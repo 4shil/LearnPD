@@ -622,8 +622,9 @@ export const DISTRIBUTIONS = {
         ],
         pdf: (x, p) => {
             if (x <= 0) return 0;
-            const exp = -Math.pow(Math.log(x) - p.mu, 2) / (2 * p.sigma * p.sigma);
-            return (1 / (x * p.sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exp);
+            const sigma = Math.max(1e-9, p.sigma);
+            const exp = -Math.pow(Math.log(x) - p.mu, 2) / (2 * sigma * sigma);
+            return (1 / (x * sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exp);
         },
         cdf: (x, p) => (x <= 0) ? 0 : 0.5 * (1 + erf((Math.log(x) - p.mu) / (p.sigma * Math.sqrt(2)))),
         mean: (p) => Math.exp(p.mu + p.sigma * p.sigma / 2),
