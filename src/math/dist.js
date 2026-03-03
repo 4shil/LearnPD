@@ -292,8 +292,13 @@ export const DISTRIBUTIONS = {
             { id: 'p', label: 'p (Success Prob)', min: 0, max: 1, step: 0.01, default: 0.5 }
         ],
         pmf: (k, p) => {
-            if (k < 0 || k > p.n) return 0;
-            return combinations(p.n, k) * Math.pow(p.p, k) * Math.pow(1 - p.p, p.n - k);
+            const n = Math.round(p.n);
+            const rK = Math.round(k);
+            if (rK < 0 || rK > n) return 0;
+            const prob = Math.max(0, Math.min(1, p.p));
+            if (prob === 0) return rK === 0 ? 1 : 0;
+            if (prob === 1) return rK === n ? 1 : 0;
+            return Math.exp(logCombination(n, rK) + rK * Math.log(prob) + (n - rK) * Math.log(1 - prob));
         },
         cdf: (k, p) => {
             if (k < 0) return 0;
