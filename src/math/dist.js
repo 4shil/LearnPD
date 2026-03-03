@@ -649,7 +649,7 @@ export const DISTRIBUTIONS = {
             { id: 'df', label: 'df (Deg Freedom)', min: 1, max: 30, step: 1, default: 4 }
         ],
         pdf: (x, p) => {
-            const v = p.df;
+            const v = Math.max(1e-9, p.df);
             const coef = logGamma((v + 1) / 2) - logGamma(v / 2) - 0.5 * Math.log(v * Math.PI);
             return Math.exp(coef - ((v + 1) / 2) * Math.log(1 + x * x / v));
         },
