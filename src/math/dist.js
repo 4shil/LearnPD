@@ -456,16 +456,17 @@ export const DISTRIBUTIONS = {
             return Math.exp(logCombination(K, rK) + logCombination(N - K, n - rK) - logCombination(N, n));
         },
         cdf: (k, p) => {
-            const N = p.N;
-            const K = Math.min(p.K, N);
-            const n = Math.min(p.n, N);
-            if (k < 0) return 0;
-            if (k >= Math.min(n, K)) return 1;
+            const N = Math.round(p.N);
+            const K = Math.min(Math.round(p.K), N);
+            const n = Math.min(Math.round(p.n), N);
+            const rK = Math.floor(k);
+            if (rK < 0) return 0;
+            if (rK >= Math.min(n, K)) return 1;
             let sum = 0;
-            for (let i = 0; i <= Math.floor(k); i++) {
+            for (let i = 0; i <= rK; i++) {
                 sum += Math.exp(logCombination(K, i) + logCombination(N - K, n - i) - logCombination(N, n));
             }
-            return sum;
+            return Math.min(1.0, sum);
         },
         mean: (p) => {
             const K = Math.min(p.K, p.N);
