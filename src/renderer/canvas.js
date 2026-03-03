@@ -137,16 +137,22 @@ export class Renderer {
         let accent = isCompare ? (this.options.accent || '#FF3E00') : '#c8f542';
         if (isTarget) accent = '#ff3366'; // Highlight target curves in red
 
-        // Apply zoom adjustments to base boundaries
-        let xMin = dist.range.min * zoom;
-        let xMax = dist.range.max * zoom;
+        // Apply center-based zoom adjustments to base boundaries
+        let xMin = dist.range.min;
+        let xMax = dist.range.max;
 
         if (dist.autoScaleX && dist.isDiscrete) {
             const mean = dist.mean(params);
             const std = Math.sqrt(dist.variance(params)) || 1e-3;
-            xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std)) * zoom;
-            xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std)) * zoom;
+            xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std));
+            xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std));
         }
+
+        const zoomFactor = Math.max(0.2, zoom || 1);
+        const center = (xMin + xMax) / 2;
+        const halfRange = Math.max(1e-9, (xMax - xMin) / (2 * zoomFactor));
+        xMin = center - halfRange;
+        xMax = center + halfRange;
 
         // Cache coordinates for coordinate tooltip mapping
         this.xMin = xMin;

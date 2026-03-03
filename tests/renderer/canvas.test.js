@@ -94,6 +94,16 @@ describe('Renderer', () => {
     expect(weibullResult.points.every((point) => Number.isFinite(point.y))).toBe(true);
   });
 
+  it('narrows the plot domain around the same center when zooming in', () => {
+    const renderer = new Renderer('chart');
+
+    const normal = renderer.plotDistribution(DISTRIBUTIONS.normal, { mu: 0, sigma: 1 }, false, false, 1);
+    const zoomed = renderer.plotDistribution(DISTRIBUTIONS.normal, { mu: 0, sigma: 1 }, false, false, 2);
+
+    expect((zoomed.xMin + zoomed.xMax) / 2).toBeCloseTo((normal.xMin + normal.xMax) / 2);
+    expect(zoomed.xMax - zoomed.xMin).toBeLessThan(normal.xMax - normal.xMin);
+  });
+
   it('keeps discrete bars inside a finite render domain', () => {
     const renderer = new Renderer('chart');
     const binomial = DISTRIBUTIONS.binomial;
