@@ -341,7 +341,9 @@ export const DISTRIBUTIONS = {
         ],
         pmf: (k, p) => {
             if (k < 0) return 0;
-            return (Math.pow(p.lambda, k) * Math.exp(-p.lambda)) / factorial(k);
+            const rK = Math.round(k);
+            const lmb = Math.max(1e-9, p.lambda);
+            return Math.exp(rK * Math.log(lmb) - lmb - logGamma(rK + 1));
         },
         cdf: (k, p) => {
             if (k < 0) return 0;
