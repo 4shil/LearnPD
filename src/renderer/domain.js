@@ -19,6 +19,14 @@ export const computePlotDomain = (dist, params, zoom = 1) => {
   };
 };
 
+export const computeMergedPlotDomain = (items, zoom = 1) => {
+  const domains = items.map(({ dist, params }) => computePlotDomain(dist, params, zoom));
+  return {
+    xMin: Math.min(...domains.map((domain) => domain.xMin)),
+    xMax: Math.max(...domains.map((domain) => domain.xMax)),
+  };
+};
+
 export const computeYDomain = (dist, maxY) => {
   if (dist.fixedY) return dist.fixedY;
   if (dist.autoScaleY) return Math.max(0.001, maxY * 1.25);

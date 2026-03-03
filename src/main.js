@@ -6,6 +6,7 @@
 
 import { UI } from './ui/controller.js';
 import { Renderer } from './renderer/canvas.js';
+import { computeMergedPlotDomain } from './renderer/domain.js';
 import { store } from './core/state.js';
 import { DISTRIBUTIONS } from './math/dist.js';
 import Lenis from 'lenis';
@@ -465,11 +466,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (state.compareOverlay) {
                 // Draw split comparison overlay A and B on the same canvas
-                const resA = mainRenderer.plotDistribution(dist, state.params, false, false, state.zoom);
-                
                 const compareDistB = DISTRIBUTIONS[state.compare.dist2];
+                const mergedDomain = computeMergedPlotDomain([
+                    { dist, params: state.params },
+                    { dist: compareDistB, params: state.compare.params2 }
+                ], state.zoom);
+                const resA = mainRenderer.plotDistribution(dist, state.params, false, false, state.zoom, mergedDomain);
+                
                 mainRenderer.options.accent = '#0066FF';
-                const resB = mainRenderer.plotDistribution(compareDistB, state.compare.params2, true, false, state.zoom);
+                const resB = mainRenderer.plotDistribution(compareDistB, state.compare.params2, true, false, state.zoom, mergedDomain);
                 mainRenderer.options.accent = '#c8f542'; // Restore default
 
                 mainRenderer.drawAxes(resA.xMin, resA.xMax, Math.max(resA.maxY, resB.maxY));
@@ -499,11 +504,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const d1 = DISTRIBUTIONS[state.compare.dist1];
             const d2 = DISTRIBUTIONS[state.compare.dist2];
+            const mergedDomain = computeMergedPlotDomain([
+                { dist: d1, params: state.compare.params1 },
+                { dist: d2, params: state.compare.params2 }
+            ], state.zoom);
             
             compareRenderer.options.accent = '#FF3E00';
-            const resA = compareRenderer.plotDistribution(d1, state.compare.params1, true, false, state.zoom);
+            const resA = compareRenderer.plotDistribution(d1, state.compare.params1, true, false, state.zoom, mergedDomain);
             compareRenderer.options.accent = '#0066FF';
-            const resB = compareRenderer.plotDistribution(d2, state.compare.params2, true, false, state.zoom);
+            const resB = compareRenderer.plotDistribution(d2, state.compare.params2, true, false, state.zoom, mergedDomain);
             compareRenderer.options.accent = '#c8f542'; // Restore default
 
             compareRenderer.drawAxes(resA.xMin, resA.xMax, Math.max(resA.maxY, resB.maxY));

@@ -131,7 +131,7 @@ export class Renderer {
         }
     }
 
-    plotDistribution(dist, params, isCompare = false, isTarget = false, zoom = 1.0) {
+    plotDistribution(dist, params, isCompare = false, isTarget = false, zoom = 1.0, domainOverride = null) {
         if (!this.ctx) return;
         const { fg } = this.options;
         const { padding, plotWidth, plotHeight, drawable } = this.getPlotBounds();
@@ -139,7 +139,7 @@ export class Renderer {
         let accent = isCompare ? (this.options.accent || '#FF3E00') : '#c8f542';
         if (isTarget) accent = '#ff3366'; // Highlight target curves in red
 
-        let { xMin, xMax } = computePlotDomain(dist, params, zoom);
+        let { xMin, xMax } = domainOverride || computePlotDomain(dist, params, zoom);
 
         // Cache coordinates for coordinate tooltip mapping
         this.xMin = xMin;
