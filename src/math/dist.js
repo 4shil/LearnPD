@@ -193,10 +193,14 @@ export const DISTRIBUTIONS = {
             { id: 'sigma', label: 'σ (Std Dev)', min: 0.1, max: 5, step: 0.1, default: 1 }
         ],
         pdf: (x, p) => {
-            const exp = -0.5 * Math.pow((x - p.mu) / p.sigma, 2);
-            return (1 / (p.sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exp);
+            const sigma = Math.max(1e-9, p.sigma);
+            const exp = -0.5 * Math.pow((x - p.mu) / sigma, 2);
+            return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(exp);
         },
-        cdf: (x, p) => 0.5 * (1 + erf((x - p.mu) / (p.sigma * Math.sqrt(2)))),
+        cdf: (x, p) => {
+            const sigma = Math.max(1e-9, p.sigma);
+            return 0.5 * (1 + erf((x - p.mu) / (sigma * Math.sqrt(2))));
+        },
         mean: (p) => p.mu,
         variance: (p) => p.sigma * p.sigma,
         median: (p) => p.mu,
