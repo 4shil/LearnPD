@@ -412,8 +412,18 @@ export const DISTRIBUTIONS = {
         params: [
             { id: 'p', label: 'p (Success Prob)', min: 0.05, max: 1.0, step: 0.05, default: 0.3 }
         ],
-        pmf: (k, p) => (k < 0) ? 0 : Math.pow(1 - p.p, k) * p.p,
-        cdf: (k, p) => (k < 0) ? 0 : 1 - Math.pow(1 - p.p, Math.floor(k) + 1),
+        pmf: (k, p) => {
+            if (k < 0) return 0;
+            const rK = Math.round(k);
+            const prob = Math.max(0.0001, Math.min(1, p.p));
+            return Math.pow(1 - prob, rK) * prob;
+        },
+        cdf: (k, p) => {
+            if (k < 0) return 0;
+            const rK = Math.floor(k);
+            const prob = Math.max(0.0001, Math.min(1, p.p));
+            return 1 - Math.pow(1 - prob, rK + 1);
+        },
         mean: (p) => (1 - p.p) / p.p,
         variance: (p) => (1 - p.p) / (p.p * p.p),
         median: (p) => Math.max(0, Math.ceil(Math.log(0.5) / Math.log(1 - p.p)) - 1),
