@@ -594,7 +594,7 @@ export const DISTRIBUTIONS = {
         ],
         pdf: (x, p) => {
             if (x <= 0) return 0;
-            const k = p.df;
+            const k = Math.max(1e-9, p.df);
             return Math.exp((k / 2 - 1) * Math.log(x) - x / 2 - (k / 2) * Math.log(2) - logGamma(k / 2));
         },
         cdf: (x, p) => (x <= 0) ? 0 : regularizedGammaP(p.df / 2, x / 2),
