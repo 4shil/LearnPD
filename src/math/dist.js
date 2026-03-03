@@ -301,13 +301,18 @@ export const DISTRIBUTIONS = {
             return Math.exp(logCombination(n, rK) + rK * Math.log(prob) + (n - rK) * Math.log(1 - prob));
         },
         cdf: (k, p) => {
-            if (k < 0) return 0;
-            if (k >= p.n) return 1;
+            const n = Math.round(p.n);
+            const rK = Math.floor(k);
+            if (rK < 0) return 0;
+            if (rK >= n) return 1;
+            const prob = Math.max(0, Math.min(1, p.p));
             let sum = 0;
-            for (let i = 0; i <= Math.floor(k); i++) {
-                sum += combinations(p.n, i) * Math.pow(p.p, i) * Math.pow(1 - p.p, p.n - i);
+            for (let i = 0; i <= rK; i++) {
+                if (prob === 0) sum += (i === 0 ? 1 : 0);
+                else if (prob === 1) sum += (i === n ? 1 : 0);
+                else sum += Math.exp(logCombination(n, i) + i * Math.log(prob) + (n - i) * Math.log(1 - prob));
             }
-            return sum;
+            return Math.min(1.0, sum);
         },
         mean: (p) => p.n * p.p,
         variance: (p) => p.n * p.p * (1 - p.p),
