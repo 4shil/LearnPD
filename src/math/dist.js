@@ -347,11 +347,13 @@ export const DISTRIBUTIONS = {
         },
         cdf: (k, p) => {
             if (k < 0) return 0;
+            const rK = Math.floor(k);
+            const lmb = Math.max(1e-9, p.lambda);
             let sum = 0;
-            for (let i = 0; i <= Math.floor(k); i++) {
-                sum += (Math.pow(p.lambda, i) * Math.exp(-p.lambda)) / factorial(i);
+            for (let i = 0; i <= rK; i++) {
+                sum += Math.exp(i * Math.log(lmb) - lmb - logGamma(i + 1));
             }
-            return sum;
+            return Math.min(1.0, sum);
         },
         mean: (p) => p.lambda,
         variance: (p) => p.lambda,
