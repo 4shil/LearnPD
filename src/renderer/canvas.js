@@ -4,6 +4,8 @@
  * quiz targets, and line paths for LLN simulations.
  */
 
+import { computePlotDomain, computeYDomain } from './domain.js';
+
 export class Renderer {
     constructor(canvasId, options = {}) {
         this.canvas = document.getElementById(canvasId);
@@ -137,22 +139,7 @@ export class Renderer {
         let accent = isCompare ? (this.options.accent || '#FF3E00') : '#c8f542';
         if (isTarget) accent = '#ff3366'; // Highlight target curves in red
 
-        // Apply center-based zoom adjustments to base boundaries
-        let xMin = dist.range.min;
-        let xMax = dist.range.max;
-
-        if (dist.autoScaleX && dist.isDiscrete) {
-            const mean = dist.mean(params);
-            const std = Math.sqrt(dist.variance(params)) || 1e-3;
-            xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std));
-            xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std));
-        }
-
-        const zoomFactor = Math.max(0.2, zoom || 1);
-        const center = (xMin + xMax) / 2;
-        const halfRange = Math.max(1e-9, (xMax - xMin) / (2 * zoomFactor));
-        xMin = center - halfRange;
-        xMax = center + halfRange;
+        let { xMin, xMax } = computePlotDomain(dist, params, zoom);
 
         // Cache coordinates for coordinate tooltip mapping
         this.xMin = xMin;
@@ -181,9 +168,7 @@ export class Renderer {
 
         if (points.length === 0) return null;
 
-        if (dist.fixedY) maxY = dist.fixedY;
-        else if (dist.autoScaleY) maxY *= 1.25;
-        else maxY = 1.0;
+        maxY = computeYDomain(dist, maxY);
 
         this.maxY = maxY;
 
