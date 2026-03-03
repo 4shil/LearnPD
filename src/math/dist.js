@@ -239,7 +239,11 @@ export const DISTRIBUTIONS = {
         median: (p) => (p.a + p.b) / 2,
         skewness: (p) => 0,
         kurtosis: (p) => -1.2,
-        sample: (p) => p.a + (p.b - p.a) * Math.random(),
+        sample: (p) => {
+            const a = Math.min(p.a, p.b - 0.1);
+            const b = Math.max(p.b, p.a + 0.1);
+            return a + (b - a) * Math.random();
+        },
         range: { min: -15, max: 15 },
         fixedY: 1.2,
         what: "Constant probability density across an interval [a, b]. All equal intervals are equally likely.",
