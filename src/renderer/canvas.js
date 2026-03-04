@@ -26,6 +26,7 @@ export class Renderer {
         this.maxY = 1.0;
         
         this.resize();
+        this.setupResizeObserver();
     }
 
     resize() {
