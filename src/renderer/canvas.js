@@ -29,6 +29,15 @@ export class Renderer {
         this.setupResizeObserver();
     }
 
+    setupResizeObserver() {
+        if (typeof ResizeObserver !== 'undefined' && this.canvas && this.canvas.parentElement) {
+            this.resizeObserver = new ResizeObserver(() => {
+                this.resize();
+            });
+            this.resizeObserver.observe(this.canvas.parentElement);
+        }
+    }
+
     resize() {
         if (!this.canvas || !this.ctx) return false;
         const parent = this.canvas.parentElement;
