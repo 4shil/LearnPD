@@ -29,12 +29,6 @@ export class Renderer {
         this.setupResizeObserver();
     }
 
-    destroy() {
-        if (this.resizeObserver) {
-            this.resizeObserver.disconnect();
-        }
-    }
-
     setupResizeObserver() {
         if (typeof ResizeObserver !== 'undefined' && this.canvas && this.canvas.parentElement) {
             this.resizeObserver = new ResizeObserver(() => {
@@ -48,25 +42,35 @@ export class Renderer {
         }
     }
 
+    destroy() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+    }
+
     resize() {
         if (!this.canvas || !this.ctx) return false;
         const parent = this.canvas.parentElement;
         const rect = parent?.getBoundingClientRect?.();
         const dpr = window.devicePixelRatio || 1;
         const width = Math.max(1, Math.floor(rect?.width || 0));
-        if (width <= 1) return false;
         const height = Math.max(1, Math.floor(rect?.height || 0));
-        if (height <= 1) return false;
+
+        // Skip resizing if parent size is essentially 0 (e.g. element is hidden)
+        // to prevent collapsing the canvas permanently to 1x1.
+        if (width <= 1 || height <= 1) {
+            return false;
+        }
 
         this.canvas.width = Math.floor(width * dpr);
         this.canvas.height = Math.floor(height * dpr);
         this.canvas.style.width = `${width}px`;
         this.canvas.style.height = `${height}px`;
-        if (this.ctx) this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         this.width = width;
         this.height = height;
 
-        return width > 1 && height > 1;
+        return true;
     }
 
     getPlotBounds() {
@@ -154,11 +158,11 @@ export class Renderer {
     }
 
     plotDistribution(dist, params, isCompare = false, isTarget = false, zoom = 1.0, domainOverride = null) {
-        if (!this.ctx) return;
+        if (!this.ctx) return null;
         const { fg } = this.options;
         const { padding, plotWidth, plotHeight, drawable } = this.getPlotBounds();
         if (!drawable) return null;
-        let accent = isCompare ? (this.options.accent || '#FF3E00') : '#c8f542';
+        let accent = isCompare ? (this.options.accent || '#0066FF') : '#c8f542';
         if (isTarget) accent = '#ff3366'; // Highlight target curves in red
 
         let { xMin, xMax } = domainOverride || computePlotDomain(dist, params, zoom);
