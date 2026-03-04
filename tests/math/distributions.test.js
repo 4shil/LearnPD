@@ -74,3 +74,4 @@ describe('extra studentt bounds', () => { it('handles low degrees of freedom var
 describe('extra weibull bounds', () => { it('handles zero or negative scale stably', () => { const w = DISTRIBUTIONS.weibull; expect(Number.isFinite(w.pdf(1, { scale: 0, shape: 2 }))).toBe(false); }); });
 describe('extra gamma bounds', () => { it('handles zero shape stably', () => { const g = DISTRIBUTIONS.gamma; expect(Number.isFinite(g.pdf(1, { shape: 0, scale: 2 }))).toBe(true); }); });
 describe('extra beta bounds', () => { it('handles zero shapes stably', () => { const b = DISTRIBUTIONS.beta; expect(Number.isFinite(b.pdf(0.5, { alpha: 0, beta: 0 }))).toBe(true); }); });
+describe('extra lognormal bounds', () => { it('handles zero scale stably', () => { const ln = DISTRIBUTIONS.lognormal; expect(Number.isFinite(ln.pdf(1, { mu: 0, sigma: 0 }))).toBe(true); }); });
