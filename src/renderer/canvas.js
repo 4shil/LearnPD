@@ -29,6 +29,12 @@ export class Renderer {
         this.setupResizeObserver();
     }
 
+    destroy() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+    }
+
     setupResizeObserver() {
         if (typeof ResizeObserver !== 'undefined' && this.canvas && this.canvas.parentElement) {
             this.resizeObserver = new ResizeObserver(() => {
