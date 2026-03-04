@@ -54,6 +54,7 @@ export class Renderer {
         const rect = parent?.getBoundingClientRect?.();
         const dpr = window.devicePixelRatio || 1;
         const width = Math.max(1, Math.floor(rect?.width || 0));
+        if (width <= 1) return false;
         const height = Math.max(1, Math.floor(rect?.height || 0));
         if (height <= 1) return false;
 
