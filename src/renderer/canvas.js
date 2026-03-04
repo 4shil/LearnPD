@@ -55,6 +55,7 @@ export class Renderer {
         const dpr = window.devicePixelRatio || 1;
         const width = Math.max(1, Math.floor(rect?.width || 0));
         const height = Math.max(1, Math.floor(rect?.height || 0));
+        if (height <= 1) return false;
 
         this.canvas.width = Math.floor(width * dpr);
         this.canvas.height = Math.floor(height * dpr);
