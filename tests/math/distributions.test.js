@@ -67,3 +67,5 @@ describe('probability distribution definitions', () => {
     }
   });
 });
+
+describe('extra binomial bounds', () => { it('handles large trial inputs stably', () => { const bin = DISTRIBUTIONS.binomial; expect(Number.isFinite(bin.pmf(500, { n: 1000, p: 0.5 }))).toBe(true); }); });
