@@ -71,3 +71,4 @@ describe('probability distribution definitions', () => {
 describe('extra binomial bounds', () => { it('handles large trial inputs stably', () => { const bin = DISTRIBUTIONS.binomial; expect(Number.isFinite(bin.pmf(500, { n: 1000, p: 0.5 }))).toBe(true); }); });
 describe('extra poisson bounds', () => { it('handles large rates stably', () => { const poi = DISTRIBUTIONS.poisson; expect(Number.isFinite(poi.pmf(200, { lambda: 180 }))).toBe(true); }); });
 describe('extra studentt bounds', () => { it('handles low degrees of freedom variance stably', () => { const t = DISTRIBUTIONS.studentt; expect(t.variance({ df: 2 })).toBe(Infinity); }); });
+describe('extra weibull bounds', () => { it('handles zero or negative scale stably', () => { const w = DISTRIBUTIONS.weibull; expect(Number.isFinite(w.pdf(1, { scale: 0, shape: 2 }))).toBe(false); }); });
