@@ -76,3 +76,4 @@ describe('extra gamma bounds', () => { it('handles zero shape stably', () => { c
 describe('extra beta bounds', () => { it('handles zero shapes stably', () => { const b = DISTRIBUTIONS.beta; expect(Number.isFinite(b.pdf(0.5, { alpha: 0, beta: 0 }))).toBe(true); }); });
 describe('extra lognormal bounds', () => { it('handles zero scale stably', () => { const ln = DISTRIBUTIONS.lognormal; expect(Number.isFinite(ln.pdf(1, { mu: 0, sigma: 0 }))).toBe(true); }); });
 describe('extra chisquare bounds', () => { it('handles zero df stably', () => { const chi = DISTRIBUTIONS.chisquare; expect(Number.isFinite(chi.pdf(1, { df: 0 }))).toBe(true); }); });
+describe('extra hypergeometric bounds', () => { it('handles empty population stably', () => { const hyp = DISTRIBUTIONS.hypergeometric; expect(hyp.mean({ N: 0, K: 0, n: 0 })).toBe(0); }); });
