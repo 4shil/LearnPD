@@ -145,7 +145,7 @@ a, button, select, input, textarea {
     box-shadow: 6px 6px 0 var(--border);
 }
 
-.dock__link {
+.dock__link { position: relative;
     display: flex;
     align-items: center;
     gap: 6px;
