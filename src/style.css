@@ -1326,4 +1326,4 @@ input[type="range"]::-moz-range-thumb {
         grid-template-columns: 1fr;
     }
 }
-.compare-overlay-legend { position: absolute; bottom: 1rem; left: 1rem; }
+.compare-overlay-legend { position: absolute; bottom: 1rem; left: 1rem; background: var(--card); border: var(--border-w) solid var(--border); padding: 6px 12px; }
