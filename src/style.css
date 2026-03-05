@@ -1328,3 +1328,4 @@ input[type="range"]::-moz-range-thumb {
 }
 .compare-overlay-legend { position: absolute; bottom: 1rem; left: 1rem; background: var(--card); border: var(--border-w) solid var(--border); padding: 6px 12px; display: flex; gap: 1rem; font-size: 0.75rem; font-weight: 700; }
 .compare-overlay-legend .model-a { background-color: #c8f542; }
+.compare-overlay-legend .model-b { background-color: #0066FF; }
