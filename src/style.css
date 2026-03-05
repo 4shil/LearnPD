@@ -128,7 +128,7 @@ a, button, select, input, textarea {
 /* ── Dock Navigation ── */
 .dock:hover { box-shadow: 8px 8px 0 var(--border); }
 
-.dock__indicator { position: absolute; height: calc(100% - 12px); }
+.dock__indicator { position: absolute; height: calc(100% - 12px); border: var(--border-w) solid var(--border); border-radius: var(--radius-pill); }
 
 .dock {
     position: fixed;
