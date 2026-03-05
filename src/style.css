@@ -1330,3 +1330,4 @@ input[type="range"]::-moz-range-thumb {
 .compare-overlay-legend .model-a { background-color: #c8f542; }
 .compare-overlay-legend .model-b { background-color: #0066FF; }
 .compare-overlay-legend.hidden { display: none !important; }
+@media (max-width: 768px) {}
