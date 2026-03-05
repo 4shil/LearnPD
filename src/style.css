@@ -172,9 +172,7 @@ a, button, select, input, textarea {
 
 .dock__link.active {
     color: var(--fg);
-    background: var(--accent);
-    border-color: var(--border);
-    box-shadow: 2px 2px 0 var(--border);
+    
 }
 
 /* ── Main Layout ── */
