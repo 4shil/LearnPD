@@ -1331,3 +1331,4 @@ input[type="range"]::-moz-range-thumb {
 .compare-overlay-legend .model-b { background-color: #0066FF; }
 .compare-overlay-legend.hidden { display: none !important; }
 @media (max-width: 768px) { .chart-container { height: 300px; } }
+.zoom-controls { position: absolute; bottom: 1rem; right: 1rem; }
