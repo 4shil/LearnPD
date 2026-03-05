@@ -138,7 +138,7 @@ a, button, select, input, textarea {
     display: flex;
     gap: 4px;
     z-index: 5000;
-    box-shadow: var(--shadow);
+    box-shadow: 6px 6px 0 var(--border);
 }
 
 .dock__link {
