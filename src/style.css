@@ -131,7 +131,7 @@ a, button, select, input, textarea {
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--card);
+    background: rgba(255, 255, 255, 0.8);
     border: var(--border-w) solid var(--border);
     border-radius: var(--radius-pill);
     padding: 6px;
