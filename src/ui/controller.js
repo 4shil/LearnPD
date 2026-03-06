@@ -250,15 +250,35 @@ export class UI {
     }
 
     updateView(viewId) {
-        const activeLink = Array.from(document.querySelectorAll('.dock__link')).find(l => (l.dataset.view || l.getAttribute('href').substring(1)) === viewId);
         document.querySelectorAll('.view').forEach(v => {
             v.classList.toggle('active', v.id === viewId);
         });
 
-        document.querySelectorAll('.dock__link').forEach(l => {
+        const activeLink = Array.from(document.querySelectorAll('.dock__link')).find(l => {
             const linkView = l.dataset.view || l.getAttribute('href').substring(1);
-            l.classList.toggle('active', linkView === viewId);
+            return linkView === viewId;
         });
+
+        document.querySelectorAll('.dock__link').forEach(l => {
+            l.classList.toggle('active', l === activeLink);
+        });
+
+        // Update sliding indicator position
+        const indicator = document.getElementById('dockIndicator');
+        const dock = document.getElementById('dock');
+        if (indicator && dock && activeLink) {
+            const dockRect = dock.getBoundingClientRect();
+            const linkRect = activeLink.getBoundingClientRect();
+            
+            // Calculate relative left and width
+            const relativeLeft = linkRect.left - dockRect.left - parseInt(window.getComputedStyle(dock).borderLeftWidth || 0);
+            
+            indicator.style.left = `${relativeLeft}px`;
+            indicator.style.width = `${linkRect.width}px`;
+            indicator.style.opacity = '1';
+        } else if (indicator) {
+            indicator.style.opacity = '0';
+        }
     }
 
     updateExplorerUI(state) {
@@ -411,21 +431,27 @@ export class UI {
             if (input) p[param.id] = parseFloat(input.value);
         });
 
+        const formatCalcVal = (v) => {
+            if (isNaN(v)) return 'NaN';
+            if (!Number.isFinite(v)) return v > 0 ? '∞' : '-∞';
+            return v.toFixed(6);
+        };
+
         let result = '';
         try {
             if (calcType === 'pdf') {
                 const x = parseFloat(document.getElementById('calcX').value);
                 const val = dist.isDiscrete ? dist.pmf(x, p) : dist.pdf(x, p);
-                result = `${dist.isDiscrete ? 'P(X = ' + x + ')' : 'f(' + x + ')'} = ${val.toFixed(6)}`;
+                result = `${dist.isDiscrete ? 'P(X = ' + x + ')' : 'f(' + x + ')'} = ${formatCalcVal(val)}`;
             } else if (calcType === 'cdf') {
                 const x = parseFloat(document.getElementById('calcX').value);
                 const val = dist.cdf(x, p);
-                result = `P(X ≤ ${x}) = ${val.toFixed(6)}`;
+                result = `P(X ≤ ${x}) = ${formatCalcVal(val)}`;
             } else if (calcType === 'interval') {
                 const a = parseFloat(document.getElementById('calcA').value);
                 const b = parseFloat(document.getElementById('calcB').value);
                 const val = dist.cdf(b, p) - dist.cdf(a, p);
-                result = `P(${a} ≤ X ≤ ${b}) = ${val.toFixed(6)}`;
+                result = `P(${a} ≤ X ≤ ${b}) = ${formatCalcVal(val)}`;
             }
         } catch (e) {
             result = 'Error: ' + e.message;
