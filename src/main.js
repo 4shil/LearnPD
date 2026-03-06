@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ch4Renderer = new Renderer('ch4Canvas');
     
     // Quiz and Simulator renderers
-    const quizRenderer = new Renderer('quizCanvas');
+    const quizRenderer = new Renderer('quizCanvas', { onResize: () => { store.notify(); } });
     const simRenderer = new Renderer('simCanvas');
 
     // ── 5. Coordinate Tooltip Explorer logic ──
