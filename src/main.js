@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const compareRenderer = new Renderer('compareCanvas', { onResize: () => { store.notify(); } });
     
     // Curriculum pane canvas renderers
-    const ch1Renderer = new Renderer('ch1Canvas');
+    const ch1Renderer = new Renderer('ch1Canvas', { onResize: () => { drawChapter1Widget(); } });
     const ch2Renderer = new Renderer('ch2Canvas');
     const ch3Renderer = new Renderer('ch3Canvas');
     const ch4Renderer = new Renderer('ch4Canvas');
