@@ -84,31 +84,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     console.log("-----------------------------------------");
 
-    // ── 4. Setup Renderers ──
-    const mainRenderer = new Renderer('mainCanvas', { onResize: () => { store.notify(); } });
-    const compareRenderer = new Renderer('compareCanvas', { onResize: () => { store.notify(); } });
+    // ── 4. Setup Renderers with dynamic ResizeObserver callbacks ──
+    const mainRenderer = new Renderer('mainCanvas', {
+        onResize: () => { store.notify(); }
+    });
+    const compareRenderer = new Renderer('compareCanvas', {
+        onResize: () => { store.notify(); }
+    });
     
     // Curriculum pane canvas renderers
-    const ch1Renderer = new Renderer('ch1Canvas', { onResize: () => { drawChapter1Widget(); } });
-    const ch2Renderer = new Renderer('ch2Canvas');
-    const ch3Renderer = new Renderer('ch3Canvas');
-    const ch4Renderer = new Renderer('ch4Canvas');
+    const ch1Renderer = new Renderer('ch1Canvas', {
+        onResize: () => { drawChapter1Widget(); }
+    });
+    const ch2Renderer = new Renderer('ch2Canvas', {
+        onResize: () => { drawChapter2Widget(); }
+    });
+    const ch3Renderer = new Renderer('ch3Canvas', {
+        onResize: () => { drawChapter3Widget(); }
+    });
+    const ch4Renderer = new Renderer('ch4Canvas', {
+        onResize: () => { drawChapter4Widget(); }
+    });
     
     // Quiz and Simulator renderers
-    const quizRenderer = new Renderer('quizCanvas', { onResize: () => { store.notify(); } });
-    const simRenderer = new Renderer('simCanvas', { onResize: () => { store.notify(); } });
+    const quizRenderer = new Renderer('quizCanvas', {
+        onResize: () => { store.notify(); }
+    });
+    const simRenderer = new Renderer('simCanvas', {
+        onResize: () => { store.notify(); }
+    });
 
-    // ── 5. Coordinate Tooltip Explorer logic ──
+    // ── 5. Coordinate Tooltip Explorer logic (with Mobile Touch Support) ──
     const canvas = document.getElementById('mainCanvas');
     const tooltip = document.getElementById('canvasTooltip');
     
     if (canvas && tooltip) {
-        canvas.addEventListener('touchstart', (e) => {}, { passive: true });
-    canvas.addEventListener('touchmove', (e) => {}, { passive: true });
-    canvas.addEventListener('mousemove', (e) => {
+        const handleTooltipEvent = (e) => {
             const rect = canvas.getBoundingClientRect();
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
             const mouseX = clientX - rect.left;
             const mouseY = clientY - rect.top;
             if (!mainRenderer.isCanvasPointInPlot(mouseX, mouseY)) {
@@ -133,12 +154,17 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const labelX = dist.isDiscrete ? Math.round(mathX) : mathX.toFixed(3);
             tooltip.innerText = `X: ${labelX}\nY: ${prob.toFixed(4)}`;
-        });
+        };
 
-        canvas.addEventListener('touchend', () => { tooltip.classList.add('hidden'); });
-    canvas.addEventListener('mouseleave', () => {
+        canvas.addEventListener('mousemove', handleTooltipEvent);
+        canvas.addEventListener('touchstart', handleTooltipEvent, { passive: true });
+        canvas.addEventListener('touchmove', handleTooltipEvent, { passive: true });
+
+        const hideTooltip = () => {
             tooltip.classList.add('hidden');
-        });
+        };
+        canvas.addEventListener('mouseleave', hideTooltip);
+        canvas.addEventListener('touchend', hideTooltip);
     }
 
     // ── 6. View Entry Animations ──
@@ -190,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Plot PDF or CDF curve
         const ctx = ch1Renderer.ctx;
+        if (!ctx) return;
         const { padding } = ch1Renderer.options;
         const plotW = ch1Renderer.width - 2 * padding;
         const plotH = ch1Renderer.height - 2 * padding;
@@ -251,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ch2Readout').innerText = `λ = n × p = ${lmb.toFixed(2)}`;
 
         const ctx = ch2Renderer.ctx;
+        if (!ctx) return;
         const { padding } = ch2Renderer.options;
         const plotW = ch2Renderer.width - 2 * padding;
         const plotH = ch2Renderer.height - 2 * padding;
@@ -322,6 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ch3Readout').innerText = `Z = (X - ${mu.toFixed(1)}) / ${sig.toFixed(1)}`;
 
         const ctx = ch3Renderer.ctx;
+        if (!ctx) return;
         const { padding } = ch3Renderer.options;
         const plotW = ch3Renderer.width - 2 * padding;
         const plotH = ch3Renderer.height - 2 * padding;
@@ -420,15 +449,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSimBatch = document.getElementById('btnSimulateBatch');
     const btnSimLarge = document.getElementById('btnSimulateLarge');
 
+    let currentSimRunId = 0; // Increment on every new simulation start or clear
+
+    const disableSimControls = (disabled) => {
+        const btnOne = document.getElementById('btnSimulateOne');
+        const btnBatch = document.getElementById('btnSimulateBatch');
+        const btnLarge = document.getElementById('btnSimulateLarge');
+        const select = document.getElementById('simDistSelect');
+        const sizeInput = document.getElementById('simSampleSize');
+        const clearBtn = document.getElementById('btnClearSim');
+        
+        [btnOne, btnBatch, btnLarge, select, sizeInput, clearBtn].forEach(el => {
+            if (el) el.disabled = disabled;
+        });
+        
+        // Also disable sliders in sidebar
+        const sliders = document.querySelectorAll('#simParams input');
+        sliders.forEach(slider => {
+            slider.disabled = disabled;
+        });
+    };
+
     const runSimulationBatch = (count) => {
+        if (store.state.simulator.isRunning) return;
+        
         const sim = store.state.simulator;
         const dist = DISTRIBUTIONS[sim.dist];
         const n = sim.sampleSize;
 
+        currentSimRunId++;
+        const runId = currentSimRunId;
+
         let step = 0;
         const addSampleMeanStep = () => {
+            // Abort if context changed or reset
+            if (runId !== currentSimRunId || store.state.currentView !== 'simulator') {
+                store.state.simulator.isRunning = false;
+                disableSimControls(false);
+                store.notify();
+                return;
+            }
+
             if (step >= count) {
                 store.state.simulator.isRunning = false;
+                disableSimControls(false);
                 store.notify();
                 return;
             }
@@ -443,25 +507,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
             step++;
             
-            // Stagger animation rendering steps only for small batches
-            if (count <= 10) {
-                setTimeout(addSampleMeanStep, 80);
-            } else if (step % 20 === 0 || step === count) {
-                // Batch updates
+            // Stagger animations based on size
+            if (count <= 1) {
+                store.state.simulator.isRunning = false;
+                disableSimControls(false);
                 store.notify();
+            } else if (count <= 100) {
+                if (step % 5 === 0 || step === count) {
+                    store.notify();
+                }
                 requestAnimationFrame(addSampleMeanStep);
             } else {
-                addSampleMeanStep();
+                if (step % 50 === 0 || step === count) {
+                    store.notify();
+                }
+                requestAnimationFrame(addSampleMeanStep);
             }
         };
 
         store.state.simulator.isRunning = true;
+        disableSimControls(true);
         addSampleMeanStep();
     };
 
     if (btnSimOne) btnSimOne.addEventListener('click', () => runSimulationBatch(1));
     if (btnSimBatch) btnSimBatch.addEventListener('click', () => runSimulationBatch(100));
     if (btnSimLarge) btnSimLarge.addEventListener('click', () => runSimulationBatch(1000));
+
+    const clearBtn = document.getElementById('btnClearSim');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            currentSimRunId++; // Interrupts active simulation loops
+            store.state.simulator.isRunning = false;
+            disableSimControls(false);
+            store.clearSim();
+        });
+    }
 
     // ── 9. Store Subscription rendering updates ──
     let lastView = null;
@@ -492,6 +573,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const readout = document.getElementById('brutalReadout');
                 if (readout) readout.innerText = `A: ${dist.name} vs B: ${compareDistB.name}`;
+
+                // Update Legend
+                const legend = document.getElementById('mainCompareLegend');
+                if (legend) {
+                    legend.classList.remove('hidden');
+                    document.getElementById('legendModelAText').innerText = `A: ${dist.name}`;
+                    document.getElementById('legendModelBText').innerText = `B: ${compareDistB.name}`;
+                }
             } else {
                 const res = mainRenderer.plotDistribution(dist, state.params, false, false, state.zoom);
                 mainRenderer.drawAxes(res.xMin, res.xMax, res.maxY);
@@ -500,10 +589,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const variance = dist.variance(state.params);
                 const readout = document.getElementById('brutalReadout');
                 if (readout) {
-                    const formattedMean = isNaN(mean) ? 'NaN' : mean.toFixed(3);
-                    const formattedVar = isNaN(variance) ? 'NaN' : variance.toFixed(3);
-                    readout.innerText = `μ = ${formattedMean}  σ² = ${formattedVar}`;
+                    const formatVal = (v) => {
+                        if (isNaN(v)) return 'NaN';
+                        if (!Number.isFinite(v)) return v > 0 ? '∞' : '-∞';
+                        return v.toFixed(3);
+                    };
+                    readout.innerText = `μ = ${formatVal(mean)}  σ² = ${formatVal(variance)}`;
                 }
+
+                const legend = document.getElementById('mainCompareLegend');
+                if (legend) legend.classList.add('hidden');
             }
         }
 
@@ -530,15 +625,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const s1 = document.getElementById('compare1Stats');
             const s2 = document.getElementById('compare2Stats');
+            const formatVal = (v) => {
+                if (isNaN(v)) return 'NaN';
+                if (!Number.isFinite(v)) return v > 0 ? '∞' : '-∞';
+                return v.toFixed(2);
+            };
             if (s1) {
                 const m = d1.mean(state.compare.params1);
                 const v = d1.variance(state.compare.params1);
-                s1.innerHTML = `μ = ${isNaN(m) ? 'NaN' : m.toFixed(2)}<br>σ² = ${isNaN(v) ? 'NaN' : v.toFixed(2)}`;
+                s1.innerHTML = `μ = ${formatVal(m)}<br>σ² = ${formatVal(v)}`;
             }
             if (s2) {
                 const m = d2.mean(state.compare.params2);
                 const v = d2.variance(state.compare.params2);
-                s2.innerHTML = `μ = ${isNaN(m) ? 'NaN' : m.toFixed(2)}<br>σ² = ${isNaN(v) ? 'NaN' : v.toFixed(2)}`;
+                s2.innerHTML = `μ = ${formatVal(m)}<br>σ² = ${formatVal(v)}`;
             }
         }
 
@@ -618,10 +718,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 obsSe = Math.sqrt(sqDiffSum / (sim.results.length || 1));
             }
 
-            document.getElementById('simTheoryMean').innerText = isNaN(theoryMean) ? 'NaN' : theoryMean.toFixed(3);
-            document.getElementById('simObsMean').innerText = obsMean === 0 ? '0.000' : obsMean.toFixed(3);
-            document.getElementById('simTheorySe').innerText = isNaN(theorySe) ? 'NaN' : theorySe.toFixed(3);
-            document.getElementById('simObsSe').innerText = obsSe === 0 ? '0.000' : obsSe.toFixed(3);
+            const formatVal = (v) => {
+                if (isNaN(v)) return 'NaN';
+                if (!Number.isFinite(v)) return v > 0 ? '∞' : '-∞';
+                return v.toFixed(3);
+            };
+
+            document.getElementById('simTheoryMean').innerText = formatVal(theoryMean);
+            document.getElementById('simObsMean').innerText = obsMean === 0 ? '0.000' : formatVal(obsMean);
+            document.getElementById('simTheorySe').innerText = formatVal(theorySe);
+            document.getElementById('simObsSe').innerText = obsSe === 0 ? '0.000' : formatVal(obsSe);
 
             // Plot sample histograms
             // Target scaling boundaries for sampling distributions
@@ -634,22 +740,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const cltParams = { mu: theoryMean, sigma: theorySe };
             
             const ctx = simRenderer.ctx;
-            const { padding } = simRenderer.options;
-            const plotW = simRenderer.width - 2 * padding;
-            const plotH = simRenderer.height - 2 * padding;
+            if (ctx) {
+                const { padding } = simRenderer.options;
+                const plotW = simRenderer.width - 2 * padding;
+                const plotH = simRenderer.height - 2 * padding;
 
-            const toX = (v) => padding + ((v - xMin) / (xMax - xMin)) * plotW;
-            const toY = (v) => simRenderer.height - padding - (v / plotYMax) * plotH;
+                const toX = (v) => padding + ((v - xMin) / (xMax - xMin)) * plotW;
+                const toY = (v) => simRenderer.height - padding - (v / plotYMax) * plotH;
 
-            ctx.strokeStyle = '#ff3366';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            for (let i = 0; i <= 100; i++) {
-                const x = xMin + (i / 100) * (xMax - xMin);
-                const y = norm.pdf(x, cltParams);
-                i === 0 ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
+                ctx.strokeStyle = '#ff3366';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                for (let i = 0; i <= 100; i++) {
+                    const x = xMin + (i / 100) * (xMax - xMin);
+                    const y = norm.pdf(x, cltParams);
+                    i === 0 ? ctx.moveTo(toX(x), toY(y)) : ctx.lineTo(toX(x), toY(y));
+                }
+                ctx.stroke();
             }
-            ctx.stroke();
 
             simRenderer.drawAxes(xMin, xMax, plotYMax);
         }
@@ -658,27 +766,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (lastView !== state.currentView) {
             animateView(state.currentView);
             lastView = state.currentView;
+
+            // Interrupt any active CLT simulation loop if view switched
+            if (state.currentView !== 'simulator') {
+                currentSimRunId++;
+                if (store.state.simulator.isRunning) {
+                    store.state.simulator.isRunning = false;
+                    disableSimControls(false);
+                }
+            }
         }
     });
 
-    // ── 10. Window Resize Observer ──
-    window.addEventListener('resize', () => {
-        mainRenderer.resize();
-        compareRenderer.resize();
-        ch1Renderer.resize();
-        ch2Renderer.resize();
-        ch3Renderer.resize();
-        ch4Renderer.resize();
-        quizRenderer.resize();
-        simRenderer.resize();
-        store.notify();
-    });
+    // ── 10. Standalone Comparison View Zoom Binding ──
+    const compareZoomIn = document.getElementById('btnCompareZoomIn');
+    const compareZoomOut = document.getElementById('btnCompareZoomOut');
+    if (compareZoomIn) compareZoomIn.addEventListener('click', () => store.adjustZoom(0.1));
+    if (compareZoomOut) compareZoomOut.addEventListener('click', () => store.adjustZoom(-0.1));
 
     // ── 11. Initial boot ──
     const hash = window.location.hash.substring(1) || 'home';
     store.switchView(hash);
     lastView = hash;
 });
-// Standalone compare zoom listeners outline
-const compareZoomIn = document.getElementById('btnCompareZoomIn');
-if (compareZoomIn) compareZoomIn.addEventListener('click', () => store.adjustZoom(0.1));
