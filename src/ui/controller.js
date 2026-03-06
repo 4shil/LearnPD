@@ -250,6 +250,7 @@ export class UI {
     }
 
     updateView(viewId) {
+        const activeLink = Array.from(document.querySelectorAll('.dock__link')).find(l => (l.dataset.view || l.getAttribute('href').substring(1)) === viewId);
         document.querySelectorAll('.view').forEach(v => {
             v.classList.toggle('active', v.id === viewId);
         });
