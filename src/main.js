@@ -133,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tooltip.innerText = `X: ${labelX}\nY: ${prob.toFixed(4)}`;
         });
 
-        canvas.addEventListener('mouseleave', () => {
+        canvas.addEventListener('touchend', () => { tooltip.classList.add('hidden'); });
+    canvas.addEventListener('mouseleave', () => {
             tooltip.classList.add('hidden');
         });
     }
