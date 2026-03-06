@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (canvas && tooltip) {
         canvas.addEventListener('touchstart', (e) => {}, { passive: true });
+    canvas.addEventListener('touchmove', (e) => {}, { passive: true });
     canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
