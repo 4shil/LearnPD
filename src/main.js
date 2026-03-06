@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("-----------------------------------------");
 
     // ── 4. Setup Renderers ──
-    const mainRenderer = new Renderer('mainCanvas');
+    const mainRenderer = new Renderer('mainCanvas', { onResize: () => { store.notify(); } });
     const compareRenderer = new Renderer('compareCanvas');
     
     // Curriculum pane canvas renderers
