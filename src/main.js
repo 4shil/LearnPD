@@ -674,3 +674,5 @@ document.addEventListener('DOMContentLoaded', () => {
     store.switchView(hash);
     lastView = hash;
 });
+// Standalone compare zoom listeners outline
+const compareZoomIn = document.getElementById('btnCompareZoomIn');
