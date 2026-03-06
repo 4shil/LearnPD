@@ -676,3 +676,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 // Standalone compare zoom listeners outline
 const compareZoomIn = document.getElementById('btnCompareZoomIn');
+if (compareZoomIn) compareZoomIn.addEventListener('click', () => store.adjustZoom(0.1));
