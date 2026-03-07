@@ -478,6 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // runSimulationBatch handles running the CLT simulator batch asynchronously
+    // log simulation batch count if debug mode is active
     const runSimulationBatch = (count) => {
         if (store.state.simulator.isRunning) return;
         
