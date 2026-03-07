@@ -420,11 +420,6 @@ export class UI {
     }
 
     calculate() {
-        const formatCalcVal = (v) => {
-            if (isNaN(v)) return 'NaN';
-            if (!Number.isFinite(v)) return v > 0 ? '∞' : '-∞';
-            return v.toFixed(6);
-        };
         const distId = document.getElementById('calcDistSelect').value;
         const dist = DISTRIBUTIONS[distId];
         const calcType = document.querySelector('input[name="calcType"]:checked')?.value;

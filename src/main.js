@@ -470,15 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const disableSimControls = (disabled) => {
-        const btnOne = document.getElementById('btnSimulateOne');
-        const btnBatch = document.getElementById('btnSimulateBatch');
-        const btnLarge = document.getElementById('btnSimulateLarge');
-        [btnOne, btnBatch, btnLarge].forEach(b => { if (b) b.disabled = disabled; });
-    };
-
-    // runSimulationBatch handles running the CLT simulator batch asynchronously
-    // log simulation batch count if debug mode is active
     const runSimulationBatch = (count) => {
         if (store.state.simulator.isRunning) return;
         
@@ -489,8 +480,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSimRunId++;
         const runId = currentSimRunId;
 
-        currentSimRunId++;
-        const runId = currentSimRunId;
         let step = 0;
         const addSampleMeanStep = () => {
             // Abort if context changed or reset
@@ -501,16 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (store.state.currentView !== 'simulator') {
-                store.state.simulator.isRunning = false;
-                disableSimControls(false);
-                return;
-            }
-            if (sim.results.length === 0 && step > 0) {
-                store.state.simulator.isRunning = false;
-                disableSimControls(false);
-                return;
-            }
             if (step >= count) {
                 store.state.simulator.isRunning = false;
                 disableSimControls(false);
