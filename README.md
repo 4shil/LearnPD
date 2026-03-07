@@ -41,3 +41,8 @@ Perfect for:
 - Probability theory demonstrations
 - Self-study and intuition building
 - Teaching distribution properties
+
+
+## Production Stability Upgrades (March 2026)
+- **ResizeObserver Canvas Scaling:** Canvases now automatically resize dynamically on element show/hide transitions.
+- **Robust Calculations:** Poisson and Binomial calculations are performed in log-space to handle large numbers.
