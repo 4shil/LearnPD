@@ -757,12 +757,14 @@ export const DISTRIBUTIONS = {
         ],
         pdf: (x, p) => {
             if (x < 0) return 0;
+            if (p.scale <= 0) return NaN;
             const k = Math.max(1e-9, p.shape);
             const lam = Math.max(1e-9, p.scale);
             if (x === 0 && k < 1) return Infinity;
             return (k / lam) * Math.pow(x / lam, k - 1) * Math.exp(-Math.pow(x / lam, k));
         },
         cdf: (x, p) => {
+            if (p.scale <= 0) return NaN;
             const k = Math.max(1e-9, p.shape);
             const lam = Math.max(1e-9, p.scale);
             return (x < 0) ? 0 : 1 - Math.exp(-Math.pow(x / lam, k));
