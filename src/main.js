@@ -470,6 +470,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const disableSimControls = (disabled) => {
+        const btnOne = document.getElementById('btnSimulateOne');
+        const btnBatch = document.getElementById('btnSimulateBatch');
+        const btnLarge = document.getElementById('btnSimulateLarge');
+        [btnOne, btnBatch, btnLarge].forEach(b => { if (b) b.disabled = disabled; });
+    };
+
     const runSimulationBatch = (count) => {
         if (store.state.simulator.isRunning) return;
         
