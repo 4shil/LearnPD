@@ -504,6 +504,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 disableSimControls(false);
                 return;
             }
+            if (sim.results.length === 0 && step > 0) {
+                store.state.simulator.isRunning = false;
+                disableSimControls(false);
+                return;
+            }
             if (step >= count) {
                 store.state.simulator.isRunning = false;
                 disableSimControls(false);
