@@ -499,6 +499,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            if (store.state.currentView !== 'simulator') {
+                store.state.simulator.isRunning = false;
+                disableSimControls(false);
+                return;
+            }
             if (step >= count) {
                 store.state.simulator.isRunning = false;
                 disableSimControls(false);
