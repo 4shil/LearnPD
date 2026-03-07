@@ -477,6 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         [btnOne, btnBatch, btnLarge].forEach(b => { if (b) b.disabled = disabled; });
     };
 
+    // runSimulationBatch handles running the CLT simulator batch asynchronously
     const runSimulationBatch = (count) => {
         if (store.state.simulator.isRunning) return;
         
