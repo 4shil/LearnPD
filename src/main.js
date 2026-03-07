@@ -489,6 +489,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSimRunId++;
         const runId = currentSimRunId;
 
+        currentSimRunId++;
+        const runId = currentSimRunId;
         let step = 0;
         const addSampleMeanStep = () => {
             // Abort if context changed or reset
