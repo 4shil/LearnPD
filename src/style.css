@@ -47,6 +47,10 @@ body {
     cursor: none; /* Required for custom cursor */
 }
 
+a {
+    text-decoration: none;
+}
+
 a, button, select, input, textarea {
     cursor: none;
 }
