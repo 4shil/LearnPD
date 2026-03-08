@@ -804,6 +804,7 @@ input[type="range"]::-moz-range-thumb {
 
 .widget__display canvas {
     display: block;
+    position: absolute;
 }
 
 .readout-box {
