@@ -169,6 +169,7 @@ a, button, select, input, textarea {
 
 .dock__link {
     display: flex;
+    text-decoration: none;
     align-items: center;
     gap: 6px;
     padding: 10px 18px;
