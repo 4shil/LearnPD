@@ -378,3 +378,4 @@ export class Renderer {
 }
 
 // Validated dimensions caching logic
+// Cached dimensions are used in render loops
