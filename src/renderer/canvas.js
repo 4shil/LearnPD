@@ -49,6 +49,7 @@ export class Renderer {
     }
 
     resize() {
+        // aspect-ratio loop prevention checks
         if (!this.canvas || !this.ctx) return false;
         const parent = this.canvas.parentElement;
         const rect = parent?.getBoundingClientRect?.();
