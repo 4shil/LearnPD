@@ -30,6 +30,7 @@ export class Renderer {
     }
 
     setupResizeObserver() {
+        // monitor parent visibility changes
         if (typeof ResizeObserver !== 'undefined' && this.canvas && this.canvas.parentElement) {
             this.resizeObserver = new ResizeObserver(() => {
                 if (this.resize()) {
