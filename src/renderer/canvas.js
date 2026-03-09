@@ -376,3 +376,5 @@ export class Renderer {
         return this.xMin + relX * (this.xMax - this.xMin);
     }
 }
+
+// Validated dimensions caching logic
