@@ -62,6 +62,7 @@ export class Renderer {
             return false;
         }
 
+        // Only resize if the layout dimensions actually changed to prevent infinite loops
         if (this.width === width && this.height === height) {
             return false;
         }
