@@ -30,7 +30,6 @@ export class Renderer {
     }
 
     setupResizeObserver() {
-        // throttled execution checks
         if (typeof ResizeObserver !== 'undefined' && this.canvas && this.canvas.parentElement) {
             this.resizeObserver = new ResizeObserver(() => {
                 if (this.resize()) {
@@ -57,23 +56,14 @@ export class Renderer {
         const width = Math.max(1, Math.floor(rect?.width || 0));
         const height = Math.max(1, Math.floor(rect?.height || 0));
 
-        if (width <= 1 || height <= 1) {
-            return false;
-        }
-
-        if (this.width === width && this.height === height) {
-            return false;
-        }
-        if (!this.canvas || !this.ctx) return false;
-        const parent = this.canvas.parentElement;
-        const rect = parent?.getBoundingClientRect?.();
-        const dpr = window.devicePixelRatio || 1;
-        const width = Math.max(1, Math.floor(rect?.width || 0));
-        const height = Math.max(1, Math.floor(rect?.height || 0));
-
         // Skip resizing if parent size is essentially 0 (e.g. element is hidden)
         // to prevent collapsing the canvas permanently to 1x1.
         if (width <= 1 || height <= 1) {
+            return false;
+        }
+
+        // Only resize if the layout dimensions actually changed to prevent infinite loops
+        if (this.width === width && this.height === height) {
             return false;
         }
 
@@ -376,6 +366,3 @@ export class Renderer {
         return this.xMin + relX * (this.xMax - this.xMin);
     }
 }
-
-// Validated dimensions caching logic
-// Cached dimensions are used in render loops
