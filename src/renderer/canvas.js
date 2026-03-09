@@ -62,6 +62,10 @@ export class Renderer {
             return false;
         }
 
+        if (this.width === width && this.height === height) {
+            return false;
+        }
+
         this.canvas.width = Math.floor(width * dpr);
         this.canvas.height = Math.floor(height * dpr);
         this.canvas.style.width = `${width}px`;
