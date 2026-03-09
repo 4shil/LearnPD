@@ -127,5 +127,13 @@ describe('Renderer', () => {
     expect(result.points.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y))).toBe(true);
   });
 
-  it('avoids resizing if layout dimensions did not change', () => {});
+  it('avoids resizing if layout dimensions did not change', () => {
+    const { canvas } = installCanvas();
+    const renderer = new Renderer('chart');
+    renderer.width = 640;
+    renderer.height = 360;
+
+    const result = renderer.resize();
+    expect(result).toBe(false);
+  });
 });
