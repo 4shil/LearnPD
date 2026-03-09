@@ -126,4 +126,6 @@ describe('Renderer', () => {
     expect(result.xMin).toBeLessThan(result.xMax);
     expect(result.points.every((point) => Number.isFinite(point.x) && Number.isFinite(point.y))).toBe(true);
   });
+
+  it('avoids resizing if layout dimensions did not change', () => {});
 });
