@@ -49,7 +49,20 @@ export class Renderer {
     }
 
     resize() {
-        // height/width boundary checks to stop loop
+        if (!this.canvas || !this.ctx) return false;
+        const parent = this.canvas.parentElement;
+        const rect = parent?.getBoundingClientRect?.();
+        const dpr = window.devicePixelRatio || 1;
+        const width = Math.max(1, Math.floor(rect?.width || 0));
+        const height = Math.max(1, Math.floor(rect?.height || 0));
+
+        if (width <= 1 || height <= 1) {
+            return false;
+        }
+
+        if (this.width === width && this.height === height) {
+            return false;
+        }
         if (!this.canvas || !this.ctx) return false;
         const parent = this.canvas.parentElement;
         const rect = parent?.getBoundingClientRect?.();
