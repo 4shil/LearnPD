@@ -5,9 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="LearnPD — Interactive probability distribution explorer. Visualize, compare, and calculate with 6 statistical models.">
-    <title>LearnPD — Probability Explorer</title>
-    <link rel="manifest" href="/manifest.json">
+        content="LearnPD — Interactive Probability & Statistics Learning Platform. Explore 14 distributions, solve interactive quizzes, and run sampling simulations.">
+    <title>LearnPD — Probability & Statistics Platform</title>
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 </head>
@@ -16,7 +15,12 @@
 
     <!-- Preloader -->
     <div class="preloader" id="preloader">
-        <span class="preloader__text">LearnPD</span>
+        <div class="preloader__content">
+            <span class="preloader__text">LearnPD</span>
+            <div class="preloader__bar">
+                <div class="preloader__progress"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Custom Cursor -->
@@ -29,6 +33,10 @@
             <span class="dock__icon">⌂</span>
             <span class="dock__label">Home</span>
         </a>
+        <a href="#chapters" class="dock__link" data-view="chapters">
+            <span class="dock__icon">📖</span>
+            <span class="dock__label">Chapters</span>
+        </a>
         <a href="#explorer" class="dock__link" data-view="explorer">
             <span class="dock__icon">◎</span>
             <span class="dock__label">Explorer</span>
@@ -37,9 +45,17 @@
             <span class="dock__icon">⊞</span>
             <span class="dock__label">Calc</span>
         </a>
-        <a href="#compare" class="dock__link" data-view="compare">
-            <span class="dock__icon">⇔</span>
-            <span class="dock__label">Compare</span>
+        <a href="#quiz" class="dock__link" data-view="quiz">
+            <span class="dock__icon">⚡</span>
+            <span class="dock__label">Quiz</span>
+        </a>
+        <a href="#simulator" class="dock__link" data-view="simulator">
+            <span class="dock__icon">⚙</span>
+            <span class="dock__label">Simulator</span>
+        </a>
+        <a href="#progress" class="dock__link" data-view="progress">
+            <span class="dock__icon">🏆</span>
+            <span class="dock__label">Progress</span>
         </a>
     </nav>
 
@@ -48,46 +64,273 @@
 
         <!-- HOME -->
         <section id="home" class="view active">
-            <div class="hero">
-                <p class="hero__eyebrow">Interactive Statistical Tool</p>
+            <div class="hero animate-in">
+                <p class="hero__eyebrow">Interactive Statistics Platform</p>
                 <h1 class="hero__title">
-                    <span class="hero__line">Probability</span>
-                    <span class="hero__line hero__line--accent">Distributions</span>
-                    <span class="hero__line">Explored.</span>
+                    <span class="hero__line">Master</span>
+                    <span class="hero__line hero__line--accent">Probability</span>
+                    <span class="hero__line">Visually.</span>
                 </h1>
-                <p class="hero__body">Visualize, manipulate, and understand 6 core probability models with real-time
-                    interactive charts and precise calculations.</p>
+                <p class="hero__body">Understand distributions, limit theorems, and sampling statistics through an interactive curriculum, real-time sandboxes, and visual quizzes.</p>
                 <div class="hero__actions">
-                    <button class="btn btn--primary" onclick="window.location.hash='#explorer'">Open Explorer</button>
-                    <button class="btn btn--ghost" onclick="window.location.hash='#calculator'">Calculator →</button>
+                    <button class="btn btn--primary" onclick="window.location.hash='#chapters'">Start Curriculum</button>
+                    <button class="btn btn--ghost" onclick="window.location.hash='#explorer'">Sandbox Explorer →</button>
                 </div>
             </div>
-            <div class="features">
+            <div class="features animate-in">
+                <div class="feature card">
+                    <span class="feature__icon">📖</span>
+                    <h3 class="feature__title">Guided Curriculum</h3>
+                    <p class="feature__body">4 chapters taking you from probability foundations to advanced continuous distributions and limit theorems.</p>
+                </div>
                 <div class="feature card">
                     <span class="feature__icon">◎</span>
-                    <h3 class="feature__title">6 Models</h3>
-                    <p class="feature__body">Normal, Uniform, Bernoulli, Binomial, Poisson, Exponential — continuous &
-                        discrete.</p>
+                    <h3 class="feature__title">14 Distributions</h3>
+                    <p class="feature__body">Interactive mathematical widgets for normal, uniform, geometric, gamma, beta, log-normal, Student's T, and more.</p>
                 </div>
                 <div class="feature card">
                     <span class="feature__icon">⚡</span>
-                    <h3 class="feature__title">Real-Time</h3>
-                    <p class="feature__body">Instant visual feedback. Drag sliders and watch distributions reshape live.
-                    </p>
+                    <h3 class="feature__title">Quiz Engine</h3>
+                    <p class="feature__body">Test your knowledge with multiple choice, calculation problems, and parameter curve-matching challenges.</p>
                 </div>
                 <div class="feature card">
-                    <span class="feature__icon">⊞</span>
-                    <h3 class="feature__title">Calculate</h3>
-                    <p class="feature__body">PDF, CDF, interval probabilities — precise values at your fingertips.</p>
+                    <span class="feature__icon">⚙</span>
+                    <h3 class="feature__title">Sampling Simulator</h3>
+                    <p class="feature__body">Run real-time animated sampling distributions to prove the Law of Large Numbers and Central Limit Theorem.</p>
                 </div>
             </div>
         </section>
 
-        <!-- EXPLORER -->
+        <!-- CHAPTERS (CURRICULUM) -->
+        <section id="chapters" class="view">
+            <div class="chapters-layout">
+                <aside class="chapters-sidebar card">
+                    <h2 class="sidebar__title">Curriculum</h2>
+                    <ul class="chapters-list">
+                        <li class="chapter-item active" data-chapter="1">
+                            <span class="chapter-num">01</span>
+                            <span class="chapter-name">Probability Foundations</span>
+                        </li>
+                        <li class="chapter-item" data-chapter="2">
+                            <span class="chapter-num">02</span>
+                            <span class="chapter-name">Discrete Models</span>
+                        </li>
+                        <li class="chapter-item" data-chapter="3">
+                            <span class="chapter-num">03</span>
+                            <span class="chapter-name">Continuous Models</span>
+                        </li>
+                        <li class="chapter-item" data-chapter="4">
+                            <span class="chapter-num">04</span>
+                            <span class="chapter-name">Sampling & CLT</span>
+                        </li>
+                    </ul>
+                </aside>
+                
+                <div class="chapter-content card">
+                    <!-- Chapter 1 -->
+                    <div class="chapter-pane active" id="pane-chapter-1">
+                        <div class="chapter-header">
+                            <span class="chapter-tag">Chapter 1</span>
+                            <h2 class="chapter-title">Foundations of Probability</h2>
+                        </div>
+                        <div class="chapter-body">
+                            <p>A <strong>Random Variable</strong> is a variable whose values are outcomes of a random process. They are categorized as either discrete or continuous. To describe how probabilities are distributed, we use function mappings:</p>
+                            <ul>
+                                <li><strong>Probability Density Function (PDF)</strong> f(x) for continuous variables, describing the density of probability at any point (area under the curve represents probability).</li>
+                                <li><strong>Probability Mass Function (PMF)</strong> P(X = x) for discrete variables, giving the exact probability of specific outcomes.</li>
+                                <li><strong>Cumulative Distribution Function (CDF)</strong> F(x) = P(X ≤ x), representing the accumulated probability up to value x.</li>
+                            </ul>
+                            <p>The core bridge between PDF and CDF is calculus: the PDF is the derivative of the CDF, i.e., <em>f(x) = dF(x)/dx</em>.</p>
+                            
+                            <div class="widget card">
+                                <h3 class="widget__title">Interactive Widget: PDF vs CDF</h3>
+                                <p class="widget__description">Toggle between PDF and CDF for a standard Normal Distribution to see how the slope of the CDF equals the height of the PDF at any point.</p>
+                                <div class="widget__controls">
+                                    <div class="btn-group">
+                                        <button class="btn btn--small btn--primary" id="btnPdfToggle">View PDF</button>
+                                        <button class="btn btn--small btn--ghost" id="btnCdfToggle">View CDF</button>
+                                    </div>
+                                    <div class="slider-container">
+                                        <label>X coordinate: <span id="ch1XVal">0.00</span></label>
+                                        <input type="range" id="ch1Slider" min="-3" max="3" step="0.05" value="0">
+                                    </div>
+                                </div>
+                                <div class="widget__display">
+                                    <canvas id="ch1Canvas" height="200" style="width: 100%; height: 200px;"></canvas>
+                                    <div id="ch1Readout" class="readout-box">PDF f(0.00) = 0.399</div>
+                                </div>
+                            </div>
+                            
+                            <h3>Expected Value and Variance</h3>
+                            <p>The <strong>Expected Value (Mean, μ)</strong> represents the long-term average outcome of a random variable. The <strong>Variance (σ²)</strong> measures the spread or dispersion of the distribution around its expected value.</p>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="practice-box card">
+                                <h4 class="practice__title">Practice Checkpoint</h4>
+                                <p>If a continuous random variable has a CDF of F(x) = x²/4 for 0 ≤ x ≤ 2, what is the value of the PDF f(x) at x = 1?</p>
+                                <div class="practice__options">
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">A) 0.25</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="true">B) 0.50</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">C) 1.00</button>
+                                </div>
+                                <p class="practice__feedback hidden"></p>
+                            </div>
+                            <button class="btn btn--primary next-chapter-btn" data-next="2">Next Chapter: Discrete Models →</button>
+                        </div>
+                    </div>
+
+                    <!-- Chapter 2 -->
+                    <div class="chapter-pane" id="pane-chapter-2">
+                        <div class="chapter-header">
+                            <span class="chapter-tag">Chapter 2</span>
+                            <h2 class="chapter-title">Discrete Probability Models</h2>
+                        </div>
+                        <div class="chapter-body">
+                            <p>Discrete distributions apply to scenarios with countable outcomes. Here are the 5 core models:</p>
+                            <ol>
+                                <li><strong>Bernoulli:</strong> A single trial with success probability <em>p</em>.</li>
+                                <li><strong>Binomial:</strong> Count of successes in <em>n</em> independent Bernoulli trials.</li>
+                                <li><strong>Poisson:</strong> Number of events in a fixed time/space interval under constant rate <em>λ</em>.</li>
+                                <li><strong>Geometric:</strong> Number of failures before the first success.</li>
+                                <li><strong>Hypergeometric:</strong> Successes in draws <em>without replacement</em> from a finite population.</li>
+                            </ol>
+
+                            <div class="widget card">
+                                <h3 class="widget__title">Interactive Widget: Binomial to Poisson Convergence</h3>
+                                <p class="widget__description">As trials <em>n</em> become large and probability <em>p</em> becomes small, the Binomial distribution converges to a Poisson distribution with <em>λ = n × p</em>.</p>
+                                <div class="widget__controls">
+                                    <div class="slider-container">
+                                        <label>Number of Trials (n): <span id="ch2NVal">20</span></label>
+                                        <input type="range" id="ch2SliderN" min="5" max="100" step="1" value="20">
+                                    </div>
+                                    <div class="slider-container">
+                                        <label>Probability (p): <span id="ch2PVal">0.25</span></label>
+                                        <input type="range" id="ch2SliderP" min="0.01" max="0.99" step="0.01" value="0.25">
+                                    </div>
+                                </div>
+                                <div class="widget__display">
+                                    <canvas id="ch2Canvas" height="200" style="width: 100%; height: 200px;"></canvas>
+                                    <div id="ch2Readout" class="readout-box">λ = 5.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="practice-box card">
+                                <h4 class="practice__title">Practice Checkpoint</h4>
+                                <p>You flip a biased coin with success probability p = 0.1 until you get heads. What distribution models the number of tails you throw before heads?</p>
+                                <div class="practice__options">
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">A) Bernoulli</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">B) Poisson</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="true">C) Geometric</button>
+                                </div>
+                                <p class="practice__feedback hidden"></p>
+                            </div>
+                            <button class="btn btn--primary next-chapter-btn" data-next="3">Next Chapter: Continuous Models →</button>
+                        </div>
+                    </div>
+
+                    <!-- Chapter 3 -->
+                    <div class="chapter-pane" id="pane-chapter-3">
+                        <div class="chapter-header">
+                            <span class="chapter-tag">Chapter 3</span>
+                            <h2 class="chapter-title">Continuous Probability Models</h2>
+                        </div>
+                        <div class="chapter-body">
+                            <p>Continuous models describe variables that can take any value in an interval. Standard distributions include:</p>
+                            <ul>
+                                <li><strong>Uniform:</strong> Flat probability across [a, b].</li>
+                                <li><strong>Normal:</strong> Symmetric bell curve representing central averages.</li>
+                                <li><strong>Exponential:</strong> Models memoryless waiting times between events.</li>
+                                <li><strong>Gamma & Beta:</strong> Highly flexible shape-parameter families. Beta is defined on [0, 1].</li>
+                                <li><strong>Chi-Square:</strong> Distribution of sum of squared normal variables.</li>
+                                <li><strong>Log-Normal:</strong> Skewed variable whose log is normally distributed.</li>
+                                <li><strong>Student's T:</strong> Symmetric bell curve with fat tails for small sample sizes.</li>
+                                <li><strong>Weibull:</strong> Widely used for failure rates and material lifetime analysis.</li>
+                            </ul>
+
+                            <div class="widget card">
+                                <h3 class="widget__title">Interactive Widget: Standardizing a Normal Distribution</h3>
+                                <p class="widget__description">Move sliders to see how shifting the mean <em>μ</em> and standard deviation <em>σ</em> stretches/squeezes the curve. Standardizing transforms any variable X into Z = (X - μ) / σ which matches the standard normal distribution N(0,1) highlighted in dotted red.</p>
+                                <div class="widget__controls">
+                                    <div class="slider-container">
+                                        <label>Mean (μ): <span id="ch3MuVal">2.0</span></label>
+                                        <input type="range" id="ch3SliderMu" min="-5" max="5" step="0.1" value="2.0">
+                                    </div>
+                                    <div class="slider-container">
+                                        <label>Std Dev (σ): <span id="ch3SigmaVal">1.5</span></label>
+                                        <input type="range" id="ch3SliderSigma" min="0.2" max="3.0" step="0.1" value="1.5">
+                                    </div>
+                                </div>
+                                <div class="widget__display">
+                                    <canvas id="ch3Canvas" height="200" style="width: 100%; height: 200px;"></canvas>
+                                    <div id="ch3Readout" class="readout-box">Z = (X - 2.0) / 1.5</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="practice-box card">
+                                <h4 class="practice__title">Practice Checkpoint</h4>
+                                <p>Which distribution is famously "memoryless," meaning the probability of an event occurring in the future is independent of how much time has already passed?</p>
+                                <div class="practice__options">
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">A) Normal</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="true">B) Exponential</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">C) Beta</button>
+                                </div>
+                                <p class="practice__feedback hidden"></p>
+                            </div>
+                            <button class="btn btn--primary next-chapter-btn" data-next="4">Next Chapter: Limit Theorems →</button>
+                        </div>
+                    </div>
+
+                    <!-- Chapter 4 -->
+                    <div class="chapter-pane" id="pane-chapter-4">
+                        <div class="chapter-header">
+                            <span class="chapter-tag">Chapter 4</span>
+                            <h2 class="chapter-title">Sampling & Limit Theorems</h2>
+                        </div>
+                        <div class="chapter-body">
+                            <p>Limit theorems form the bedrock of statistical inference, explaining what happens when we draw many samples:</p>
+                            <ul>
+                                <li><strong>Law of Large Numbers (LLN):</strong> As the number of trials increases, the sample average converges to the theoretical expected value (μ).</li>
+                                <li><strong>Central Limit Theorem (CLT):</strong> Regardless of the shape of the underlying distribution, the distribution of the sample mean converges to a Normal Distribution as the sample size (n) becomes large (typically n ≥ 30).</li>
+                            </ul>
+
+                            <div class="widget card">
+                                <h3 class="widget__title">Interactive Widget: LLN Coin Toss Convergence</h3>
+                                <p class="widget__description">Simulate coin flips dynamically to watch the running proportion of heads converge to the theoretical expected value of 0.50 (dotted line).</p>
+                                <div class="widget__controls">
+                                    <button class="btn btn--small btn--primary" id="btnRunLln">Flip 100 Times</button>
+                                    <button class="btn btn--small btn--ghost" id="btnClearLln">Clear</button>
+                                    <span id="llnStats" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: bold; margin-left: auto;">Total Flips: 0 | Heads: 0 (0.0%)</span>
+                                </div>
+                                <div class="widget__display">
+                                    <canvas id="ch4Canvas" height="200" style="width: 100%; height: 200px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chapter-footer">
+                            <div class="practice-box card">
+                                <h4 class="practice__title">Practice Checkpoint</h4>
+                                <p>If you sample from a highly skewed exponential distribution, what shape will the distribution of the sample means take if your sample size is n = 100?</p>
+                                <div class="practice__options">
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">A) Exponential</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="true">B) Normal (Gaussian)</button>
+                                    <button class="btn btn--small btn--ghost practice-btn" data-correct="false">C) Uniform</button>
+                                </div>
+                                <p class="practice__feedback hidden"></p>
+                            </div>
+                            <button class="btn btn--primary" onclick="window.location.hash='#quiz'">Go to Quiz Center →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPLORER (SANDBOX) -->
         <section id="explorer" class="view">
             <div class="explorer">
                 <aside class="explorer__sidebar card">
-                    <h2 class="sidebar__title">Explorer</h2>
+                    <h2 class="sidebar__title">Sandbox</h2>
                     <div class="control-group">
                         <label class="control__label">Distribution</label>
                         <select id="distSelect" class="control__select">
@@ -97,21 +340,49 @@
                             <option value="binomial">Binomial</option>
                             <option value="poisson">Poisson</option>
                             <option value="exponential">Exponential</option>
+                            <option value="geometric">Geometric</option>
+                            <option value="hypergeometric">Hypergeometric</option>
+                            <option value="gamma">Gamma</option>
+                            <option value="beta">Beta</option>
+                            <option value="chisquare">Chi-Square</option>
+                            <option value="lognormal">Log-Normal</option>
+                            <option value="studentt">Student's T</option>
+                            <option value="weibull">Weibull</option>
                         </select>
                     </div>
+                    
                     <div id="paramSliders" class="sliders-list"></div>
+                    
                     <div class="sidebar__actions">
-                        <button class="btn btn--small btn--ghost math-toggle">Show Formula</button>
-                        <div id="formulaBox" class="formula-box hidden"></div>
-                        <button class="btn btn--small btn--ghost"
-                            onclick="store.initDistParams(store.state.currentDist); store.notify();">Reset</button>
+                        <div class="btn-group-vertical">
+                            <button class="btn btn--small btn--ghost math-toggle">Show Formula</button>
+                            <div id="formulaBox" class="formula-box hidden"></div>
+                            <button class="btn btn--small btn--ghost" id="btnResetParams">Reset</button>
+                            <button class="btn btn--small btn--ghost" id="btnExportCsv">Export CSV</button>
+                            <button class="btn btn--small btn--ghost" id="btnDownloadChart">Download PNG</button>
+                        </div>
                     </div>
                 </aside>
+                
                 <div class="explorer__main">
                     <div class="chart-container card card--flush">
                         <canvas id="mainCanvas"></canvas>
                         <div id="brutalReadout" class="chart__readout"></div>
+                        <div class="zoom-controls">
+                            <button class="btn btn--small btn--ghost zoom-btn" id="btnZoomIn">+</button>
+                            <button class="btn btn--small btn--ghost zoom-btn" id="btnZoomOut">-</button>
+                        </div>
+                        <div id="canvasTooltip" class="canvas-tooltip hidden"></div>
                     </div>
+                    
+                    <!-- Compare Overlay Checkbox -->
+                    <div class="card card--narrow compare-overlay-card">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="chkCompareOverlay">
+                            <span>Enable Split-Screen Comparison View</span>
+                        </label>
+                    </div>
+
                     <div class="info-row">
                         <div class="info-card card">
                             <h4 class="info-card__title">What</h4>
@@ -133,7 +404,7 @@
         <!-- CALCULATOR -->
         <section id="calculator" class="view">
             <div class="calc">
-                <h2 class="section-title">Calculator</h2>
+                <h2 class="section-title">Probability Calculator</h2>
                 <div class="calc__grid card">
                     <div class="calc__col">
                         <h3 class="calc__step">1 — Model</h3>
@@ -144,20 +415,28 @@
                             <option value="binomial">Binomial</option>
                             <option value="poisson">Poisson</option>
                             <option value="exponential">Exponential</option>
+                            <option value="geometric">Geometric</option>
+                            <option value="hypergeometric">Hypergeometric</option>
+                            <option value="gamma">Gamma</option>
+                            <option value="beta">Beta</option>
+                            <option value="chisquare">Chi-Square</option>
+                            <option value="lognormal">Log-Normal</option>
+                            <option value="studentt">Student's T</option>
+                            <option value="weibull">Weibull</option>
                         </select>
                         <div id="calcParams" class="calc__params"></div>
                     </div>
                     <div class="calc__col">
                         <h3 class="calc__step">2 — Operation</h3>
                         <div class="radio-group">
-                            <label class="radio"><input type="radio" name="calcType" value="pdf" checked><span>PDF /
-                                    PMF</span></label>
-                            <label class="radio"><input type="radio" name="calcType" value="cdf"><span>CDF P(X ≤
-                                    x)</span></label>
-                            <label class="radio"><input type="radio" name="calcType"
-                                    value="interval"><span>Interval</span></label>
+                            <label class="radio"><input type="radio" name="calcType" value="pdf" checked><span>PDF / PMF</span></label>
+                            <label class="radio"><input type="radio" name="calcType" value="cdf"><span>CDF P(X ≤ x)</span></label>
+                            <label class="radio"><input type="radio" name="calcType" value="interval"><span>Interval [a, b]</span></label>
                         </div>
-                        <div id="calcInputs" class="calc__params"></div>
+                        <div id="calcInputs" class="calc__params">
+                            <label>Value (x):</label>
+                            <input type="number" id="calcX" step="0.01" value="0">
+                        </div>
                         <button class="btn btn--primary btn-calc">Calculate</button>
                     </div>
                     <div class="calc__col">
@@ -168,10 +447,10 @@
             </div>
         </section>
 
-        <!-- COMPARE -->
+        <!-- COMPARE (SPLIT-SCREEN) -->
         <section id="compare" class="view">
             <div class="compare">
-                <h2 class="section-title">Compare</h2>
+                <h2 class="section-title">Double Distribution Comparison</h2>
                 <div class="compare__controls">
                     <div class="compare__side card">
                         <label class="control__label">Model A</label>
@@ -182,6 +461,14 @@
                             <option value="binomial">Binomial</option>
                             <option value="poisson">Poisson</option>
                             <option value="exponential">Exponential</option>
+                            <option value="geometric">Geometric</option>
+                            <option value="hypergeometric">Hypergeometric</option>
+                            <option value="gamma">Gamma</option>
+                            <option value="beta">Beta</option>
+                            <option value="chisquare">Chi-Square</option>
+                            <option value="lognormal">Log-Normal</option>
+                            <option value="studentt">Student's T</option>
+                            <option value="weibull">Weibull</option>
                         </select>
                         <div id="compare1Params"></div>
                         <div id="compare1Stats" class="compare__stat"></div>
@@ -190,11 +477,19 @@
                         <label class="control__label">Model B</label>
                         <select id="compare2Select" class="control__select">
                             <option value="normal">Normal</option>
-                            <option value="binomial" selected>Binomial</option>
                             <option value="uniform">Uniform</option>
                             <option value="bernoulli">Bernoulli</option>
+                            <option value="binomial" selected>Binomial</option>
                             <option value="poisson">Poisson</option>
                             <option value="exponential">Exponential</option>
+                            <option value="geometric">Geometric</option>
+                            <option value="hypergeometric">Hypergeometric</option>
+                            <option value="gamma">Gamma</option>
+                            <option value="beta">Beta</option>
+                            <option value="chisquare">Chi-Square</option>
+                            <option value="lognormal">Log-Normal</option>
+                            <option value="studentt">Student's T</option>
+                            <option value="weibull">Weibull</option>
                         </select>
                         <div id="compare2Params"></div>
                         <div id="compare2Stats" class="compare__stat"></div>
@@ -207,6 +502,221 @@
                         <span class="legend legend--b">● Model B</span>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- QUIZ CENTER -->
+        <section id="quiz" class="view">
+            <div class="quiz-container">
+                <div class="quiz-sidebar card">
+                    <h2 class="sidebar__title">Quiz Center</h2>
+                    <p class="quiz-desc">Test your understanding of probability distributions. Complete all 5 challenges to earn your certificate.</p>
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" id="quizProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="quiz-stats-sidebar">
+                        <div>Question: <span id="quizCurrentNum">1/5</span></div>
+                        <div>Score: <span id="quizScore">0/0</span></div>
+                    </div>
+                    <button class="btn btn--primary" id="btnStartQuiz" style="width: 100%; margin-top: 1rem;">Reset / Start Quiz</button>
+                </div>
+                
+                <div class="quiz-main-area">
+                    <!-- Question Card -->
+                    <div class="card quiz-card hidden" id="quizCard">
+                        <div class="quiz-card-header">
+                            <span class="quiz-card-qtype" id="quizQType">Multiple Choice</span>
+                            <span class="quiz-card-qnum" id="quizQIndex">Q1</span>
+                        </div>
+                        <h3 class="quiz-question" id="quizQuestionText">What is the mean of a binomial distribution with n=20, p=0.5?</h3>
+                        
+                        <!-- Answers (for MC) -->
+                        <div class="quiz-options-list" id="quizOptionsList">
+                            <button class="quiz-option-btn card">A) 5</button>
+                            <button class="quiz-option-btn card">B) 10</button>
+                            <button class="quiz-option-btn card card--selected">C) 15</button>
+                            <button class="quiz-option-btn card">D) 20</button>
+                        </div>
+                        
+                        <!-- Interactive Canvas (for curve matching) -->
+                        <div class="quiz-matching-area hidden" id="quizMatchingArea">
+                            <p class="matching-desc">Slide the parameter controls below so that your active curve (solid line) matches the target distribution curve (dotted red line).</p>
+                            <div class="chart-container card card--flush" style="height: 300px;">
+                                <canvas id="quizCanvas"></canvas>
+                                <div id="quizMatchReadout" class="chart__readout">Match: 0%</div>
+                            </div>
+                            <div class="quiz-matching-sliders" id="quizMatchingSliders">
+                                <!-- Dynamically populated range sliders -->
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-card-footer">
+                            <button class="btn btn--primary" id="btnSubmitAnswer">Submit Answer</button>
+                            <button class="btn btn--ghost hidden" id="btnNextQuestion">Next Question →</button>
+                        </div>
+                        <div class="quiz-feedback-box hidden" id="quizFeedbackBox">
+                            <div class="feedback-status status--correct">CORRECT!</div>
+                            <p class="feedback-text">The expected value of a binomial variable is simply n × p = 20 × 0.5 = 10.</p>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Intro/Welcome -->
+                    <div class="card quiz-welcome-card" id="quizWelcomeCard">
+                        <span class="feature__icon">⚡</span>
+                        <h2 class="welcome-title">Ready for the Challenge?</h2>
+                        <p class="welcome-body">This quiz consists of 5 questions including conceptual choices, formula calculations, and interactive curve parameter-matching puzzles. Complete the quiz with 100% accuracy to log it in your progress tracker.</p>
+                        <button class="btn btn--primary" id="btnStartQuizBig">Start Quiz</button>
+                    </div>
+
+                    <!-- Quiz Score Screen -->
+                    <div class="card quiz-score-card hidden" id="quizScoreCard">
+                        <span class="feature__icon">🏆</span>
+                        <h2 class="score-title" id="quizScoreTitle">Quiz Completed!</h2>
+                        <p class="score-body" id="quizScoreBody">You scored 5 out of 5! That is a perfect score. You have unlocked the Probability Master badge.</p>
+                        <button class="btn btn--primary" onclick="window.location.hash='#progress'">View Dashboard</button>
+                        <button class="btn btn--ghost" id="btnRestartQuiz">Retake Quiz</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SAMPLING SIMULATOR -->
+        <section id="simulator" class="view">
+            <div class="simulator-layout">
+                <aside class="simulator-sidebar card">
+                    <h2 class="sidebar__title">Simulator</h2>
+                    <div class="control-group">
+                        <label class="control__label">Source Model</label>
+                        <select id="simDistSelect" class="control__select">
+                            <option value="normal">Normal (Gaussian)</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="exponential">Exponential</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="binomial">Binomial</option>
+                            <option value="geometric">Geometric</option>
+                        </select>
+                    </div>
+                    <div id="simParams" class="sim-params-list"></div>
+                    <div class="control-group" style="margin-top: 1rem;">
+                        <label class="control__label">Sample Size (n)</label>
+                        <input type="number" id="simSampleSize" class="control__select" min="2" max="1000" value="30" style="padding: 10px 14px; width:100%; box-shadow: 3px 3px 0 var(--border);">
+                    </div>
+                    <div class="sidebar__actions" style="margin-top: 1rem;">
+                        <button class="btn btn--primary" id="btnSimulateOne">Draw 1 Sample Mean</button>
+                        <button class="btn btn--primary" id="btnSimulateBatch">Draw 100 Means</button>
+                        <button class="btn btn--primary" id="btnSimulateLarge">Draw 1000 Means</button>
+                        <button class="btn btn--ghost" id="btnClearSim">Clear Simulation</button>
+                    </div>
+                </aside>
+                
+                <div class="simulator-main">
+                    <div class="chart-container card card--flush">
+                        <canvas id="simCanvas"></canvas>
+                        <div id="simReadout" class="chart__readout">Samples: 0</div>
+                        <div class="sim-legend">
+                            <span class="legend" style="color: var(--accent);">● Sample Means (CLT Histogram)</span>
+                            <span class="legend" style="color: #ff3366;">● Theoretical Normal Approx</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-comparison card">
+                        <h3 class="stats-comp-title">Convergence Statistics (CLT Proof)</h3>
+                        <div class="stats-comp-grid">
+                            <div class="stats-comp-cell">
+                                <span class="comp-label">Theoretical Mean (μ)</span>
+                                <span class="comp-value" id="simTheoryMean">0.00</span>
+                            </div>
+                            <div class="stats-comp-cell">
+                                <span class="comp-label">Observed Sample Mean (x̄)</span>
+                                <span class="comp-value" id="simObsMean">0.00</span>
+                            </div>
+                            <div class="stats-comp-cell">
+                                <span class="comp-label">Theoretical SE (σ / √n)</span>
+                                <span class="comp-value" id="simTheorySe">0.00</span>
+                            </div>
+                            <div class="stats-comp-cell">
+                                <span class="comp-label">Observed Std Error (s)</span>
+                                <span class="comp-value" id="simObsSe">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROGRESS DASHBOARD -->
+        <section id="progress" class="view">
+            <h2 class="section-title">Course Progress Dashboard</h2>
+            <div class="progress-grid">
+                <div class="card progress-overview">
+                    <h3 class="dashboard-card-title">Overall Progress</h3>
+                    <div class="progress-dial-container">
+                        <div class="progress-dial">
+                            <span class="progress-percentage" id="dashTotalPercent">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress-stats-summary">
+                        <div class="progress-sum-item">
+                            <span class="sum-label">Chapters Read</span>
+                            <span class="sum-val" id="dashChaptersRead">0/4</span>
+                        </div>
+                        <div class="progress-sum-item">
+                            <span class="sum-label">Practice Questions Completed</span>
+                            <span class="sum-val" id="dashCheckpointsDone">0/4</span>
+                        </div>
+                        <div class="progress-sum-item">
+                            <span class="sum-label">Quiz Highscore</span>
+                            <span class="sum-val" id="dashQuizScore">0/5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card progress-badges">
+                    <h3 class="dashboard-card-title">Unlocked Badges</h3>
+                    <div class="badges-list">
+                        <div class="badge-item locked" id="badgeFoundations">
+                            <span class="badge-icon">📖</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Foundations Explorer</span>
+                                <span class="badge-desc">Complete Chapter 1 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeDiscrete">
+                            <span class="badge-icon">⊞</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Discrete Specialist</span>
+                                <span class="badge-desc">Complete Chapter 2 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeContinuous">
+                            <span class="badge-icon">◎</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Continuous Specialist</span>
+                                <span class="badge-desc">Complete Chapter 3 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeSimulator">
+                            <span class="badge-icon">⚙</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Limit Prover</span>
+                                <span class="badge-desc">Complete Chapter 4 and checkpoint.</span>
+                            </div>
+                        </div>
+                        <div class="badge-item locked" id="badgeMaster">
+                            <span class="badge-icon">👑</span>
+                            <div class="badge-info">
+                                <span class="badge-name">Probability Master</span>
+                                <span class="badge-desc">Score 5/5 in the final exam.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card clear-data-card" style="margin-top: 2rem;">
+                <h3 class="dashboard-card-title">Profile Settings</h3>
+                <p>Reset your progress and quiz high scores to start learning from scratch.</p>
+                <button class="btn btn--primary" id="btnResetProgress" style="margin-top: 1rem; background-color: #ff3366; color: white;">Reset All Progress</button>
             </div>
         </section>
 

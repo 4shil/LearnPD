@@ -1,6 +1,7 @@
 /**
- * Canvas Renderer — Clean, instant plotting.
- * No GSAP in the render path. High-DPI aware.
+ * Canvas Renderer — Clean, responsive plotting.
+ * Supports high-DPI scaling, grids, distributions, relative frequency histograms,
+ * quiz targets, and line paths for LLN simulations.
  */
 
 export class Renderer {
@@ -16,6 +17,12 @@ export class Renderer {
             lineWidth: 2.5,
             ...options
         };
+        
+        // Cache rendering coordinates for tooltip mapping
+        this.xMin = -5;
+        this.xMax = 5;
+        this.maxY = 1.0;
+        
         this.resize();
     }
 
@@ -38,7 +45,7 @@ export class Renderer {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
-    drawGrid() {
+    drawGrid(zoom = 1.0) {
         if (!this.ctx) return;
         const { padding, grid } = this.options;
         this.ctx.strokeStyle = grid;
@@ -64,33 +71,69 @@ export class Renderer {
         }
     }
 
-    drawAxes() {
+    drawAxes(xMinVal = null, xMaxVal = null, yMaxVal = null) {
         if (!this.ctx) return;
         const { padding, fg } = this.options;
         this.ctx.strokeStyle = fg;
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 2.5;
         this.ctx.beginPath();
-        this.ctx.moveTo(padding, padding);
+        this.ctx.moveTo(padding, padding - 10);
         this.ctx.lineTo(padding, this.height - padding);
-        this.ctx.lineTo(this.width - padding, this.height - padding);
+        this.ctx.lineTo(this.width - padding + 10, this.height - padding);
         this.ctx.stroke();
+
+        // Draw axis labels if bounds are provided
+        if (xMinVal !== null && xMaxVal !== null) {
+            this.ctx.fillStyle = fg;
+            this.ctx.font = "bold 9px 'JetBrains Mono', monospace";
+            this.ctx.textAlign = "center";
+            this.ctx.textBaseline = "top";
+            
+            // X Ticks
+            const steps = 5;
+            for (let i = 0; i <= steps; i++) {
+                const val = xMinVal + (i / steps) * (xMaxVal - xMinVal);
+                const cx = padding + (i / steps) * (this.width - 2 * padding);
+                this.ctx.fillText(val.toFixed(1), cx, this.height - padding + 8);
+            }
+            
+            // Y Ticks
+            if (yMaxVal !== null) {
+                this.ctx.textAlign = "right";
+                this.ctx.textBaseline = "middle";
+                const ySteps = 4;
+                for (let i = 0; i <= ySteps; i++) {
+                    const val = (i / ySteps) * yMaxVal;
+                    const cy = this.height - padding - (i / ySteps) * (this.height - 2 * padding);
+                    this.ctx.fillText(val.toFixed(2), padding - 8, cy);
+                }
+            }
+        }
     }
 
-    plotDistribution(dist, params, isCompare = false) {
+    plotDistribution(dist, params, isCompare = false, isTarget = false, zoom = 1.0) {
         if (!this.ctx) return;
-        const { padding, accent, fg } = this.options;
+        const { padding, fg } = this.options;
+        let accent = isCompare ? (this.options.accent || '#FF3E00') : '#c8f542';
+        if (isTarget) accent = '#ff3366'; // Highlight target curves in red
+
         const plotWidth = this.width - 2 * padding;
         const plotHeight = this.height - 2 * padding;
 
-        let xMin = dist.range.min;
-        let xMax = dist.range.max;
+        // Apply zoom adjustments to base boundaries
+        let xMin = dist.range.min * zoom;
+        let xMax = dist.range.max * zoom;
 
         if (dist.autoScaleX && dist.isDiscrete) {
             const mean = dist.mean(params);
-            const std = Math.sqrt(dist.variance(params));
-            xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std));
-            xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std));
+            const std = Math.sqrt(dist.variance(params)) || 1e-3;
+            xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std)) * zoom;
+            xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std)) * zoom;
         }
+
+        // Cache coordinates for coordinate tooltip mapping
+        this.xMin = xMin;
+        this.xMax = xMax;
 
         let points = [];
         let maxY = 0.001;
@@ -112,37 +155,50 @@ export class Renderer {
         }
 
         if (dist.fixedY) maxY = dist.fixedY;
-        else if (dist.autoScaleY) maxY *= 1.2;
+        else if (dist.autoScaleY) maxY *= 1.25;
         else maxY = 1.0;
+
+        this.maxY = maxY;
 
         const toCanvasX = (val) => padding + ((val - xMin) / (xMax - xMin)) * plotWidth;
         const toCanvasY = (val) => this.height - padding - (val / maxY) * plotHeight;
 
         if (dist.isDiscrete) {
             const numBars = xMax - xMin + 1;
-            const barW = Math.min((plotWidth / numBars) * 0.7, 36);
+            const barW = Math.max(2, Math.min((plotWidth / numBars) * 0.7, 30));
 
             points.forEach(p => {
                 const cx = toCanvasX(p.x);
                 const cy = toCanvasY(p.y);
                 const h = (this.height - padding) - cy;
 
-                // Gradient bar
-                const grad = this.ctx.createLinearGradient(0, cy, 0, this.height - padding);
-                grad.addColorStop(0, isCompare ? accent : accent);
-                grad.addColorStop(1, isCompare ? accent + '44' : accent + '66');
+                if (isTarget) {
+                    // Render target as outline dotted bars
+                    this.ctx.strokeStyle = accent;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.setLineDash([4, 4]);
+                    this.ctx.beginPath();
+                    this.ctx.roundRect(cx - barW / 2, cy, barW, h, [3, 3, 0, 0]);
+                    this.ctx.stroke();
+                    this.ctx.setLineDash([]);
+                } else {
+                    const grad = this.ctx.createLinearGradient(0, cy, 0, this.height - padding);
+                    grad.addColorStop(0, accent);
+                    grad.addColorStop(1, accent + '22');
 
-                this.ctx.fillStyle = grad;
-                this.ctx.beginPath();
-                this.ctx.roundRect(cx - barW / 2, cy, barW, h, [4, 4, 0, 0]);
-                this.ctx.fill();
-                this.ctx.strokeStyle = fg;
-                this.ctx.lineWidth = 1.5;
-                this.ctx.stroke();
+                    this.ctx.fillStyle = grad;
+                    this.ctx.beginPath();
+                    this.ctx.roundRect(cx - barW / 2, cy, barW, h, [3, 3, 0, 0]);
+                    this.ctx.fill();
+                    
+                    this.ctx.strokeStyle = fg;
+                    this.ctx.lineWidth = 1.5;
+                    this.ctx.stroke();
+                }
             });
         } else {
-            // Area fill
-            if (!isCompare) {
+            // Continuous Area Fill (only for solid active curves, not compared or targets)
+            if (!isCompare && !isTarget) {
                 this.ctx.beginPath();
                 this.ctx.moveTo(toCanvasX(points[0].x), this.height - padding);
                 points.forEach(p => this.ctx.lineTo(toCanvasX(p.x), toCanvasY(p.y)));
@@ -150,25 +206,114 @@ export class Renderer {
                 this.ctx.closePath();
                 const grad = this.ctx.createLinearGradient(0, padding, 0, this.height - padding);
                 grad.addColorStop(0, accent + '55');
-                grad.addColorStop(1, accent + '08');
+                grad.addColorStop(1, accent + '04');
                 this.ctx.fillStyle = grad;
                 this.ctx.fill();
             }
 
-            // Line
+            // Outline Curve
             this.ctx.beginPath();
             points.forEach((p, i) => {
                 const cx = toCanvasX(p.x);
                 const cy = toCanvasY(p.y);
                 i === 0 ? this.ctx.moveTo(cx, cy) : this.ctx.lineTo(cx, cy);
             });
-            this.ctx.strokeStyle = isCompare ? accent : fg;
-            this.ctx.lineWidth = isCompare ? 2.5 : 3;
+            
+            if (isTarget) {
+                this.ctx.strokeStyle = accent;
+                this.ctx.lineWidth = 2.5;
+                this.ctx.setLineDash([6, 4]);
+            } else {
+                this.ctx.strokeStyle = isCompare ? accent : fg;
+                this.ctx.lineWidth = 3;
+            }
             this.ctx.lineJoin = 'round';
             this.ctx.lineCap = 'round';
             this.ctx.stroke();
+            this.ctx.setLineDash([]);
         }
 
         return { xMin, xMax, maxY, points };
+    }
+
+    // --- Histogram for Sampling CLT Simulator ---
+    drawHistogram(samples, xMinVal, xMaxVal, yMaxVal) {
+        if (!this.ctx || !samples || samples.length === 0) return;
+        const { padding } = this.options;
+        const plotWidth = this.width - 2 * padding;
+        const plotHeight = this.height - 2 * padding;
+
+        // Count samples in bins
+        const binCount = 25;
+        const bins = new Array(binCount).fill(0);
+        
+        samples.forEach(s => {
+            let binIdx = Math.floor(((s - xMinVal) / (xMaxVal - xMinVal)) * binCount);
+            binIdx = Math.max(0, Math.min(binCount - 1, binIdx));
+            bins[binIdx]++;
+        });
+
+        const maxBinVal = Math.max(...bins) || 1;
+        const barW = plotWidth / binCount;
+
+        // Draw histogram bars in semi-transparent light green
+        bins.forEach((count, i) => {
+            const countDensity = count / (samples.length * (xMaxVal - xMinVal) / binCount); // Relative frequency density
+            
+            // Map height relative to yMaxVal
+            const h = (countDensity / yMaxVal) * plotHeight;
+            const cx = padding + i * barW;
+            const cy = this.height - padding - h;
+
+            this.ctx.fillStyle = 'rgba(200, 245, 66, 0.4)';
+            this.ctx.strokeStyle = '#1a1a1a';
+            this.ctx.lineWidth = 1;
+            
+            this.ctx.beginPath();
+            this.ctx.rect(cx, cy, barW - 1, h);
+            this.ctx.fill();
+            this.ctx.stroke();
+        });
+    }
+
+    // --- LLN Convergence Line Widget ---
+    drawLlnPath(data, targetValue) {
+        if (!this.ctx || data.length === 0) return;
+        const { padding, fg } = this.options;
+        const plotWidth = this.width - 2 * padding;
+        const plotHeight = this.height - 2 * padding;
+
+        const maxIt = data.length;
+        const toCanvasX = (idx) => padding + (idx / maxIt) * plotWidth;
+        const toCanvasY = (val) => this.height - padding - (val / 1.0) * plotHeight; // Normal proportion bounds [0, 1]
+
+        // Draw Target dotted line (0.50)
+        this.ctx.strokeStyle = 'rgba(26, 26, 26, 0.5)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.setLineDash([4, 4]);
+        this.ctx.beginPath();
+        this.ctx.moveTo(padding, toCanvasY(targetValue));
+        this.ctx.lineTo(this.width - padding, toCanvasY(targetValue));
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+
+        // Draw Running Average path
+        this.ctx.strokeStyle = fg;
+        this.ctx.lineWidth = 2.5;
+        this.ctx.beginPath();
+        data.forEach((val, idx) => {
+            const cx = toCanvasX(idx);
+            const cy = toCanvasY(val);
+            idx === 0 ? this.ctx.moveTo(cx, cy) : this.ctx.lineTo(cx, cy);
+        });
+        this.ctx.stroke();
+    }
+
+    // --- Tooltip coordinate conversion ---
+    canvasXToMathX(canvasX) {
+        const { padding } = this.options;
+        const plotW = this.width - 2 * padding;
+        const relX = (canvasX - padding) / plotW;
+        return this.xMin + relX * (this.xMax - this.xMin);
     }
 }
