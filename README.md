@@ -1,43 +1,80 @@
-# PROBABILITY DISTRIBUTION
+# LearnPD
 
-An interactive, visually-driven web application for exploring probability distributions.
+Interactive visualiser for probability distributions. Drag sliders, watch curves update in real time, see mean and variance change live.
 
-## Features
-- **6 Core Distributions:** Normal, Uniform, Bernoulli, Binomial, Poisson, Exponential
-- **Accurate Mathematics:** Implements correct PDF/PMF, CDF, mean, and variance calculations
-- **Interactive Sliders:** Real-time parameter manipulation with instant visual feedback
-- **Statistical Readouts:** Live display of mean, variance, and peak values
-- **Neo-Brutalist Design:** High-contrast, accessible interface with bold typography
+Live: [prob-brut.vercel.app](https://prob-brut.vercel.app)
 
-## Tech Stack
-- Vanilla HTML5
-- Vanilla CSS3
-- Vanilla JavaScript (Canvas API)
+![demo](https://media.giphy.com/media/PiQejEf31116URju4a/giphy.gif)
 
-## Distributions Included
+---
 
-### Continuous
-1. **Normal (Gaussian)** - Bell curve for natural phenomena
-2. **Uniform** - Equal probability across an interval
-3. **Exponential** - Time between events
+## What it does
 
-### Discrete
-4. **Bernoulli** - Single success/failure trial
-5. **Binomial** - Number of successes in n trials
-6. **Poisson** - Count of rare events
+Turns abstract probability math into something you can interact with. Pick a distribution, adjust its parameters, and the canvas redraws instantly. Designed for students and developers who want to build intuition, not just memorise formulas.
 
-## Accuracy
-- Implements proper overflow handling for large factorials
-- Uses logarithmic combinations for large binomial coefficients
-- Includes Abramowitz-Stegun error function approximation for Normal CDF
-- Auto-scales axes based on distribution parameters for optimal viewing
+---
 
-## Deployment
-Live at: [https://prob-brut.vercel.app](https://prob-brut.vercel.app)
+## Distributions
 
-## Educational Use
-Perfect for:
-- Statistics courses
-- Probability theory demonstrations
-- Self-study and intuition building
-- Teaching distribution properties
+**Continuous**
+- Normal (Gaussian)
+- Uniform
+- Exponential
+
+**Discrete**
+- Bernoulli
+- Binomial
+- Poisson
+
+---
+
+## Stack
+
+Pure browser — no frameworks, no build step required.
+
+- HTML5
+- CSS3
+- Vanilla JavaScript + Canvas API
+
+Math accuracy notes:
+- Logarithmic combinations for large binomial coefficients (avoids factorial overflow)
+- Abramowitz-Stegun approximation for Normal CDF
+- Auto-scaling axes based on distribution parameters
+
+---
+
+## Getting started
+
+```bash
+git clone https://github.com/4shil/LearnPD.git
+cd LearnPD
+open index.html
+```
+
+Or just visit the live site.
+
+---
+
+## Project structure
+
+```
+src/
+  main.js           # App bootstrap
+  style.css
+  core/
+    state.js        # App state
+  math/
+    dist.js         # PDF, PMF, CDF implementations
+  renderer/
+    canvas.js       # Canvas drawing engine
+  ui/
+    controller.js   # Slider and event handlers
+public/
+  manifest.json     # PWA manifest
+```
+
+---
+
+## License
+
+MIT

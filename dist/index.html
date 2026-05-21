@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="LearnPD — Interactive probability distribution explorer. Visualize, compare, and calculate with 6 statistical models.">
+    <title>LearnPD — Probability Explorer</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <script type="module" crossorigin src="/assets/index-Cmqshji7.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CfNbjpyp.css">
+</head>
+
+<body>
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <span class="preloader__text">LearnPD</span>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor cursor--follower" id="cursorFollower"></div>
+
+    <!-- Navigation Dock -->
+    <nav class="dock" id="dock">
+        <a href="#home" class="dock__link active" data-view="home">
+            <span class="dock__icon">⌂</span>
+            <span class="dock__label">Home</span>
+        </a>
+        <a href="#explorer" class="dock__link" data-view="explorer">
+            <span class="dock__icon">◎</span>
+            <span class="dock__label">Explorer</span>
+        </a>
+        <a href="#calculator" class="dock__link" data-view="calculator">
+            <span class="dock__icon">⊞</span>
+            <span class="dock__label">Calc</span>
+        </a>
+        <a href="#compare" class="dock__link" data-view="compare">
+            <span class="dock__icon">⇔</span>
+            <span class="dock__label">Compare</span>
+        </a>
+    </nav>
+
+    <!-- Views -->
+    <main class="main">
+
+        <!-- HOME -->
+        <section id="home" class="view active">
+            <div class="hero">
+                <p class="hero__eyebrow">Interactive Statistical Tool</p>
+                <h1 class="hero__title">
+                    <span class="hero__line">Probability</span>
+                    <span class="hero__line hero__line--accent">Distributions</span>
+                    <span class="hero__line">Explored.</span>
+                </h1>
+                <p class="hero__body">Visualize, manipulate, and understand 6 core probability models with real-time
+                    interactive charts and precise calculations.</p>
+                <div class="hero__actions">
+                    <button class="btn btn--primary" onclick="window.location.hash='#explorer'">Open Explorer</button>
+                    <button class="btn btn--ghost" onclick="window.location.hash='#calculator'">Calculator →</button>
+                </div>
+            </div>
+            <div class="features">
+                <div class="feature card">
+                    <span class="feature__icon">◎</span>
+                    <h3 class="feature__title">6 Models</h3>
+                    <p class="feature__body">Normal, Uniform, Bernoulli, Binomial, Poisson, Exponential — continuous &
+                        discrete.</p>
+                </div>
+                <div class="feature card">
+                    <span class="feature__icon">⚡</span>
+                    <h3 class="feature__title">Real-Time</h3>
+                    <p class="feature__body">Instant visual feedback. Drag sliders and watch distributions reshape live.
+                    </p>
+                </div>
+                <div class="feature card">
+                    <span class="feature__icon">⊞</span>
+                    <h3 class="feature__title">Calculate</h3>
+                    <p class="feature__body">PDF, CDF, interval probabilities — precise values at your fingertips.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPLORER -->
+        <section id="explorer" class="view">
+            <div class="explorer">
+                <aside class="explorer__sidebar card">
+                    <h2 class="sidebar__title">Explorer</h2>
+                    <div class="control-group">
+                        <label class="control__label">Distribution</label>
+                        <select id="distSelect" class="control__select">
+                            <option value="normal">Normal (Gaussian)</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="binomial">Binomial</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
+                        </select>
+                    </div>
+                    <div id="paramSliders" class="sliders-list"></div>
+                    <div class="sidebar__actions">
+                        <button class="btn btn--small btn--ghost math-toggle">Show Formula</button>
+                        <div id="formulaBox" class="formula-box hidden"></div>
+                        <button class="btn btn--small btn--ghost"
+                            onclick="store.initDistParams(store.state.currentDist); store.notify();">Reset</button>
+                    </div>
+                </aside>
+                <div class="explorer__main">
+                    <div class="chart-container card card--flush">
+                        <canvas id="mainCanvas"></canvas>
+                        <div id="brutalReadout" class="chart__readout"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-card card">
+                            <h4 class="info-card__title">What</h4>
+                            <p id="whatText" class="info-card__body"></p>
+                        </div>
+                        <div class="info-card card">
+                            <h4 class="info-card__title">When</h4>
+                            <p id="whenText" class="info-card__body"></p>
+                        </div>
+                        <div class="info-card card">
+                            <h4 class="info-card__title">How</h4>
+                            <p id="mechanicsText" class="info-card__body"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALCULATOR -->
+        <section id="calculator" class="view">
+            <div class="calc">
+                <h2 class="section-title">Calculator</h2>
+                <div class="calc__grid card">
+                    <div class="calc__col">
+                        <h3 class="calc__step">1 — Model</h3>
+                        <select id="calcDistSelect" class="control__select">
+                            <option value="normal">Normal</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="binomial">Binomial</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
+                        </select>
+                        <div id="calcParams" class="calc__params"></div>
+                    </div>
+                    <div class="calc__col">
+                        <h3 class="calc__step">2 — Operation</h3>
+                        <div class="radio-group">
+                            <label class="radio"><input type="radio" name="calcType" value="pdf" checked><span>PDF /
+                                    PMF</span></label>
+                            <label class="radio"><input type="radio" name="calcType" value="cdf"><span>CDF P(X ≤
+                                    x)</span></label>
+                            <label class="radio"><input type="radio" name="calcType"
+                                    value="interval"><span>Interval</span></label>
+                        </div>
+                        <div id="calcInputs" class="calc__params"></div>
+                        <button class="btn btn--primary btn-calc">Calculate</button>
+                    </div>
+                    <div class="calc__col">
+                        <h3 class="calc__step">3 — Result</h3>
+                        <div id="calcResult" class="calc__result">—</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARE -->
+        <section id="compare" class="view">
+            <div class="compare">
+                <h2 class="section-title">Compare</h2>
+                <div class="compare__controls">
+                    <div class="compare__side card">
+                        <label class="control__label">Model A</label>
+                        <select id="compare1Select" class="control__select">
+                            <option value="normal">Normal</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="binomial">Binomial</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
+                        </select>
+                        <div id="compare1Params"></div>
+                        <div id="compare1Stats" class="compare__stat"></div>
+                    </div>
+                    <div class="compare__side card">
+                        <label class="control__label">Model B</label>
+                        <select id="compare2Select" class="control__select">
+                            <option value="normal">Normal</option>
+                            <option value="binomial" selected>Binomial</option>
+                            <option value="uniform">Uniform</option>
+                            <option value="bernoulli">Bernoulli</option>
+                            <option value="poisson">Poisson</option>
+                            <option value="exponential">Exponential</option>
+                        </select>
+                        <div id="compare2Params"></div>
+                        <div id="compare2Stats" class="compare__stat"></div>
+                    </div>
+                </div>
+                <div class="chart-container card card--flush">
+                    <canvas id="compareCanvas"></canvas>
+                    <div class="compare__legend">
+                        <span class="legend legend--a">● Model A</span>
+                        <span class="legend legend--b">● Model B</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+
+</html>
