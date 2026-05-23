@@ -131,14 +131,36 @@ a, button, select, input, textarea {
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--card);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: var(--border-w) solid var(--border);
     border-radius: var(--radius-pill);
     padding: 6px;
     display: flex;
     gap: 4px;
     z-index: 5000;
-    box-shadow: var(--shadow);
+    box-shadow: 6px 6px 0 var(--border);
+    transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.dock:hover {
+    box-shadow: 8px 8px 0 var(--border);
+}
+
+.dock__indicator {
+    position: absolute;
+    height: calc(100% - 12px);
+    top: 6px;
+    left: 6px;
+    background: var(--accent);
+    border: var(--border-w) solid var(--border);
+    border-radius: var(--radius-pill);
+    box-shadow: 2px 2px 0 var(--border);
+    z-index: 1;
+    transition: left 0.3s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s;
+    pointer-events: none;
+    opacity: 0;
 }
 
 .dock__link {
@@ -154,6 +176,8 @@ a, button, select, input, textarea {
     transition: all var(--dur) var(--ease);
     border: var(--border-w) solid transparent;
     user-select: none;
+    position: relative;
+    z-index: 2;
 }
 
 .dock__icon {
@@ -163,14 +187,10 @@ a, button, select, input, textarea {
 
 .dock__link:hover {
     color: var(--fg);
-    background: var(--bg);
 }
 
 .dock__link.active {
     color: var(--fg);
-    background: var(--accent);
-    border-color: var(--border);
-    box-shadow: 2px 2px 0 var(--border);
 }
 
 /* ── Main Layout ── */
@@ -499,6 +519,44 @@ input[type="range"]::-moz-range-thumb {
     height: 480px;
     margin-bottom: 2rem;
     background: var(--card);
+}
+
+.compare-overlay-legend {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    display: flex;
+    gap: 1rem;
+    background: var(--card);
+    border: var(--border-w) solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 2px 2px 0 var(--border);
+    z-index: 10;
+}
+
+.compare-overlay-legend .legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    margin-right: 4px;
+    align-self: center;
+}
+
+.compare-overlay-legend .model-a {
+    background-color: #c8f542;
+}
+
+.compare-overlay-legend .model-b {
+    background-color: #0066FF;
+}
+
+.compare-overlay-legend.hidden {
+    display: none !important;
 }
 
 .chart-container canvas {
@@ -1322,5 +1380,11 @@ input[type="range"]::-moz-range-thumb {
     
     .stats-comp-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 300px;
     }
 }

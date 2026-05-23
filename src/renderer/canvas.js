@@ -4,6 +4,8 @@
  * quiz targets, and line paths for LLN simulations.
  */
 
+import { computePlotDomain, computeYDomain } from './domain.js';
+
 export class Renderer {
     constructor(canvasId, options = {}) {
         this.canvas = document.getElementById(canvasId);
@@ -24,20 +26,64 @@ export class Renderer {
         this.maxY = 1.0;
         
         this.resize();
+        this.setupResizeObserver();
+    }
+
+    setupResizeObserver() {
+        if (typeof ResizeObserver !== 'undefined' && this.canvas && this.canvas.parentElement) {
+            this.resizeObserver = new ResizeObserver(() => {
+                if (this.resize()) {
+                    if (this.options.onResize) {
+                        this.options.onResize();
+                    }
+                }
+            });
+            this.resizeObserver.observe(this.canvas.parentElement);
+        }
+    }
+
+    destroy() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
     }
 
     resize() {
-        if (!this.canvas) return;
+        if (!this.canvas || !this.ctx) return false;
         const parent = this.canvas.parentElement;
-        const rect = parent.getBoundingClientRect();
+        const rect = parent?.getBoundingClientRect?.();
         const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = rect.width * dpr;
-        this.canvas.height = rect.height * dpr;
-        this.canvas.style.width = `${rect.width}px`;
-        this.canvas.style.height = `${rect.height}px`;
-        this.ctx.scale(dpr, dpr);
-        this.width = rect.width;
-        this.height = rect.height;
+        const width = Math.max(1, Math.floor(rect?.width || 0));
+        const height = Math.max(1, Math.floor(rect?.height || 0));
+
+        // Skip resizing if parent size is essentially 0 (e.g. element is hidden)
+        // to prevent collapsing the canvas permanently to 1x1.
+        if (width <= 1 || height <= 1) {
+            return false;
+        }
+
+        this.canvas.width = Math.floor(width * dpr);
+        this.canvas.height = Math.floor(height * dpr);
+        this.canvas.style.width = `${width}px`;
+        this.canvas.style.height = `${height}px`;
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.width = width;
+        this.height = height;
+
+        return true;
+    }
+
+    getPlotBounds() {
+        const padding = Math.min(this.options.padding, Math.max(8, Math.floor(Math.min(this.width, this.height) / 4)));
+        const plotWidth = this.width - 2 * padding;
+        const plotHeight = this.height - 2 * padding;
+
+        return {
+            padding,
+            plotWidth,
+            plotHeight,
+            drawable: Number.isFinite(plotWidth) && Number.isFinite(plotHeight) && plotWidth > 0 && plotHeight > 0
+        };
     }
 
     clear() {
@@ -111,25 +157,15 @@ export class Renderer {
         }
     }
 
-    plotDistribution(dist, params, isCompare = false, isTarget = false, zoom = 1.0) {
-        if (!this.ctx) return;
-        const { padding, fg } = this.options;
-        let accent = isCompare ? (this.options.accent || '#FF3E00') : '#c8f542';
+    plotDistribution(dist, params, isCompare = false, isTarget = false, zoom = 1.0, domainOverride = null) {
+        if (!this.ctx) return null;
+        const { fg } = this.options;
+        const { padding, plotWidth, plotHeight, drawable } = this.getPlotBounds();
+        if (!drawable) return null;
+        let accent = isCompare ? (this.options.accent || '#0066FF') : '#c8f542';
         if (isTarget) accent = '#ff3366'; // Highlight target curves in red
 
-        const plotWidth = this.width - 2 * padding;
-        const plotHeight = this.height - 2 * padding;
-
-        // Apply zoom adjustments to base boundaries
-        let xMin = dist.range.min * zoom;
-        let xMax = dist.range.max * zoom;
-
-        if (dist.autoScaleX && dist.isDiscrete) {
-            const mean = dist.mean(params);
-            const std = Math.sqrt(dist.variance(params)) || 1e-3;
-            xMin = Math.max(dist.range.min, Math.floor(mean - 4 * std)) * zoom;
-            xMax = Math.min(dist.range.max, Math.ceil(mean + 4 * std)) * zoom;
-        }
+        let { xMin, xMax } = domainOverride || computePlotDomain(dist, params, zoom);
 
         // Cache coordinates for coordinate tooltip mapping
         this.xMin = xMin;
@@ -141,6 +177,7 @@ export class Renderer {
         if (dist.isDiscrete) {
             for (let k = Math.floor(xMin); k <= Math.ceil(xMax); k++) {
                 const y = dist.pmf(k, params);
+                if (!Number.isFinite(y) || y < 0) continue;
                 if (y > maxY) maxY = y;
                 points.push({ x: k, y });
             }
@@ -149,14 +186,15 @@ export class Renderer {
             for (let i = 0; i <= steps; i++) {
                 const x = xMin + (i / steps) * (xMax - xMin);
                 const y = dist.pdf(x, params);
-                if (y > maxY && isFinite(y)) maxY = y;
+                if (!Number.isFinite(y) || y < 0) continue;
+                if (y > maxY) maxY = y;
                 points.push({ x, y });
             }
         }
 
-        if (dist.fixedY) maxY = dist.fixedY;
-        else if (dist.autoScaleY) maxY *= 1.25;
-        else maxY = 1.0;
+        if (points.length === 0) return null;
+
+        maxY = computeYDomain(dist, maxY);
 
         this.maxY = maxY;
 
@@ -310,10 +348,16 @@ export class Renderer {
     }
 
     // --- Tooltip coordinate conversion ---
+    isCanvasPointInPlot(canvasX, canvasY) {
+        const { padding, plotWidth, plotHeight, drawable } = this.getPlotBounds();
+        return drawable && canvasX >= padding && canvasX <= padding + plotWidth && canvasY >= padding && canvasY <= padding + plotHeight;
+    }
+
     canvasXToMathX(canvasX) {
-        const { padding } = this.options;
-        const plotW = this.width - 2 * padding;
-        const relX = (canvasX - padding) / plotW;
+        const { padding, plotWidth, drawable } = this.getPlotBounds();
+        if (!drawable || this.xMax === this.xMin) return this.xMin;
+        const clampedX = Math.max(padding, Math.min(padding + plotWidth, canvasX));
+        const relX = (clampedX - padding) / plotWidth;
         return this.xMin + relX * (this.xMax - this.xMin);
     }
 }

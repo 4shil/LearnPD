@@ -29,6 +29,7 @@
 
     <!-- Navigation Dock -->
     <nav class="dock" id="dock">
+        <div class="dock__indicator" id="dockIndicator"></div>
         <a href="#home" class="dock__link active" data-view="home">
             <span class="dock__icon">⌂</span>
             <span class="dock__label">Home</span>
@@ -372,6 +373,10 @@
                             <button class="btn btn--small btn--ghost zoom-btn" id="btnZoomIn">+</button>
                             <button class="btn btn--small btn--ghost zoom-btn" id="btnZoomOut">-</button>
                         </div>
+                        <div id="mainCompareLegend" class="compare-overlay-legend hidden">
+                            <span class="legend-dot model-a"></span> <span class="legend-text" id="legendModelAText">Model A</span>
+                            <span class="legend-dot model-b"></span> <span class="legend-text" id="legendModelBText">Model B</span>
+                        </div>
                         <div id="canvasTooltip" class="canvas-tooltip hidden"></div>
                     </div>
                     
@@ -497,6 +502,10 @@
                 </div>
                 <div class="chart-container card card--flush">
                     <canvas id="compareCanvas"></canvas>
+                    <div class="zoom-controls">
+                        <button class="btn btn--small btn--ghost zoom-btn" id="btnCompareZoomIn">+</button>
+                        <button class="btn btn--small btn--ghost zoom-btn" id="btnCompareZoomOut">-</button>
+                    </div>
                     <div class="compare__legend">
                         <span class="legend legend--a">● Model A</span>
                         <span class="legend legend--b">● Model B</span>
