@@ -47,6 +47,10 @@ body {
     cursor: none; /* Required for custom cursor */
 }
 
+a {
+    text-decoration: none;
+}
+
 a, button, select, input, textarea {
     cursor: none;
 }
@@ -173,6 +177,7 @@ a, button, select, input, textarea {
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--muted);
+    text-decoration: none;
     transition: all var(--dur) var(--ease);
     border: var(--border-w) solid transparent;
     user-select: none;
@@ -789,6 +794,7 @@ input[type="range"]::-moz-range-thumb {
 
 .widget__display {
     position: relative;
+    height: 200px;
     border: var(--border-w) solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--card);
@@ -797,6 +803,11 @@ input[type="range"]::-moz-range-thumb {
 
 .widget__display canvas {
     display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .readout-box {
